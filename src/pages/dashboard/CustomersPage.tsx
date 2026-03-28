@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, Pencil, Trash2, Eye, Search, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -20,9 +22,22 @@ export default function CustomersPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [sendDialogCustomer, setSendDialogCustomer] = useState<any>(null);
+  const [selectedTours, setSelectedTours] = useState<string[]>([]);
+  const [selectedDepartures, setSelectedDepartures] = useState<string[]>([]);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
 
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ["customers"], queryFn: async () => { const { data, error } = await supabase.from("customers").select("*").order("created_at", { ascending: false }); if (error) throw error; return data; },
+  });
+
+  const { data: tours = [] } = useQuery({
+    queryKey: ["all-tours"], queryFn: async () => { const { data, error } = await supabase.from("tours").select("id, title, destination, adult_price, currency, cover_image, slug").eq("is_active", true).order("title"); if (error) throw error; return data; },
+  });
+
+  const { data: departures = [] } = useQuery({
+    queryKey: ["all-departures"], queryFn: async () => { const { data, error } = await supabase.from("tour_departures").select("id, departure_date, return_date, total_seats, booked_seats, price_override, status, tours(title, destination, adult_price, currency)").eq("status", "open").order("departure_date"); if (error) throw error; return data; },
   });
 
   const save = useMutation({
@@ -42,10 +57,49 @@ export default function CustomersPage() {
     onError: (e) => toast.error(e.message),
   });
 
+  const sendEmail = useMutation({
+    mutationFn: async () => {
+      if (!sendDialogCustomer || !profile?.company_id) throw new Error("Missing data");
+      if (selectedTours.length === 0 && selectedDepartures.length === 0) throw new Error("Please select at least one tour or departure");
+      if (!sendDialogCustomer.email) throw new Error("Customer has no email address");
+
+      const { data, error } = await supabase.functions.invoke("send-customer-email", {
+        body: {
+          customer_id: sendDialogCustomer.id,
+          company_id: profile.company_id,
+          tour_ids: selectedTours.length > 0 ? selectedTours : undefined,
+          departure_ids: selectedDepartures.length > 0 ? selectedDepartures : undefined,
+          subject: emailSubject || undefined,
+          custom_message: emailMessage || undefined,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.message || "Email sent successfully!");
+      closeSendDialog();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
   const closeDialog = () => { setOpen(false); setEditId(null); setForm(emptyForm); };
   const openEdit = (c: any) => { setEditId(c.id); setForm({ full_name: c.full_name, email: c.email || "", phone: c.phone || "", nationality: c.nationality || "", passport_number: c.passport_number || "", date_of_birth: c.date_of_birth || "", notes: c.notes || "" }); setOpen(true); };
   const viewCustomer = customers.find(c => c.id === viewId);
   const filtered = customers.filter(c => c.full_name.toLowerCase().includes(search.toLowerCase()) || (c.email?.toLowerCase().includes(search.toLowerCase()) ?? false));
+
+  const openSendDialog = (c: any) => {
+    setSendDialogCustomer(c);
+    setSelectedTours([]);
+    setSelectedDepartures([]);
+    setEmailSubject("");
+    setEmailMessage("");
+  };
+  const closeSendDialog = () => { setSendDialogCustomer(null); setSelectedTours([]); setSelectedDepartures([]); };
+
+  const toggleTour = (id: string) => setSelectedTours(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
+  const toggleDeparture = (id: string) => setSelectedDepartures(prev => prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]);
 
   return (
     <div>
@@ -89,9 +143,10 @@ export default function CustomersPage() {
                 <TableCell className="hidden lg:table-cell text-muted-foreground">{c.nationality || "—"}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(c.id)}><Eye className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(c)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this customer?")) remove.mutate(c.id); }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(c.id)} title="View"><Eye className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(c)} title="Edit"><Pencil className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-primary" onClick={() => openSendDialog(c)} title="Send Tours" disabled={!c.email}><Send className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this customer?")) remove.mutate(c.id); }} title="Delete"><Trash2 className="h-3.5 w-3.5" /></Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -100,6 +155,7 @@ export default function CustomersPage() {
         </Table>
       </div>
 
+      {/* View Dialog */}
       <Dialog open={!!viewId} onOpenChange={() => setViewId(null)}>
         <DialogContent className="bg-card border-border">
           <DialogHeader><DialogTitle className="font-display">Customer Details</DialogTitle></DialogHeader>
@@ -116,6 +172,69 @@ export default function CustomersPage() {
               {viewCustomer.notes && <div><p className="text-muted-foreground">Notes</p><p className="text-foreground">{viewCustomer.notes}</p></div>}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Send Tours/Departures Dialog */}
+      <Dialog open={!!sendDialogCustomer} onOpenChange={() => closeSendDialog()}>
+        <DialogContent className="bg-card border-border max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display">Send Tours to {sendDialogCustomer?.full_name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Email Subject (optional)</Label>
+              <Input value={emailSubject} onChange={(e) => setEmailSubject(e.target.value)} placeholder="Exclusive Travel Offers..." className="mt-1" />
+            </div>
+            <div>
+              <Label>Custom Message (optional)</Label>
+              <textarea value={emailMessage} onChange={(e) => setEmailMessage(e.target.value)} rows={2} placeholder="We have curated some amazing travel experiences just for you..." className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+            </div>
+
+            <Tabs defaultValue="tours">
+              <TabsList className="w-full">
+                <TabsTrigger value="tours" className="flex-1">Tours ({tours.length})</TabsTrigger>
+                <TabsTrigger value="departures" className="flex-1">Fixed Departures ({departures.length})</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="tours" className="mt-3 max-h-60 overflow-y-auto space-y-2">
+                {tours.length === 0 ? <p className="text-muted-foreground text-sm py-4 text-center">No active tours</p> :
+                  tours.map((t) => (
+                    <label key={t.id} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/5 cursor-pointer transition-colors">
+                      <Checkbox checked={selectedTours.includes(t.id)} onCheckedChange={() => toggleTour(t.id)} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{t.title}</p>
+                        <p className="text-xs text-muted-foreground">📍 {t.destination || "Various"} · {t.currency} {Number(t.adult_price).toLocaleString()}</p>
+                      </div>
+                    </label>
+                  ))
+                }
+              </TabsContent>
+
+              <TabsContent value="departures" className="mt-3 max-h-60 overflow-y-auto space-y-2">
+                {departures.length === 0 ? <p className="text-muted-foreground text-sm py-4 text-center">No open departures</p> :
+                  departures.map((d: any) => (
+                    <label key={d.id} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/5 cursor-pointer transition-colors">
+                      <Checkbox checked={selectedDepartures.includes(d.id)} onCheckedChange={() => toggleDeparture(d.id)} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{d.tours?.title || "Tour"}</p>
+                        <p className="text-xs text-muted-foreground">📅 {new Date(d.departure_date).toLocaleDateString()} · {d.total_seats - d.booked_seats} seats left</p>
+                      </div>
+                    </label>
+                  ))
+                }
+              </TabsContent>
+            </Tabs>
+
+            <div className="flex items-center justify-between pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground">
+                {selectedTours.length + selectedDepartures.length} items selected
+              </p>
+              <Button variant="brand" onClick={() => sendEmail.mutate()} disabled={sendEmail.isPending || (selectedTours.length === 0 && selectedDepartures.length === 0)}>
+                {sendEmail.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><Send className="h-4 w-4" /> Send Email</>}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
