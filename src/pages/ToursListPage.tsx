@@ -1,12 +1,31 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { MapPin, Clock, ArrowRight, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+const normalizeText = (value?: string | null) =>
+  (value ?? "")
+    .toLowerCase()
+    .replace(/activities?/g, "")
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const matchesFilter = (source: string, filter: string) =>
+  !filter || source.includes(filter) || filter.includes(source);
+
 export default function ToursListPage() {
+  const [searchParams] = useSearchParams();
+
+  const destinationFilter = normalizeText(searchParams.get("destination"));
+  const categoryFilter = normalizeText(searchParams.get("category"));
+  const searchFilter = normalizeText(searchParams.get("search") ?? searchParams.get("q"));
+
   const { data: tours = [], isLoading } = useQuery({
     queryKey: ["public-tours"],
     queryFn: async () => {
@@ -19,6 +38,22 @@ export default function ToursListPage() {
       return data;
     },
   });
+
+  const filteredTours = useMemo(() => {
+    return tours.filter((tour) => {
+      const destination = normalizeText(tour.destination);
+      const category = normalizeText(tour.category);
+      const searchable = normalizeText(`${tour.title} ${tour.destination ?? ""} ${tour.category ?? ""} ${tour.description ?? ""}`);
+
+      if (!matchesFilter(destination, destinationFilter)) return false;
+      if (!matchesFilter(category, categoryFilter)) return false;
+      if (searchFilter && !searchable.includes(searchFilter)) return false;
+
+      return true;
+    });
+  }, [tours, destinationFilter, categoryFilter, searchFilter]);
+
+  const hasActiveFilters = Boolean(destinationFilter || categoryFilter || searchFilter);
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,17 +68,34 @@ export default function ToursListPage() {
       </div>
 
       <div className="container mx-auto px-4 py-12">
+        {hasActiveFilters && (
+          <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">Filtered results</span>
+            {destinationFilter && <Badge variant="outline">Destination: {searchParams.get("destination")}</Badge>}
+            {categoryFilter && <Badge variant="outline">Category: {searchParams.get("category")}</Badge>}
+            {searchFilter && <Badge variant="outline">Search: {searchParams.get("search") ?? searchParams.get("q")}</Badge>}
+            <Link to="/tours" className="text-primary font-semibold hover:underline ml-auto">
+              Clear filters
+            </Link>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="text-center py-16">
             <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto" />
           </div>
-        ) : tours.length === 0 ? (
+        ) : filteredTours.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
-            <p className="text-lg">No tours available yet. Check back soon!</p>
+            <p className="text-lg">No tours found for your selected filters.</p>
+            {hasActiveFilters && (
+              <Link to="/tours" className="inline-flex mt-3 text-primary font-semibold hover:underline">
+                View all tours
+              </Link>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tours.map((tour) => (
+            {filteredTours.map((tour) => (
               <Link
                 key={tour.id}
                 to={`/tours/${tour.slug}`}
