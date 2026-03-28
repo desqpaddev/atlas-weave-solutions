@@ -67,7 +67,7 @@ export function DestinationsSection() {
             {items.map((dest) => (
               <Link
                 key={dest.name + activeTab}
-                to={`/packages?destination=${encodeURIComponent(dest.name)}`}
+                to={`/tours/${dest.slug}`}
                 className="snap-start shrink-0 w-[220px] md:w-[260px] group"
               >
                 <div className="relative rounded-2xl overflow-hidden shadow-card">
