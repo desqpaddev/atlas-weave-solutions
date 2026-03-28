@@ -13,7 +13,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, MapPin, Clock, Plane, Hotel, Map, Car, Trash2, GripVertical, Edit } from "lucide-react";
+import { Plus, MapPin, Clock, Plane, Hotel, Map, Car, Trash2, GripVertical, Edit, Pencil, Eye } from "lucide-react";
 import { toast } from "sonner";
 import type { Json } from "@/integrations/supabase/types";
 
