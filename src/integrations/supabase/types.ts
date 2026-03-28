@@ -328,6 +328,95 @@ export type Database = {
           },
         ]
       }
+      packages: {
+        Row: {
+          base_price: number
+          company_id: string
+          cover_image: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          destination: string | null
+          duration_days: number
+          duration_nights: number
+          exclusions: string[] | null
+          highlights: string[] | null
+          id: string
+          images: string[] | null
+          includes_flight: boolean | null
+          includes_hotel: boolean | null
+          includes_tour: boolean | null
+          includes_transfer: boolean | null
+          inclusions: string[] | null
+          is_active: boolean | null
+          is_customizable: boolean | null
+          itinerary: Json | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          base_price?: number
+          company_id: string
+          cover_image?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          destination?: string | null
+          duration_days?: number
+          duration_nights?: number
+          exclusions?: string[] | null
+          highlights?: string[] | null
+          id?: string
+          images?: string[] | null
+          includes_flight?: boolean | null
+          includes_hotel?: boolean | null
+          includes_tour?: boolean | null
+          includes_transfer?: boolean | null
+          inclusions?: string[] | null
+          is_active?: boolean | null
+          is_customizable?: boolean | null
+          itinerary?: Json | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number
+          company_id?: string
+          cover_image?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          destination?: string | null
+          duration_days?: number
+          duration_nights?: number
+          exclusions?: string[] | null
+          highlights?: string[] | null
+          id?: string
+          images?: string[] | null
+          includes_flight?: boolean | null
+          includes_hotel?: boolean | null
+          includes_tour?: boolean | null
+          includes_transfer?: boolean | null
+          inclusions?: string[] | null
+          is_active?: boolean | null
+          is_customizable?: boolean | null
+          itinerary?: Json | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -412,6 +501,161 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_departures: {
+        Row: {
+          booked_seats: number
+          booking_cutoff_date: string | null
+          company_id: string
+          created_at: string
+          departure_date: string
+          id: string
+          notes: string | null
+          price_override: number | null
+          return_date: string | null
+          status: string
+          total_seats: number
+          tour_id: string
+          updated_at: string
+          waitlist_count: number
+        }
+        Insert: {
+          booked_seats?: number
+          booking_cutoff_date?: string | null
+          company_id: string
+          created_at?: string
+          departure_date: string
+          id?: string
+          notes?: string | null
+          price_override?: number | null
+          return_date?: string | null
+          status?: string
+          total_seats?: number
+          tour_id: string
+          updated_at?: string
+          waitlist_count?: number
+        }
+        Update: {
+          booked_seats?: number
+          booking_cutoff_date?: string | null
+          company_id?: string
+          created_at?: string
+          departure_date?: string
+          id?: string
+          notes?: string | null
+          price_override?: number | null
+          return_date?: string | null
+          status?: string
+          total_seats?: number
+          tour_id?: string
+          updated_at?: string
+          waitlist_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_departures_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_departures_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tours: {
+        Row: {
+          adult_price: number
+          category: string | null
+          child_price: number | null
+          company_id: string
+          cover_image: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          destination: string | null
+          difficulty: string | null
+          duration_days: number
+          duration_nights: number
+          exclusions: string[] | null
+          group_price: number | null
+          highlights: string[] | null
+          id: string
+          images: string[] | null
+          inclusions: string[] | null
+          is_active: boolean | null
+          itinerary: Json | null
+          max_group_size: number | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          adult_price?: number
+          category?: string | null
+          child_price?: number | null
+          company_id: string
+          cover_image?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          destination?: string | null
+          difficulty?: string | null
+          duration_days?: number
+          duration_nights?: number
+          exclusions?: string[] | null
+          group_price?: number | null
+          highlights?: string[] | null
+          id?: string
+          images?: string[] | null
+          inclusions?: string[] | null
+          is_active?: boolean | null
+          itinerary?: Json | null
+          max_group_size?: number | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          adult_price?: number
+          category?: string | null
+          child_price?: number | null
+          company_id?: string
+          cover_image?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          destination?: string | null
+          difficulty?: string | null
+          duration_days?: number
+          duration_nights?: number
+          exclusions?: string[] | null
+          group_price?: number | null
+          highlights?: string[] | null
+          id?: string
+          images?: string[] | null
+          inclusions?: string[] | null
+          is_active?: boolean | null
+          itinerary?: Json | null
+          max_group_size?: number | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tours_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
