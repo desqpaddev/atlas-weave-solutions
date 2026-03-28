@@ -13,13 +13,17 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, MapPin, Clock, Plane, Hotel, Map, Car } from "lucide-react";
+import { Plus, MapPin, Clock, Plane, Hotel, Map, Car, Trash2, GripVertical, Edit } from "lucide-react";
 import { toast } from "sonner";
+import type { Json } from "@/integrations/supabase/types";
+
+type ItineraryDay = { day: number; title: string; description: string; activities: string[] };
 
 export default function PackagesPage() {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [itineraryOpen, setItineraryOpen] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", destination: "", duration_days: 1, duration_nights: 0,
     base_price: 0, description: "",
@@ -75,10 +79,10 @@ export default function PackagesPage() {
 
   const IncludesIcons = ({ pkg }: { pkg: any }) => (
     <div className="flex gap-1.5">
-      {pkg.includes_flight && <Plane className="h-3.5 w-3.5 text-blue-400" />}
-      {pkg.includes_hotel && <Hotel className="h-3.5 w-3.5 text-purple-400" />}
-      {pkg.includes_tour && <Map className="h-3.5 w-3.5 text-green-400" />}
-      {pkg.includes_transfer && <Car className="h-3.5 w-3.5 text-yellow-400" />}
+      {pkg.includes_flight && <Plane className="h-3.5 w-3.5 text-primary" />}
+      {pkg.includes_hotel && <Hotel className="h-3.5 w-3.5 text-primary" />}
+      {pkg.includes_tour && <Map className="h-3.5 w-3.5 text-primary" />}
+      {pkg.includes_transfer && <Car className="h-3.5 w-3.5 text-primary" />}
     </div>
   );
 
@@ -100,37 +104,37 @@ export default function PackagesPage() {
             <div className="grid gap-4 py-2">
               <div className="grid gap-2">
                 <Label className="text-foreground">Title *</Label>
-                <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Bali Honeymoon Package" className="bg-secondary border-border" />
+                <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Bali Honeymoon Package" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-2">
                   <Label className="text-foreground">Destination</Label>
-                  <Input value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} placeholder="Bali, Indonesia" className="bg-secondary border-border" />
+                  <Input value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} placeholder="Bali, Indonesia" />
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-foreground">Base Price ($)</Label>
-                  <Input type="number" min={0} value={form.base_price} onChange={(e) => setForm({ ...form, base_price: Number(e.target.value) })} className="bg-secondary border-border" />
+                  <Input type="number" min={0} value={form.base_price} onChange={(e) => setForm({ ...form, base_price: Number(e.target.value) })} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-2">
                   <Label className="text-foreground">Days</Label>
-                  <Input type="number" min={1} value={form.duration_days} onChange={(e) => setForm({ ...form, duration_days: Number(e.target.value) })} className="bg-secondary border-border" />
+                  <Input type="number" min={1} value={form.duration_days} onChange={(e) => setForm({ ...form, duration_days: Number(e.target.value) })} />
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-foreground">Nights</Label>
-                  <Input type="number" min={0} value={form.duration_nights} onChange={(e) => setForm({ ...form, duration_nights: Number(e.target.value) })} className="bg-secondary border-border" />
+                  <Input type="number" min={0} value={form.duration_nights} onChange={(e) => setForm({ ...form, duration_nights: Number(e.target.value) })} />
                 </div>
               </div>
               <div>
                 <Label className="text-foreground mb-2 block">Includes</Label>
                 <div className="grid grid-cols-2 gap-3">
-                  {[
+                  {([
                     { key: "includes_flight" as const, label: "Flights", icon: Plane },
                     { key: "includes_hotel" as const, label: "Hotels", icon: Hotel },
                     { key: "includes_tour" as const, label: "Tours", icon: Map },
                     { key: "includes_transfer" as const, label: "Transfers", icon: Car },
-                  ].map(({ key, label, icon: Icon }) => (
+                  ]).map(({ key, label, icon: Icon }) => (
                     <label key={key} className="flex items-center gap-2 cursor-pointer text-sm text-foreground">
                       <Checkbox checked={form[key]} onCheckedChange={(c) => setForm({ ...form, [key]: !!c })} />
                       <Icon className="h-3.5 w-3.5 text-muted-foreground" /> {label}
@@ -140,15 +144,19 @@ export default function PackagesPage() {
               </div>
               <div className="grid gap-2">
                 <Label className="text-foreground">Description</Label>
-                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="flex w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
+                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground" />
+              </div>
+              <div className="grid gap-2">
+                <Label className="text-foreground">Highlights (comma-separated)</Label>
+                <Input value={form.highlights} onChange={(e) => setForm({ ...form, highlights: e.target.value })} placeholder="Beach views, Private pool villa" />
               </div>
               <div className="grid gap-2">
                 <Label className="text-foreground">Inclusions (comma-separated)</Label>
-                <Input value={form.inclusions} onChange={(e) => setForm({ ...form, inclusions: e.target.value })} placeholder="Airport transfer, Breakfast daily" className="bg-secondary border-border" />
+                <Input value={form.inclusions} onChange={(e) => setForm({ ...form, inclusions: e.target.value })} placeholder="Airport transfer, Breakfast daily" />
               </div>
               <div className="grid gap-2">
                 <Label className="text-foreground">Exclusions (comma-separated)</Label>
-                <Input value={form.exclusions} onChange={(e) => setForm({ ...form, exclusions: e.target.value })} placeholder="Visa fees, Personal expenses" className="bg-secondary border-border" />
+                <Input value={form.exclusions} onChange={(e) => setForm({ ...form, exclusions: e.target.value })} placeholder="Visa fees, Personal expenses" />
               </div>
               <label className="flex items-center gap-2 cursor-pointer text-sm text-foreground">
                 <Checkbox checked={form.is_customizable} onCheckedChange={(c) => setForm({ ...form, is_customizable: !!c })} />
@@ -171,14 +179,15 @@ export default function PackagesPage() {
               <TableHead className="hidden sm:table-cell">Duration</TableHead>
               <TableHead>Includes</TableHead>
               <TableHead>Price</TableHead>
+              <TableHead>Itinerary</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
             ) : packages.length === 0 ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No packages yet. Create your first package!</TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No packages yet. Create your first package!</TableCell></TableRow>
             ) : (
               packages.map((p) => (
                 <TableRow key={p.id} className="border-border">
@@ -203,7 +212,20 @@ export default function PackagesPage() {
                     ${Number(p.base_price).toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className={p.is_active ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1 text-xs"
+                      onClick={() => setItineraryOpen(p.id)}
+                    >
+                      <Edit className="h-3 w-3" />
+                      {Array.isArray(p.itinerary) && (p.itinerary as unknown as ItineraryDay[]).length > 0
+                        ? `${(p.itinerary as unknown as ItineraryDay[]).length} days`
+                        : "Add"}
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className={p.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
                       {p.is_active ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
@@ -213,6 +235,156 @@ export default function PackagesPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Itinerary Builder Dialog */}
+      {itineraryOpen && (
+        <ItineraryBuilderDialog
+          packageId={itineraryOpen}
+          pkg={packages.find((p) => p.id === itineraryOpen)!}
+          onClose={() => setItineraryOpen(null)}
+        />
+      )}
     </div>
+  );
+}
+
+function ItineraryBuilderDialog({
+  packageId,
+  pkg,
+  onClose,
+}: {
+  packageId: string;
+  pkg: any;
+  onClose: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const initialItinerary: ItineraryDay[] = Array.isArray(pkg.itinerary)
+    ? (pkg.itinerary as unknown as ItineraryDay[])
+    : [];
+  const [days, setDays] = useState<ItineraryDay[]>(
+    initialItinerary.length > 0 ? initialItinerary : []
+  );
+  const [newActivity, setNewActivity] = useState<Record<number, string>>({});
+
+  const addDay = () => {
+    const nextDay = days.length + 1;
+    setDays([...days, { day: nextDay, title: `Day ${nextDay}`, description: "", activities: [] }]);
+  };
+
+  const removeDay = (index: number) => {
+    const updated = days.filter((_, i) => i !== index).map((d, i) => ({ ...d, day: i + 1 }));
+    setDays(updated);
+  };
+
+  const updateDay = (index: number, field: keyof ItineraryDay, value: string) => {
+    const updated = [...days];
+    (updated[index] as any)[field] = value;
+    setDays(updated);
+  };
+
+  const addActivity = (dayIndex: number) => {
+    const activity = newActivity[dayIndex]?.trim();
+    if (!activity) return;
+    const updated = [...days];
+    updated[dayIndex].activities = [...updated[dayIndex].activities, activity];
+    setDays(updated);
+    setNewActivity({ ...newActivity, [dayIndex]: "" });
+  };
+
+  const removeActivity = (dayIndex: number, actIndex: number) => {
+    const updated = [...days];
+    updated[dayIndex].activities = updated[dayIndex].activities.filter((_, i) => i !== actIndex);
+    setDays(updated);
+  };
+
+  const saveItinerary = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("packages")
+        .update({ itinerary: days as unknown as Json[] })
+        .eq("id", packageId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["packages"] });
+      toast.success("Itinerary saved!");
+      onClose();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={true} onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-card border-border">
+        <DialogHeader>
+          <DialogTitle className="text-foreground">
+            Itinerary — {pkg.title}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {days.map((day, dayIndex) => (
+            <div key={dayIndex} className="border border-border rounded-xl p-4 bg-secondary/30">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shrink-0">
+                  {day.day}
+                </span>
+                <Input
+                  value={day.title}
+                  onChange={(e) => updateDay(dayIndex, "title", e.target.value)}
+                  className="font-semibold"
+                  placeholder="Day title"
+                />
+                <Button variant="ghost" size="icon" className="shrink-0 text-destructive" onClick={() => removeDay(dayIndex)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <textarea
+                value={day.description}
+                onChange={(e) => updateDay(dayIndex, "description", e.target.value)}
+                placeholder="Day description..."
+                rows={2}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground mb-3"
+              />
+
+              {/* Activities */}
+              <div className="space-y-1.5 mb-3">
+                {day.activities.map((activity, actIndex) => (
+                  <div key={actIndex} className="flex items-center gap-2 text-sm bg-background rounded-lg px-3 py-2">
+                    <span className="text-muted-foreground flex-1">{activity}</span>
+                    <button onClick={() => removeActivity(dayIndex, actIndex)} className="text-destructive hover:text-destructive/80">
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <Input
+                  value={newActivity[dayIndex] || ""}
+                  onChange={(e) => setNewActivity({ ...newActivity, [dayIndex]: e.target.value })}
+                  placeholder="Add activity (e.g., City tour, Lunch at resort)"
+                  onKeyDown={(e) => e.key === "Enter" && addActivity(dayIndex)}
+                  className="text-sm"
+                />
+                <Button variant="outline" size="sm" onClick={() => addActivity(dayIndex)}>Add</Button>
+              </div>
+            </div>
+          ))}
+
+          <Button variant="outline" onClick={addDay} className="w-full gap-1 border-dashed">
+            <Plus className="h-4 w-4" /> Add Day
+          </Button>
+
+          <div className="flex gap-3 pt-2">
+            <Button variant="ghost" onClick={onClose} className="flex-1">Cancel</Button>
+            <Button variant="brand" onClick={() => saveItinerary.mutate()} disabled={saveItinerary.isPending} className="flex-1">
+              {saveItinerary.isPending ? "Saving..." : "Save Itinerary"}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
