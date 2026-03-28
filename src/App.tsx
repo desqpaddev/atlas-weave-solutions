@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/AuthPage";
 import PackagesListPage from "./pages/PackagesListPage";
 import PackageDetailPage from "./pages/PackageDetailPage";
+import ToursListPage from "./pages/ToursListPage";
+import TourDetailPage from "./pages/TourDetailPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import LeadsPage from "./pages/dashboard/LeadsPage";
@@ -36,6 +38,8 @@ const App = () => (
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/packages" element={<PackagesListPage />} />
             <Route path="/packages/:slug" element={<PackageDetailPage />} />
+            <Route path="/tours" element={<ToursListPage />} />
+            <Route path="/tours/:slug" element={<TourDetailPage />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<DashboardOverview />} />
               <Route path="leads" element={<LeadsPage />} />

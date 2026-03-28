@@ -4,10 +4,10 @@ import { Menu, X, Phone, MapPin, Globe, Plane, Hotel, Compass, Ship, ChevronDown
 import { Link } from "react-router-dom";
 
 const navLinks = [
-  { label: "Holidays", href: "#packages", icon: Compass },
+  { label: "Holidays", href: "/packages", icon: Compass },
   { label: "Flights", href: "#flights", icon: Plane },
   { label: "Hotels", href: "#hotels", icon: Hotel },
-  { label: "Tours", href: "#tours", icon: Compass },
+  { label: "Tours", href: "/tours", icon: Compass },
   { label: "Cruise", href: "#cruise", icon: Ship },
 ];
 
@@ -48,16 +48,21 @@ export function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors group"
-              >
-                <link.icon className="h-5 w-5 group-hover:text-primary" />
-                <span className="text-xs font-medium">{link.label}</span>
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isInternal = link.href.startsWith("/");
+              const Comp = isInternal ? Link : "a";
+              const props = isInternal ? { to: link.href } : { href: link.href };
+              return (
+                <Comp
+                  key={link.label}
+                  {...(props as any)}
+                  className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors group"
+                >
+                  <link.icon className="h-5 w-5 group-hover:text-primary" />
+                  <span className="text-xs font-medium">{link.label}</span>
+                </Comp>
+              );
+            })}
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
@@ -80,17 +85,22 @@ export function Navbar() {
       {open && (
         <div className="lg:hidden bg-background border-b border-border animate-fade-in">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="flex items-center gap-3 text-sm font-medium text-muted-foreground hover:text-primary py-3 px-2 rounded-lg hover:bg-secondary transition-colors"
-                onClick={() => setOpen(false)}
-              >
-                <link.icon className="h-5 w-5" />
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isInternal = link.href.startsWith("/");
+              const Comp = isInternal ? Link : "a";
+              const props = isInternal ? { to: link.href } : { href: link.href };
+              return (
+                <Comp
+                  key={link.label}
+                  {...(props as any)}
+                  className="flex items-center gap-3 text-sm font-medium text-muted-foreground hover:text-primary py-3 px-2 rounded-lg hover:bg-secondary transition-colors"
+                  onClick={() => setOpen(false)}
+                >
+                  <link.icon className="h-5 w-5" />
+                  {link.label}
+                </Comp>
+              );
+            })}
             <div className="flex gap-3 pt-3 border-t border-border mt-2">
               <Button variant="brand" size="sm" className="flex-1" asChild>
                 <Link to="/auth">Login</Link>
