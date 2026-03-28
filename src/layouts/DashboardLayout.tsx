@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Outlet, Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, UserCheck, Briefcase, CalendarDays,
@@ -47,6 +49,17 @@ export default function DashboardLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const { data: company } = useQuery({
+    queryKey: ["dashboard-company-branding"],
+    queryFn: async () => {
+      if (!profile?.company_id) return null;
+      const { data } = await supabase.from("companies").select("name, logo_url").eq("id", profile.company_id).single();
+      return data;
+    },
+    enabled: !!profile?.company_id,
+    staleTime: 1000 * 60 * 5,
+  });
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -80,8 +93,14 @@ export default function DashboardLayout() {
         <div className="h-full flex flex-col">
           <div className="h-16 flex items-center justify-between px-5 border-b border-border">
             <Link to="/" className="flex items-center gap-2">
-              <Plane className="h-5 w-5 text-primary" />
-              <span className="font-display text-xl font-bold text-gradient-blue">TravelHub</span>
+              {company?.logo_url ? (
+                <img src={company.logo_url} alt={company.name || "Logo"} className="h-8 w-auto max-w-[140px] object-contain" />
+              ) : (
+                <>
+                  <Plane className="h-5 w-5 text-primary" />
+                  <span className="font-display text-xl font-bold text-gradient-blue">{company?.name || "TravelHub"}</span>
+                </>
+              )}
             </Link>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground">
               <X className="h-5 w-5" />
