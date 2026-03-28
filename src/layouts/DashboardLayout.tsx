@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const navItems = [
+const adminNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { label: "Leads", icon: Users, path: "/dashboard/leads" },
   { label: "Customers", icon: UserCheck, path: "/dashboard/customers" },
@@ -23,8 +23,26 @@ const navItems = [
   { label: "Settings", icon: Settings, path: "/dashboard/settings" },
 ];
 
+const customerNavItems = [
+  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  { label: "My Bookings", icon: CalendarDays, path: "/dashboard/bookings" },
+  { label: "My Payments", icon: DollarSign, path: "/dashboard/payments" },
+  { label: "Settings", icon: Settings, path: "/dashboard/settings" },
+];
+
+const agentNavItems = [
+  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  { label: "Leads", icon: Users, path: "/dashboard/leads" },
+  { label: "Customers", icon: UserCheck, path: "/dashboard/customers" },
+  { label: "Tours", icon: Map, path: "/dashboard/tours" },
+  { label: "Departures", icon: CalendarDays, path: "/dashboard/departures" },
+  { label: "Packages", icon: Package, path: "/dashboard/packages" },
+  { label: "Bookings", icon: CalendarDays, path: "/dashboard/bookings" },
+  { label: "Payments", icon: DollarSign, path: "/dashboard/payments" },
+];
+
 export default function DashboardLayout() {
-  const { user, profile, signOut, loading } = useAuth();
+  const { user, profile, roles, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -42,6 +60,10 @@ export default function DashboardLayout() {
     return null;
   }
 
+  const isAdmin = roles.includes("company_admin") || roles.includes("super_admin");
+  const isAgent = roles.includes("travel_agent");
+  const navItems = isAdmin ? adminNavItems : isAgent ? agentNavItems : customerNavItems;
+
   const initials = (profile?.full_name || user.email || "U")
     .split(" ")
     .map((n) => n[0])
@@ -51,13 +73,11 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-200
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static lg:z-auto`}
       >
         <div className="h-full flex flex-col">
-          {/* Logo */}
           <div className="h-16 flex items-center justify-between px-5 border-b border-border">
             <Link to="/" className="flex items-center gap-2">
               <Plane className="h-5 w-5 text-primary" />
@@ -68,7 +88,6 @@ export default function DashboardLayout() {
             </button>
           </div>
 
-          {/* Nav */}
           <nav className="flex-1 overflow-y-auto py-4 px-3">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
@@ -91,7 +110,6 @@ export default function DashboardLayout() {
             })}
           </nav>
 
-          {/* User */}
           <div className="p-4 border-t border-border">
             <div className="flex items-center gap-3">
               <Avatar className="h-9 w-9">
@@ -112,7 +130,6 @@ export default function DashboardLayout() {
         </div>
       </aside>
 
-      {/* Overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 lg:hidden"
@@ -120,7 +137,6 @@ export default function DashboardLayout() {
         />
       )}
 
-      {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 border-b border-border flex items-center px-4 lg:px-6 gap-4">
           <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-foreground">

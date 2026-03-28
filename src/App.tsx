@@ -42,6 +42,8 @@ const App = () => (
             <Route path="/packages/:slug" element={<PackageDetailPage />} />
             <Route path="/tours" element={<ToursListPage />} />
             <Route path="/tours/:slug" element={<TourDetailPage />} />
+            <Route path="/cruises" element={<CruisesListPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<DashboardOverview />} />
               <Route path="leads" element={<LeadsPage />} />
