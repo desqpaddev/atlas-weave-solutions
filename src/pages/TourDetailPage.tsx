@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Check, X, Star, Users, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { MockPaymentDialog } from "@/components/MockPaymentDialog";
 import destBali from "@/assets/dest-bali.jpg";
 import destSwiss from "@/assets/dest-swiss.jpg";
 import destDubai from "@/assets/dest-dubai.jpg";
@@ -42,6 +43,7 @@ export default function TourDetailPage() {
     fullName: "", email: "", phone: "", adults: 1, children: 0, checkIn: "", notes: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   const { data: tour, isLoading } = useQuery({
     queryKey: ["tour-detail", slug],
@@ -60,10 +62,20 @@ export default function TourDetailPage() {
   const childPrice = Number(activeTour?.child_price || 0);
   const totalPrice = (adultPrice * bookingForm.adults) + (childPrice * bookingForm.children);
 
-  const handleBooking = async (e: React.FormEvent) => {
+  const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeTour) return;
+    if (!bookingForm.fullName || !bookingForm.email) {
+      toast.error("Please fill in your name and email.");
+      return;
+    }
+    setShowPayment(true);
+  };
+
+  const finalizeBooking = async () => {
+    if (!activeTour) return;
     setSubmitting(true);
+    setShowPayment(false);
     try {
       let companyId = activeTour.company_id;
       if (!companyId) {
@@ -75,7 +87,9 @@ export default function TourDetailPage() {
         setSubmitting(false);
         return;
       }
-      // Create lead for CRM
+      const refNumber = `BK-${Date.now().toString(36).toUpperCase()}`;
+
+      // Create lead
       const { error: leadError } = await supabase.from("leads").insert({
         company_id: companyId,
         full_name: bookingForm.fullName, email: bookingForm.email, phone: bookingForm.phone,
@@ -87,15 +101,15 @@ export default function TourDetailPage() {
       });
       if (leadError) throw leadError;
 
-      // Also create a booking record
-      const refNumber = `BK-${Date.now().toString(36).toUpperCase()}`;
+      // Create booking (paid)
       const { error: bookingError } = await supabase.from("bookings").insert({
         company_id: companyId,
         title: activeTour.title,
         booking_type: "tour" as const,
-        status: "pending" as const,
+        status: "confirmed" as const,
         total_amount: totalPrice,
-        paid_amount: 0,
+        paid_amount: totalPrice,
+        payment_status: "paid" as const,
         destination: activeTour.destination || null,
         pax: bookingForm.adults + bookingForm.children,
         check_in: bookingForm.checkIn || null,
@@ -108,14 +122,16 @@ export default function TourDetailPage() {
           adults: bookingForm.adults,
           children: bookingForm.children,
           tour_slug: activeTour.slug,
+          payment_method: "card",
+          payment_status: "paid",
         },
       });
       if (bookingError) console.error("Booking creation failed:", bookingError);
 
-      toast.success("Booking submitted successfully! We'll contact you shortly.");
+      toast.success(`Booking confirmed! Ref: ${refNumber}`);
       setBookingForm({ fullName: "", email: "", phone: "", adults: 1, children: 0, checkIn: "", notes: "" });
     } catch (err: any) {
-      toast.error(err.message || "Failed to submit inquiry");
+      toast.error(err.message || "Failed to complete booking");
     } finally {
       setSubmitting(false);
     }
@@ -236,6 +252,15 @@ export default function TourDetailPage() {
           </div>
         </div>
       </div>
+      {activeTour && (
+        <MockPaymentDialog
+          open={showPayment}
+          onClose={() => setShowPayment(false)}
+          onPaymentSuccess={finalizeBooking}
+          amount={totalPrice}
+          title={activeTour.title}
+        />
+      )}
       <Footer />
     </div>
   );
