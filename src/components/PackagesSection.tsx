@@ -42,23 +42,27 @@ const packages = [
 
 export function PackagesSection() {
   return (
-    <section id="packages" className="py-24 bg-secondary/30">
+    <section id="packages" className="py-16 bg-secondary">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <p className="text-gold text-sm font-medium tracking-widest uppercase mb-2">Curated For You</p>
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground">
-            Holiday Packages
-          </h2>
-          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-            Hand-picked packages combining flights, hotels, and experiences for an unforgettable journey.
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
+              Holiday Packages
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Hand-picked packages for an unforgettable journey.
+            </p>
+          </div>
+          <a href="#" className="hidden md:flex items-center gap-1 text-primary text-sm font-semibold hover:underline">
+            View All <ArrowRight className="h-4 w-4" />
+          </a>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {packages.map((pkg) => (
             <div
               key={pkg.title}
-              className="bg-card rounded-xl overflow-hidden border border-border hover:border-gold/30 transition-all duration-300 shadow-card group"
+              className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-elevated transition-all duration-300 group"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
                 <img
@@ -67,7 +71,7 @@ export function PackagesSection() {
                   loading="lazy"
                   width={640}
                   height={400}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute top-3 right-3 bg-destructive text-destructive-foreground text-xs font-bold px-2.5 py-1 rounded-full">
                   Save ${pkg.originalPrice - pkg.price}
@@ -77,15 +81,15 @@ export function PackagesSection() {
               <div className="p-5">
                 <div className="flex flex-wrap gap-2 mb-3">
                   {pkg.tags.map((tag) => (
-                    <span key={tag} className="text-xs bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full">
+                    <span key={tag} className="text-xs bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full font-medium">
                       {tag}
                     </span>
                   ))}
                 </div>
 
-                <h3 className="font-display text-xl font-bold text-foreground">{pkg.title}</h3>
+                <h3 className="font-display text-lg font-bold text-foreground">{pkg.title}</h3>
 
-                <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" /> {pkg.duration}
                   </span>
@@ -94,19 +98,19 @@ export function PackagesSection() {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 mt-3">
-                  <Star className="h-4 w-4 text-gold fill-gold" />
+                <div className="flex items-center gap-1.5 mt-2">
+                  <Star className="h-4 w-4 text-accent fill-accent" />
                   <span className="text-sm font-semibold text-foreground">{pkg.rating}</span>
                   <span className="text-xs text-muted-foreground">({pkg.reviews} reviews)</span>
                 </div>
 
-                <div className="flex items-center justify-between mt-5 pt-4 border-t border-border">
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
                   <div>
                     <span className="text-xs text-muted-foreground line-through">${pkg.originalPrice}</span>
-                    <p className="text-xl font-bold text-gradient-gold">${pkg.price}</p>
+                    <p className="text-xl font-bold text-primary">${pkg.price}</p>
                     <span className="text-xs text-muted-foreground">per person</span>
                   </div>
-                  <Button variant="hero" size="sm" className="gap-1">
+                  <Button variant="brand" size="sm" className="gap-1">
                     Book Now <ArrowRight className="h-3.5 w-3.5" />
                   </Button>
                 </div>

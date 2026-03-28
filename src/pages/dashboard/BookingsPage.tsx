@@ -36,7 +36,7 @@ export default function BookingsPage() {
           <h1 className="font-display text-2xl font-bold text-foreground">Bookings</h1>
           <p className="text-muted-foreground text-sm">Manage all travel bookings across channels.</p>
         </div>
-        <Button variant="hero" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Booking</Button>
+        <Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Booking</Button>
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-hidden">

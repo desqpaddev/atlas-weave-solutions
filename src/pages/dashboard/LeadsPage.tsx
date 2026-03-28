@@ -93,7 +93,7 @@ export default function LeadsPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="hero" size="sm" className="gap-1">
+            <Button variant="brand" size="sm" className="gap-1">
               <Plus className="h-4 w-4" /> Add Lead
             </Button>
           </DialogTrigger>
@@ -146,7 +146,7 @@ export default function LeadsPage() {
                 <Label>Notes</Label>
                 <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1" />
               </div>
-              <Button variant="hero" className="w-full" disabled={createLead.isPending}>
+              <Button variant="brand" className="w-full" disabled={createLead.isPending}>
                 {createLead.isPending ? "Creating..." : "Create Lead"}
               </Button>
             </form>

@@ -1,52 +1,64 @@
-import { Shield, Headphones, CreditCard, Sparkles } from "lucide-react";
+import { Shield, Headphones, CreditCard, Sparkles, Award, Clock } from "lucide-react";
 
 const features = [
   {
     icon: Shield,
     title: "Secure Booking",
-    description: "Your payments and personal data are protected with enterprise-grade security.",
+    description: "Enterprise-grade security for your payments and personal data.",
   },
   {
     icon: Headphones,
-    title: "24/7 Concierge",
-    description: "Dedicated travel experts available around the clock for your peace of mind.",
+    title: "24/7 Support",
+    description: "Dedicated travel experts available around the clock.",
   },
   {
     icon: CreditCard,
     title: "Flexible Payments",
-    description: "Split payments, deposits, and multi-currency support for your convenience.",
+    description: "Split payments, deposits, and multi-currency support.",
   },
   {
     icon: Sparkles,
     title: "AI Itineraries",
-    description: "Get personalized travel plans crafted by AI, tailored to your preferences.",
+    description: "Personalized travel plans crafted by AI for your preferences.",
+  },
+  {
+    icon: Award,
+    title: "Best Price Guarantee",
+    description: "We match any lower price you find for the same package.",
+  },
+  {
+    icon: Clock,
+    title: "Instant Confirmation",
+    description: "Get immediate booking confirmation and e-vouchers.",
   },
 ];
 
 export function FeaturesSection() {
   return (
-    <section className="py-24">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <p className="text-gold text-sm font-medium tracking-widest uppercase mb-2">Why TravelHub</p>
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground">
-            Travel With Confidence
+        <div className="text-center mb-12">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
+            Why Choose TravelHub
           </h2>
+          <p className="text-muted-foreground mt-2 text-sm max-w-lg mx-auto">
+            Trusted by thousands of travelers for seamless booking experiences.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {features.map((feature) => (
             <div
               key={feature.title}
               className="text-center group"
             >
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-secondary flex items-center justify-center mb-5 group-hover:bg-gold/10 transition-colors">
-                <feature.icon className="h-7 w-7 text-gold" />
+              <div className="w-14 h-14 mx-auto rounded-xl bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                <feature.icon className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-display text-lg font-semibold text-foreground mb-2">
+              <h3 className="font-display text-sm font-semibold text-foreground mb-1">
                 {feature.title}
               </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+              <p className="text-muted-foreground text-xs leading-relaxed">
                 {feature.description}
               </p>
             </div>

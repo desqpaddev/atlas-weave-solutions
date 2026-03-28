@@ -129,7 +129,7 @@ export default function AuthPage() {
                 className="mt-1"
               />
             </div>
-            <Button variant="hero" className="w-full h-11" disabled={loading}>
+            <Button variant="brand" className="w-full h-11" disabled={loading}>
               {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
             </Button>
           </form>
