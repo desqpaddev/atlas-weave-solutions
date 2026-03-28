@@ -48,16 +48,21 @@ export function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors group"
-              >
-                <link.icon className="h-5 w-5 group-hover:text-primary" />
-                <span className="text-xs font-medium">{link.label}</span>
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isInternal = link.href.startsWith("/");
+              const Comp = isInternal ? Link : "a";
+              const props = isInternal ? { to: link.href } : { href: link.href };
+              return (
+                <Comp
+                  key={link.label}
+                  {...(props as any)}
+                  className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors group"
+                >
+                  <link.icon className="h-5 w-5 group-hover:text-primary" />
+                  <span className="text-xs font-medium">{link.label}</span>
+                </Comp>
+              );
+            })}
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
