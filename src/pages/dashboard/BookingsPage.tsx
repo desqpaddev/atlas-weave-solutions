@@ -124,16 +124,24 @@ export default function BookingsPage() {
       ) : (
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <Table>
-            <TableHeader><TableRow className="border-border hover:bg-transparent"><TableHead>Reference</TableHead><TableHead>Title</TableHead><TableHead className="hidden md:table-cell">Type</TableHead><TableHead>Status</TableHead><TableHead className="hidden sm:table-cell">Amount</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow className="border-border hover:bg-transparent"><TableHead>Reference</TableHead><TableHead>Title</TableHead><TableHead className="hidden md:table-cell">Type</TableHead><TableHead>Status</TableHead><TableHead className="hidden sm:table-cell">Destination</TableHead><TableHead className="hidden lg:table-cell">Pax</TableHead><TableHead className="hidden sm:table-cell">Amount</TableHead><TableHead className="hidden lg:table-cell">Paid</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
             <TableBody>
-              {isLoading ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow> :
-              bookings.map((b) => (
+              {isLoading ? <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow> :
+              bookings.map((b) => {
+                const meta = (b.metadata && typeof b.metadata === 'object' && !Array.isArray(b.metadata)) ? b.metadata as Record<string, any> : {};
+                return (
                 <TableRow key={b.id} className="border-border">
                   <TableCell className="font-mono text-xs text-primary">{b.reference_number}</TableCell>
-                  <TableCell className="font-medium text-foreground">{b.title}</TableCell>
+                  <TableCell>
+                    <p className="font-medium text-foreground">{b.title}</p>
+                    {meta.customer_name && <p className="text-xs text-muted-foreground">{meta.customer_name}</p>}
+                  </TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground capitalize">{b.booking_type}</TableCell>
                   <TableCell><Badge variant="secondary" className={statusColors[b.status as BookingStatus]}>{b.status}</Badge></TableCell>
+                  <TableCell className="hidden sm:table-cell text-muted-foreground">{b.destination || "—"}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-muted-foreground">{b.pax}</TableCell>
                   <TableCell className="hidden sm:table-cell text-foreground font-medium">${Number(b.total_amount).toLocaleString()}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-muted-foreground">${Number(b.paid_amount).toLocaleString()}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(b.id)}><Eye className="h-3.5 w-3.5" /></Button>
@@ -146,7 +154,7 @@ export default function BookingsPage() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              )})}
             </TableBody>
           </Table>
         </div>
