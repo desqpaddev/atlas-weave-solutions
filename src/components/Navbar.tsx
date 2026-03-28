@@ -38,8 +38,8 @@ export function Navbar() {
           <Button variant="ghost" size="icon" className="text-muted-foreground">
             <Globe className="h-4 w-4" />
           </Button>
-          <Button variant="hero-outline" size="sm">Sign In</Button>
-          <Button variant="hero" size="sm">Book Now</Button>
+          <Button variant="hero-outline" size="sm" asChild><Link to="/auth">Sign In</Link></Button>
+          <Button variant="hero" size="sm" asChild><Link to="/dashboard">Dashboard</Link></Button>
         </div>
 
         {/* Mobile toggle */}
