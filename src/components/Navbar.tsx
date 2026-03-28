@@ -8,7 +8,8 @@ const navLinks = [
   { label: "Flights", href: "#flights", icon: Plane },
   { label: "Hotels", href: "#hotels", icon: Hotel },
   { label: "Tours", href: "/tours", icon: Compass },
-  { label: "Cruise", href: "#cruise", icon: Ship },
+  { label: "Cruise", href: "/cruises", icon: Ship },
+  { label: "Contact", href: "/contact", icon: Phone },
 ];
 
 export function Navbar() {

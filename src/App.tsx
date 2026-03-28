@@ -23,6 +23,8 @@ import PackagesPage from "./pages/dashboard/PackagesPage";
 import PaymentsPage from "./pages/dashboard/PaymentsPage";
 import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
+import CruisesListPage from "./pages/CruisesListPage";
+import ContactPage from "./pages/ContactPage";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,8 @@ const App = () => (
             <Route path="/packages/:slug" element={<PackageDetailPage />} />
             <Route path="/tours" element={<ToursListPage />} />
             <Route path="/tours/:slug" element={<TourDetailPage />} />
+            <Route path="/cruises" element={<CruisesListPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<DashboardOverview />} />
               <Route path="leads" element={<LeadsPage />} />
