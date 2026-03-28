@@ -43,6 +43,7 @@ export default function TourDetailPage() {
     fullName: "", email: "", phone: "", adults: 1, children: 0, checkIn: "", notes: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   const { data: tour, isLoading } = useQuery({
     queryKey: ["tour-detail", slug],
