@@ -56,9 +56,9 @@ export function PackagesSection() {
               Hand-picked packages for an unforgettable journey.
             </p>
           </div>
-          <a href="#" className="hidden md:flex items-center gap-1 text-primary text-sm font-semibold hover:underline">
+          <Link to="/packages" className="hidden md:flex items-center gap-1 text-primary text-sm font-semibold hover:underline">
             View All <ArrowRight className="h-4 w-4" />
-          </a>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
