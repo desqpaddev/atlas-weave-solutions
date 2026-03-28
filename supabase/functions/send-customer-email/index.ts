@@ -48,15 +48,21 @@ serve(async (req) => {
     }
 
     const settings = (company.settings || {}) as Record<string, string>;
-    const smtpHost = settings.smtp_host;
-    const smtpPort = parseInt(settings.smtp_port || "587");
+    const rawSmtpHost = (settings.smtp_host || "").trim();
+    const smtpHost = rawSmtpHost.replace(/^smtp@/i, "smtp.");
+    const smtpPort = Number.parseInt(settings.smtp_port || "587", 10);
     const smtpUser = settings.smtp_user;
     const smtpPass = settings.smtp_password;
     const fromEmail = settings.smtp_from_email || company.email || smtpUser;
     const fromName = settings.smtp_from_name || company.name;
 
-    if (!smtpHost || !smtpUser || !smtpPass) {
+    if (!smtpHost || !smtpUser || !smtpPass || Number.isNaN(smtpPort)) {
       return new Response(JSON.stringify({ error: "SMTP not configured. Please configure SMTP settings in Settings." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    const smtpHostIsValid = /^(?!-)[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/.test(smtpHost);
+    if (!smtpHostIsValid) {
+      return new Response(JSON.stringify({ error: `Invalid SMTP host '${rawSmtpHost}'. Please use a valid host like smtp.gmail.com.` }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Get tours if requested
