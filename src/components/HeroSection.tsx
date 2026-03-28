@@ -146,7 +146,7 @@ export function HeroSection() {
       </div>
 
       {/* Advanced Search Bar */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20 w-full max-w-5xl px-4">
+      <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-5xl px-4">
         <div className="bg-background rounded-2xl shadow-elevated border border-border overflow-hidden">
           {/* Search tabs */}
           <div className="flex items-center gap-1 px-4 pt-3 pb-0">

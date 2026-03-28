@@ -1,12 +1,22 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { MapPin, Clock, ArrowRight, Plane, Hotel, Map, Car } from "lucide-react";
 
+const normalizeText = (value?: string | null) =>
+  (value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
 export default function PackagesListPage() {
+  const [searchParams] = useSearchParams();
+  const destinationFilter = normalizeText(searchParams.get("destination"));
+
   const { data: packages = [], isLoading } = useQuery({
     queryKey: ["public-packages"],
     queryFn: async () => {
@@ -19,6 +29,14 @@ export default function PackagesListPage() {
       return data;
     },
   });
+
+  const filteredPackages = useMemo(() => {
+    if (!destinationFilter) return packages;
+    return packages.filter((pkg) => {
+      const destination = normalizeText(pkg.destination);
+      return destination.includes(destinationFilter) || destinationFilter.includes(destination);
+    });
+  }, [packages, destinationFilter]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,17 +52,30 @@ export default function PackagesListPage() {
       </div>
 
       <div className="container mx-auto px-4 py-12">
+        {destinationFilter && (
+          <div className="mb-6 flex items-center gap-3 text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">Destination filter:</span>
+            <span className="px-3 py-1 rounded-full bg-secondary text-foreground">{searchParams.get("destination")}</span>
+            <Link to="/packages" className="ml-auto text-primary font-semibold hover:underline">Clear filter</Link>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="text-center py-16">
             <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto" />
           </div>
-        ) : packages.length === 0 ? (
+        ) : filteredPackages.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
-            <p className="text-lg">No packages available yet. Check back soon!</p>
+            <p className="text-lg">No packages found for this destination.</p>
+            {destinationFilter && (
+              <Link to="/packages" className="inline-flex mt-3 text-primary font-semibold hover:underline">
+                View all packages
+              </Link>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {packages.map((pkg) => (
+            {filteredPackages.map((pkg) => (
               <Link
                 key={pkg.id}
                 to={`/packages/${pkg.slug}`}
