@@ -19,15 +19,39 @@ const statusColors: Record<BookingStatus, string> = { pending: "bg-yellow-500/20
 const emptyForm = { title: "", booking_type: "tour" as BookingType, status: "pending" as BookingStatus, total_amount: 0, paid_amount: 0, destination: "", pax: 1, check_in: "", check_out: "", description: "", reference_number: "" };
 
 export default function BookingsPage() {
-  const { profile } = useAuth();
+  const { profile, roles, user } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
 
+  const isAdmin = roles.includes("company_admin") || roles.includes("super_admin");
+  const isAgent = roles.includes("travel_agent");
+  const isCustomer = !isAdmin && !isAgent;
+
+  // For customers, first find their customer record
+  const { data: customerRecord } = useQuery({
+    queryKey: ["my-customer-record", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("customers").select("id").eq("user_id", user!.id).maybeSingle();
+      return data;
+    },
+    enabled: isCustomer && !!user?.id,
+  });
+
   const { data: bookings = [], isLoading } = useQuery({
-    queryKey: ["bookings"], queryFn: async () => { const { data, error } = await supabase.from("bookings").select("*").order("created_at", { ascending: false }); if (error) throw error; return data; },
+    queryKey: ["bookings", isCustomer ? customerRecord?.id : "all"],
+    queryFn: async () => {
+      let query = supabase.from("bookings").select("*").order("created_at", { ascending: false });
+      if (isCustomer && customerRecord?.id) {
+        query = query.eq("customer_id", customerRecord.id);
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+    enabled: isCustomer ? !!customerRecord?.id || customerRecord === null : true,
   });
 
   const save = useMutation({
@@ -55,61 +79,78 @@ export default function BookingsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <div><h1 className="font-display text-2xl font-bold text-foreground">Bookings</h1><p className="text-muted-foreground text-sm">Manage all travel bookings across channels.</p></div>
-        <Dialog open={open} onOpenChange={(o) => { if (!o) closeDialog(); else setOpen(true); }}>
-          <DialogTrigger asChild><Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Booking</Button></DialogTrigger>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto bg-card border-border">
-            <DialogHeader><DialogTitle>{editId ? "Edit Booking" : "New Booking"}</DialogTitle></DialogHeader>
-            <form onSubmit={(e) => { e.preventDefault(); save.mutate(); }} className="grid gap-4 py-2">
-              <div><Label>Title *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required className="mt-1" /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><Label>Type</Label><Select value={form.booking_type} onValueChange={(v) => setForm({ ...form, booking_type: v as BookingType })}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent>{(["flight","hotel","tour","package"] as BookingType[]).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
-                <div><Label>Status</Label><Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as BookingStatus })}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent>{(["pending","confirmed","in_progress","completed","cancelled","refunded"] as BookingStatus[]).map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><Label>Total Amount ($)</Label><Input type="number" min={0} value={form.total_amount} onChange={(e) => setForm({ ...form, total_amount: Number(e.target.value) })} className="mt-1" /></div>
-                <div><Label>Paid Amount ($)</Label><Input type="number" min={0} value={form.paid_amount} onChange={(e) => setForm({ ...form, paid_amount: Number(e.target.value) })} className="mt-1" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><Label>Destination</Label><Input value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} className="mt-1" /></div>
-                <div><Label>Travelers</Label><Input type="number" min={1} value={form.pax} onChange={(e) => setForm({ ...form, pax: Number(e.target.value) })} className="mt-1" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><Label>Check-in</Label><Input type="date" value={form.check_in} onChange={(e) => setForm({ ...form, check_in: e.target.value })} className="mt-1" /></div>
-                <div><Label>Check-out</Label><Input type="date" value={form.check_out} onChange={(e) => setForm({ ...form, check_out: e.target.value })} className="mt-1" /></div>
-              </div>
-              <div><Label>Description</Label><textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" /></div>
-              <Button variant="brand" disabled={!form.title || save.isPending}>{save.isPending ? "Saving..." : editId ? "Update" : "Create"}</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <div>
+          <h1 className="font-display text-2xl font-bold text-foreground">{isCustomer ? "My Bookings" : "Bookings"}</h1>
+          <p className="text-muted-foreground text-sm">{isCustomer ? "View your travel bookings." : "Manage all travel bookings across channels."}</p>
+        </div>
+        {!isCustomer && (
+          <Dialog open={open} onOpenChange={(o) => { if (!o) closeDialog(); else setOpen(true); }}>
+            <DialogTrigger asChild><Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Booking</Button></DialogTrigger>
+            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto bg-card border-border">
+              <DialogHeader><DialogTitle>{editId ? "Edit Booking" : "New Booking"}</DialogTitle></DialogHeader>
+              <form onSubmit={(e) => { e.preventDefault(); save.mutate(); }} className="grid gap-4 py-2">
+                <div><Label>Title *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required className="mt-1" /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Type</Label><Select value={form.booking_type} onValueChange={(v) => setForm({ ...form, booking_type: v as BookingType })}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent>{(["flight","hotel","tour","package"] as BookingType[]).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
+                  <div><Label>Status</Label><Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as BookingStatus })}><SelectTrigger className="mt-1"><SelectValue /></SelectTrigger><SelectContent>{(["pending","confirmed","in_progress","completed","cancelled","refunded"] as BookingStatus[]).map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Total Amount ($)</Label><Input type="number" min={0} value={form.total_amount} onChange={(e) => setForm({ ...form, total_amount: Number(e.target.value) })} className="mt-1" /></div>
+                  <div><Label>Paid Amount ($)</Label><Input type="number" min={0} value={form.paid_amount} onChange={(e) => setForm({ ...form, paid_amount: Number(e.target.value) })} className="mt-1" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Destination</Label><Input value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} className="mt-1" /></div>
+                  <div><Label>Travelers</Label><Input type="number" min={1} value={form.pax} onChange={(e) => setForm({ ...form, pax: Number(e.target.value) })} className="mt-1" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Check-in</Label><Input type="date" value={form.check_in} onChange={(e) => setForm({ ...form, check_in: e.target.value })} className="mt-1" /></div>
+                  <div><Label>Check-out</Label><Input type="date" value={form.check_out} onChange={(e) => setForm({ ...form, check_out: e.target.value })} className="mt-1" /></div>
+                </div>
+                <div><Label>Description</Label><textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" /></div>
+                <Button variant="brand" disabled={!form.title || save.isPending}>{save.isPending ? "Saving..." : editId ? "Update" : "Create"}</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <Table>
-          <TableHeader><TableRow className="border-border hover:bg-transparent"><TableHead>Reference</TableHead><TableHead>Title</TableHead><TableHead className="hidden md:table-cell">Type</TableHead><TableHead>Status</TableHead><TableHead className="hidden sm:table-cell">Amount</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
-          <TableBody>
-            {isLoading ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow> :
-            bookings.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No bookings yet.</TableCell></TableRow> :
-            bookings.map((b) => (
-              <TableRow key={b.id} className="border-border">
-                <TableCell className="font-mono text-xs text-primary">{b.reference_number}</TableCell>
-                <TableCell className="font-medium text-foreground">{b.title}</TableCell>
-                <TableCell className="hidden md:table-cell text-muted-foreground capitalize">{b.booking_type}</TableCell>
-                <TableCell><Badge variant="secondary" className={statusColors[b.status as BookingStatus]}>{b.status}</Badge></TableCell>
-                <TableCell className="hidden sm:table-cell text-foreground font-medium">${Number(b.total_amount).toLocaleString()}</TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(b.id)}><Eye className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(b)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this booking?")) remove.mutate(b.id); }}><Trash2 className="h-3.5 w-3.5" /></Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      {isCustomer && bookings.length === 0 && !isLoading ? (
+        <div className="text-center py-16">
+          <div className="text-4xl mb-4">✈️</div>
+          <h2 className="text-xl font-display font-semibold text-foreground mb-2">No bookings yet</h2>
+          <p className="text-muted-foreground mb-4">Browse our tours and packages to book your next adventure!</p>
+          <Button variant="brand" onClick={() => window.location.href = "/tours"}>Explore Tours</Button>
+        </div>
+      ) : (
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <Table>
+            <TableHeader><TableRow className="border-border hover:bg-transparent"><TableHead>Reference</TableHead><TableHead>Title</TableHead><TableHead className="hidden md:table-cell">Type</TableHead><TableHead>Status</TableHead><TableHead className="hidden sm:table-cell">Amount</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
+            <TableBody>
+              {isLoading ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow> :
+              bookings.map((b) => (
+                <TableRow key={b.id} className="border-border">
+                  <TableCell className="font-mono text-xs text-primary">{b.reference_number}</TableCell>
+                  <TableCell className="font-medium text-foreground">{b.title}</TableCell>
+                  <TableCell className="hidden md:table-cell text-muted-foreground capitalize">{b.booking_type}</TableCell>
+                  <TableCell><Badge variant="secondary" className={statusColors[b.status as BookingStatus]}>{b.status}</Badge></TableCell>
+                  <TableCell className="hidden sm:table-cell text-foreground font-medium">${Number(b.total_amount).toLocaleString()}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(b.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                      {!isCustomer && (
+                        <>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(b)}><Pencil className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this booking?")) remove.mutate(b.id); }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       <Dialog open={!!viewId} onOpenChange={() => setViewId(null)}>
         <DialogContent className="bg-card border-border">
