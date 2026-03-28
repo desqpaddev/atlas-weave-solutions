@@ -75,17 +75,44 @@ export default function TourDetailPage() {
         setSubmitting(false);
         return;
       }
-      const { error } = await supabase.from("leads").insert({
+      // Create lead for CRM
+      const { error: leadError } = await supabase.from("leads").insert({
         company_id: companyId,
         full_name: bookingForm.fullName, email: bookingForm.email, phone: bookingForm.phone,
         pax: bookingForm.adults + bookingForm.children,
         destination: activeTour.destination, travel_dates: bookingForm.checkIn,
         budget: totalPrice, source: "website",
-        notes: `Tour: ${activeTour.title}\nAdults: ${bookingForm.adults}, Children: ${bookingForm.children}\n${bookingForm.notes}`,
+        notes: `Tour: ${activeTour.title}\nAdults: ${bookingForm.adults}, Children: ${bookingForm.children}\nCheck-in: ${bookingForm.checkIn}\n${bookingForm.notes}`,
         status: "new",
       });
-      if (error) throw error;
-      toast.success("Booking inquiry submitted! We'll contact you shortly.");
+      if (leadError) throw leadError;
+
+      // Also create a booking record
+      const refNumber = `BK-${Date.now().toString(36).toUpperCase()}`;
+      const { error: bookingError } = await supabase.from("bookings").insert({
+        company_id: companyId,
+        title: activeTour.title,
+        booking_type: "tour" as const,
+        status: "pending" as const,
+        total_amount: totalPrice,
+        paid_amount: 0,
+        destination: activeTour.destination || null,
+        pax: bookingForm.adults + bookingForm.children,
+        check_in: bookingForm.checkIn || null,
+        reference_number: refNumber,
+        description: `Customer: ${bookingForm.fullName}\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}\nAdults: ${bookingForm.adults}, Children: ${bookingForm.children}\n${bookingForm.notes}`,
+        metadata: {
+          customer_name: bookingForm.fullName,
+          customer_email: bookingForm.email,
+          customer_phone: bookingForm.phone,
+          adults: bookingForm.adults,
+          children: bookingForm.children,
+          tour_slug: activeTour.slug,
+        },
+      });
+      if (bookingError) console.error("Booking creation failed:", bookingError);
+
+      toast.success("Booking submitted successfully! We'll contact you shortly.");
       setBookingForm({ fullName: "", email: "", phone: "", adults: 1, children: 0, checkIn: "", notes: "" });
     } catch (err: any) {
       toast.error(err.message || "Failed to submit inquiry");
