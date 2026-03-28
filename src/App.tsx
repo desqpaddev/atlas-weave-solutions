@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/AuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PackagesListPage from "./pages/PackagesListPage";
 import PackageDetailPage from "./pages/PackageDetailPage";
 import ToursListPage from "./pages/ToursListPage";
