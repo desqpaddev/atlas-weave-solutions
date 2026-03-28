@@ -85,17 +85,22 @@ export function Navbar() {
       {open && (
         <div className="lg:hidden bg-background border-b border-border animate-fade-in">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="flex items-center gap-3 text-sm font-medium text-muted-foreground hover:text-primary py-3 px-2 rounded-lg hover:bg-secondary transition-colors"
-                onClick={() => setOpen(false)}
-              >
-                <link.icon className="h-5 w-5" />
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isInternal = link.href.startsWith("/");
+              const Comp = isInternal ? Link : "a";
+              const props = isInternal ? { to: link.href } : { href: link.href };
+              return (
+                <Comp
+                  key={link.label}
+                  {...(props as any)}
+                  className="flex items-center gap-3 text-sm font-medium text-muted-foreground hover:text-primary py-3 px-2 rounded-lg hover:bg-secondary transition-colors"
+                  onClick={() => setOpen(false)}
+                >
+                  <link.icon className="h-5 w-5" />
+                  {link.label}
+                </Comp>
+              );
+            })}
             <div className="flex gap-3 pt-3 border-t border-border mt-2">
               <Button variant="brand" size="sm" className="flex-1" asChild>
                 <Link to="/auth">Login</Link>
