@@ -252,6 +252,15 @@ export default function TourDetailPage() {
           </div>
         </div>
       </div>
+      {activeTour && (
+        <MockPaymentDialog
+          open={showPayment}
+          onClose={() => setShowPayment(false)}
+          onPaymentSuccess={finalizeBooking}
+          amount={totalPrice}
+          title={activeTour.title}
+        />
+      )}
       <Footer />
     </div>
   );
