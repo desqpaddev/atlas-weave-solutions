@@ -25,6 +25,7 @@ import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import CruisesListPage from "./pages/CruisesListPage";
 import ContactPage from "./pages/ContactPage";
+import AboutPage from "./pages/AboutPage";
 import FixedDeparturesPage from "./pages/FixedDeparturesPage";
 
 const queryClient = new QueryClient();
