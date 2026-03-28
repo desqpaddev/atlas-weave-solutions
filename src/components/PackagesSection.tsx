@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Star, Clock, Users, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import destBali from "@/assets/dest-bali.jpg";
+import destSwiss from "@/assets/dest-swiss.jpg";
+import destDubai from "@/assets/dest-dubai.jpg";
 import destSwiss from "@/assets/dest-swiss.jpg";
 import destDubai from "@/assets/dest-dubai.jpg";
 
