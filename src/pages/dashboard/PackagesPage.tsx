@@ -31,6 +31,8 @@ export default function PackagesPage() {
     is_customizable: true,
     inclusions: "", exclusions: "", highlights: "",
   });
+  const [formItinerary, setFormItinerary] = useState<ItineraryDay[]>([]);
+  const [formNewActivity, setFormNewActivity] = useState<Record<number, string>>({});
 
   const { data: packages = [], isLoading } = useQuery({
     queryKey: ["packages"],
@@ -65,6 +67,7 @@ export default function PackagesPage() {
         inclusions: form.inclusions ? form.inclusions.split(",").map((s) => s.trim()) : [],
         exclusions: form.exclusions ? form.exclusions.split(",").map((s) => s.trim()) : [],
         highlights: form.highlights ? form.highlights.split(",").map((s) => s.trim()) : [],
+        itinerary: formItinerary.length > 0 ? (formItinerary as unknown as Json[]) : [],
       });
       if (error) throw error;
     },
@@ -72,6 +75,8 @@ export default function PackagesPage() {
       queryClient.invalidateQueries({ queryKey: ["packages"] });
       setOpen(false);
       setForm({ title: "", destination: "", duration_days: 1, duration_nights: 0, base_price: 0, description: "", includes_flight: false, includes_hotel: false, includes_tour: false, includes_transfer: false, is_customizable: true, inclusions: "", exclusions: "", highlights: "" });
+      setFormItinerary([]);
+      setFormNewActivity({});
       toast.success("Package created!");
     },
     onError: (e) => toast.error(e.message),
@@ -162,6 +167,90 @@ export default function PackagesPage() {
                 <Checkbox checked={form.is_customizable} onCheckedChange={(c) => setForm({ ...form, is_customizable: !!c })} />
                 Allow customers to customize this package
               </label>
+
+              {/* Inline Itinerary Builder */}
+              <div className="border border-border rounded-xl p-4 bg-secondary/30">
+                <Label className="text-foreground font-semibold mb-3 block">Day-wise Itinerary</Label>
+                <div className="space-y-3">
+                  {formItinerary.map((day, dayIndex) => (
+                    <div key={dayIndex} className="border border-border rounded-lg p-3 bg-background">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shrink-0">{day.day}</span>
+                        <Input
+                          value={day.title}
+                          onChange={(e) => {
+                            const updated = [...formItinerary];
+                            updated[dayIndex].title = e.target.value;
+                            setFormItinerary(updated);
+                          }}
+                          className="text-sm font-semibold"
+                          placeholder="Day title"
+                        />
+                        <Button variant="ghost" size="icon" className="shrink-0 text-destructive h-7 w-7" onClick={() => {
+                          setFormItinerary(formItinerary.filter((_, i) => i !== dayIndex).map((d, i) => ({ ...d, day: i + 1 })));
+                        }}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                      <textarea
+                        value={day.description}
+                        onChange={(e) => {
+                          const updated = [...formItinerary];
+                          updated[dayIndex].description = e.target.value;
+                          setFormItinerary(updated);
+                        }}
+                        placeholder="Day description..."
+                        rows={1}
+                        className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs placeholder:text-muted-foreground mb-2"
+                      />
+                      {day.activities.map((activity, actIndex) => (
+                        <div key={actIndex} className="flex items-center gap-1.5 text-xs bg-secondary rounded px-2 py-1 mb-1">
+                          <span className="flex-1 text-muted-foreground">{activity}</span>
+                          <button onClick={() => {
+                            const updated = [...formItinerary];
+                            updated[dayIndex].activities = updated[dayIndex].activities.filter((_, i) => i !== actIndex);
+                            setFormItinerary(updated);
+                          }} className="text-destructive"><Trash2 className="h-2.5 w-2.5" /></button>
+                        </div>
+                      ))}
+                      <div className="flex gap-1.5">
+                        <Input
+                          value={formNewActivity[dayIndex] || ""}
+                          onChange={(e) => setFormNewActivity({ ...formNewActivity, [dayIndex]: e.target.value })}
+                          placeholder="Add activity..."
+                          className="text-xs h-7"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              const val = formNewActivity[dayIndex]?.trim();
+                              if (!val) return;
+                              const updated = [...formItinerary];
+                              updated[dayIndex].activities = [...updated[dayIndex].activities, val];
+                              setFormItinerary(updated);
+                              setFormNewActivity({ ...formNewActivity, [dayIndex]: "" });
+                            }
+                          }}
+                        />
+                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => {
+                          const val = formNewActivity[dayIndex]?.trim();
+                          if (!val) return;
+                          const updated = [...formItinerary];
+                          updated[dayIndex].activities = [...updated[dayIndex].activities, val];
+                          setFormItinerary(updated);
+                          setFormNewActivity({ ...formNewActivity, [dayIndex]: "" });
+                        }}>Add</Button>
+                      </div>
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" className="w-full gap-1 border-dashed text-xs" onClick={() => {
+                    const nextDay = formItinerary.length + 1;
+                    setFormItinerary([...formItinerary, { day: nextDay, title: `Day ${nextDay}`, description: "", activities: [] }]);
+                  }}>
+                    <Plus className="h-3.5 w-3.5" /> Add Day
+                  </Button>
+                </div>
+              </div>
+
               <Button variant="brand" onClick={() => createPackage.mutate()} disabled={!form.title || createPackage.isPending}>
                 {createPackage.isPending ? "Creating..." : "Create Package"}
               </Button>
