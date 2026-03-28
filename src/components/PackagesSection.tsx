@@ -111,9 +111,11 @@ export function PackagesSection() {
                     <p className="text-xl font-bold text-primary">${pkg.price}</p>
                     <span className="text-xs text-muted-foreground">per person</span>
                   </div>
-                  <Button variant="brand" size="sm" className="gap-1">
-                    Book Now <ArrowRight className="h-3.5 w-3.5" />
-                  </Button>
+              <Link to="/packages">
+                    <Button variant="brand" size="sm" className="gap-1">
+                      Book Now <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>

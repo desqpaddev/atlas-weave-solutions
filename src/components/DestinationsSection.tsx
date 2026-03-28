@@ -65,9 +65,10 @@ export function DestinationsSection() {
         <div className="relative">
           <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none" }}>
             {items.map((dest) => (
-              <div
+              <Link
                 key={dest.name + activeTab}
-                className="snap-start shrink-0 w-[220px] md:w-[260px] group cursor-pointer"
+                to={`/packages?destination=${encodeURIComponent(dest.name)}`}
+                className="snap-start shrink-0 w-[220px] md:w-[260px] group"
               >
                 <div className="relative rounded-2xl overflow-hidden shadow-card">
                   <div className="aspect-[3/4] overflow-hidden">
@@ -86,7 +87,7 @@ export function DestinationsSection() {
                     <p className="text-sm text-white/80 mt-0.5">{dest.price}</p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
