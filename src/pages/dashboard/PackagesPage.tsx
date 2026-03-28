@@ -19,68 +19,66 @@ import type { Json } from "@/integrations/supabase/types";
 
 type ItineraryDay = { day: number; title: string; description: string; activities: string[] };
 
+const defaultForm = { title: "", destination: "", duration_days: 1, duration_nights: 0, base_price: 0, description: "", includes_flight: false, includes_hotel: false, includes_tour: false, includes_transfer: false, is_customizable: true, inclusions: "", exclusions: "", highlights: "" };
+
 export default function PackagesPage() {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [viewId, setViewId] = useState<string | null>(null);
   const [itineraryOpen, setItineraryOpen] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    title: "", destination: "", duration_days: 1, duration_nights: 0,
-    base_price: 0, description: "",
-    includes_flight: false, includes_hotel: false, includes_tour: false, includes_transfer: false,
-    is_customizable: true,
-    inclusions: "", exclusions: "", highlights: "",
-  });
+  const [form, setForm] = useState(defaultForm);
   const [formItinerary, setFormItinerary] = useState<ItineraryDay[]>([]);
   const [formNewActivity, setFormNewActivity] = useState<Record<number, string>>({});
 
   const { data: packages = [], isLoading } = useQuery({
     queryKey: ["packages"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("packages")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("packages").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
   });
 
-  const createPackage = useMutation({
+  const closeDialog = () => { setOpen(false); setEditId(null); setForm(defaultForm); setFormItinerary([]); setFormNewActivity({}); };
+
+  const openEdit = (p: any) => {
+    setEditId(p.id);
+    setForm({ title: p.title, destination: p.destination || "", duration_days: p.duration_days, duration_nights: p.duration_nights, base_price: Number(p.base_price), description: p.description || "", includes_flight: p.includes_flight ?? false, includes_hotel: p.includes_hotel ?? false, includes_tour: p.includes_tour ?? false, includes_transfer: p.includes_transfer ?? false, is_customizable: p.is_customizable ?? true, inclusions: (p.inclusions || []).join(", "), exclusions: (p.exclusions || []).join(", "), highlights: (p.highlights || []).join(", ") });
+    setFormItinerary(Array.isArray(p.itinerary) ? (p.itinerary as unknown as ItineraryDay[]) : []);
+    setOpen(true);
+  };
+
+  const savePackage = useMutation({
     mutationFn: async () => {
       if (!profile?.company_id) throw new Error("No company assigned");
       const slug = form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-      const { error } = await supabase.from("packages").insert({
-        company_id: profile.company_id,
-        title: form.title,
-        slug,
-        destination: form.destination || null,
-        duration_days: form.duration_days,
-        duration_nights: form.duration_nights,
-        base_price: form.base_price,
-        description: form.description || null,
-        includes_flight: form.includes_flight,
-        includes_hotel: form.includes_hotel,
-        includes_tour: form.includes_tour,
-        includes_transfer: form.includes_transfer,
+      const payload = {
+        company_id: profile.company_id, title: form.title, slug,
+        destination: form.destination || null, duration_days: form.duration_days, duration_nights: form.duration_nights,
+        base_price: form.base_price, description: form.description || null,
+        includes_flight: form.includes_flight, includes_hotel: form.includes_hotel, includes_tour: form.includes_tour, includes_transfer: form.includes_transfer,
         is_customizable: form.is_customizable,
         inclusions: form.inclusions ? form.inclusions.split(",").map((s) => s.trim()) : [],
         exclusions: form.exclusions ? form.exclusions.split(",").map((s) => s.trim()) : [],
         highlights: form.highlights ? form.highlights.split(",").map((s) => s.trim()) : [],
         itinerary: formItinerary.length > 0 ? (formItinerary as unknown as Json[]) : [],
-      });
-      if (error) throw error;
+      };
+      if (editId) { const { error } = await supabase.from("packages").update(payload).eq("id", editId); if (error) throw error; }
+      else { const { error } = await supabase.from("packages").insert(payload); if (error) throw error; }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["packages"] });
-      setOpen(false);
-      setForm({ title: "", destination: "", duration_days: 1, duration_nights: 0, base_price: 0, description: "", includes_flight: false, includes_hotel: false, includes_tour: false, includes_transfer: false, is_customizable: true, inclusions: "", exclusions: "", highlights: "" });
-      setFormItinerary([]);
-      setFormNewActivity({});
-      toast.success("Package created!");
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["packages"] }); toast.success(editId ? "Package updated!" : "Package created!"); closeDialog(); },
     onError: (e) => toast.error(e.message),
   });
+
+  const removePackage = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from("packages").delete().eq("id", id); if (error) throw error; },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["packages"] }); toast.success("Package deleted"); },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const viewPkg = packages.find(p => p.id === viewId);
 
   const IncludesIcons = ({ pkg }: { pkg: any }) => (
     <div className="flex gap-1.5">
