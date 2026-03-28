@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import destSantorini from "@/assets/dest-santorini.jpg";
 import destBali from "@/assets/dest-bali.jpg";
