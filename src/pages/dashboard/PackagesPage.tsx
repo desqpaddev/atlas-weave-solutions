@@ -264,57 +264,31 @@ export default function PackagesPage() {
               <TableHead>Package</TableHead>
               <TableHead className="hidden md:table-cell">Destination</TableHead>
               <TableHead className="hidden sm:table-cell">Duration</TableHead>
-              <TableHead>Includes</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Itinerary</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
             ) : packages.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No packages yet. Create your first package!</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No packages yet.</TableCell></TableRow>
             ) : (
               packages.map((p) => (
                 <TableRow key={p.id} className="border-border">
+                  <TableCell><div><p className="font-medium text-foreground">{p.title}</p>{p.is_customizable && <p className="text-xs text-muted-foreground">Customizable</p>}</div></TableCell>
+                  <TableCell className="hidden md:table-cell"><span className="flex items-center gap-1 text-muted-foreground text-sm"><MapPin className="h-3 w-3" /> {p.destination || "—"}</span></TableCell>
+                  <TableCell className="hidden sm:table-cell"><span className="flex items-center gap-1 text-muted-foreground text-sm"><Clock className="h-3 w-3" /> {p.duration_days}D/{p.duration_nights}N</span></TableCell>
+                  <TableCell className="text-foreground font-medium">${Number(p.base_price).toLocaleString()}</TableCell>
+                  <TableCell><Badge variant="secondary" className={p.is_active ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}>{p.is_active ? "Active" : "Inactive"}</Badge></TableCell>
                   <TableCell>
-                    <div>
-                      <p className="font-medium text-foreground">{p.title}</p>
-                      {p.is_customizable && <p className="text-xs text-muted-foreground">Customizable</p>}
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(p.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setItineraryOpen(p.id)}><Edit className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(p)}><Pencil className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this package?")) removePackage.mutate(p.id); }}><Trash2 className="h-3.5 w-3.5" /></Button>
                     </div>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    <span className="flex items-center gap-1 text-muted-foreground text-sm">
-                      <MapPin className="h-3 w-3" /> {p.destination || "—"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    <span className="flex items-center gap-1 text-muted-foreground text-sm">
-                      <Clock className="h-3 w-3" /> {p.duration_days}D/{p.duration_nights}N
-                    </span>
-                  </TableCell>
-                  <TableCell><IncludesIcons pkg={p} /></TableCell>
-                  <TableCell className="text-foreground font-medium">
-                    ${Number(p.base_price).toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1 text-xs"
-                      onClick={() => setItineraryOpen(p.id)}
-                    >
-                      <Edit className="h-3 w-3" />
-                      {Array.isArray(p.itinerary) && (p.itinerary as unknown as ItineraryDay[]).length > 0
-                        ? `${(p.itinerary as unknown as ItineraryDay[]).length} days`
-                        : "Add"}
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={p.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
-                      {p.is_active ? "Active" : "Inactive"}
-                    </Badge>
                   </TableCell>
                 </TableRow>
               ))
@@ -323,14 +297,27 @@ export default function PackagesPage() {
         </Table>
       </div>
 
-      {/* Itinerary Builder Dialog */}
       {itineraryOpen && (
-        <ItineraryBuilderDialog
-          packageId={itineraryOpen}
-          pkg={packages.find((p) => p.id === itineraryOpen)!}
-          onClose={() => setItineraryOpen(null)}
-        />
+        <ItineraryBuilderDialog packageId={itineraryOpen} pkg={packages.find((p) => p.id === itineraryOpen)!} onClose={() => setItineraryOpen(null)} />
       )}
+
+      <Dialog open={!!viewId} onOpenChange={() => setViewId(null)}>
+        <DialogContent className="bg-card border-border max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader><DialogTitle className="font-display">Package Details</DialogTitle></DialogHeader>
+          {viewPkg && (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div><p className="text-muted-foreground">Title</p><p className="font-medium text-foreground">{viewPkg.title}</p></div>
+                <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewPkg.destination || "—"}</p></div>
+                <div><p className="text-muted-foreground">Duration</p><p className="text-foreground">{viewPkg.duration_days}D / {viewPkg.duration_nights}N</p></div>
+                <div><p className="text-muted-foreground">Price</p><p className="text-foreground">${Number(viewPkg.base_price).toLocaleString()}</p></div>
+              </div>
+              <div><p className="text-muted-foreground">Includes</p><p className="text-foreground">{[viewPkg.includes_flight && "Flights", viewPkg.includes_hotel && "Hotels", viewPkg.includes_tour && "Tours", viewPkg.includes_transfer && "Transfers"].filter(Boolean).join(", ") || "—"}</p></div>
+              {viewPkg.description && <div><p className="text-muted-foreground">Description</p><p className="text-foreground">{viewPkg.description}</p></div>}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
