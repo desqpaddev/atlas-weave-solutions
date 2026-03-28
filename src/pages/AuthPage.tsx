@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/contexts/AuthContext";
-import { Plane } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 export default function AuthPage() {
   const { user, loading } = useAuth();
@@ -18,10 +18,17 @@ export default function AuthPage() {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
+  const { data: company } = useQuery({
+    queryKey: ["auth-company-branding"],
+    queryFn: async () => {
+      const { data } = await supabase.from("companies").select("name, logo_url").limit(1).maybeSingle();
+      return data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
   useEffect(() => {
-    if (!loading && user) {
-      navigate("/dashboard", { replace: true });
-    }
+    if (!loading && user) navigate("/dashboard", { replace: true });
   }, [user, loading, navigate]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -60,8 +67,11 @@ export default function AuthPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Plane className="h-8 w-8 text-primary" />
-            <span className="font-display text-3xl font-bold text-gradient-blue">TravelHub</span>
+            {company?.logo_url ? (
+              <img src={company.logo_url} alt={company.name || "Logo"} className="h-12 w-auto max-w-[200px] object-contain" />
+            ) : (
+              <span className="font-display text-3xl font-bold text-gradient-blue">{company?.name || "Joanna Holidays"}</span>
+            )}
           </div>
           <p className="text-muted-foreground">{isLogin ? "Welcome back" : "Create your account"}</p>
         </div>

@@ -1,84 +1,171 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plane, Mail, MapPin, Phone, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { Mail, MapPin, Phone, Facebook, Instagram, Youtube, ArrowRight, Globe, Send } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Footer() {
+  const { data: company } = useQuery({
+    queryKey: ["footer-company"],
+    queryFn: async () => {
+      const { data } = await supabase.from("companies").select("name, logo_url, phone, email, address, website, settings").limit(1).maybeSingle();
+      return data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const companyName = company?.name || "Joanna Holidays";
+  const companyEmail = company?.email || "admin@joannaholidays.uk";
+  const companyPhone = company?.phone || "+44 7418375151";
+  const companyAddress = company?.address || "The Business Terrace, Maidstone House, King Street, Maidstone, Kent. ME 15 6JQ";
+  const logoUrl = company?.logo_url;
+
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-foreground text-background relative overflow-hidden">
+      {/* Decorative top wave */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
+
       {/* Newsletter */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="bg-primary rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left">
-            <h3 className="font-display text-xl md:text-2xl font-bold text-primary-foreground mb-1">
-              Get Exclusive Travel Deals
-            </h3>
-            <p className="text-primary-foreground/80 text-sm">
-              Subscribe to receive handpicked destinations and early access to our best packages.
-            </p>
-          </div>
-          <div className="flex gap-2 w-full max-w-sm">
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50"
-            />
-            <Button variant="brand-yellow">Subscribe</Button>
+      <div className="container mx-auto px-4 py-14">
+        <div className="relative bg-gradient-blue rounded-3xl p-8 md:p-12 overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <h3 className="font-display text-xl md:text-2xl font-bold text-white mb-2">
+                Get Exclusive Travel Deals ✈
+              </h3>
+              <p className="text-white/70 text-sm max-w-md">
+                Subscribe to receive handpicked destinations and early access to our best packages.
+              </p>
+            </div>
+            <div className="flex gap-2 w-full max-w-sm">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl h-12"
+              />
+              <Button variant="brand-yellow" className="rounded-xl h-12 px-6 gap-2">
+                <Send className="h-4 w-4" /> Subscribe
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Links */}
+      {/* Main footer */}
       <div className="container mx-auto px-4 pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          {/* Brand */}
           <div>
-            <span className="font-display text-xl font-bold text-accent">TravelHub</span>
-            <p className="text-sm text-background/60 mt-3 leading-relaxed">
-              Your trusted partner for unforgettable travel experiences worldwide.
+            {logoUrl ? (
+              <img src={logoUrl} alt={companyName} className="h-12 w-auto max-w-[180px] object-contain mb-4 brightness-0 invert" />
+            ) : (
+              <span className="font-display text-2xl font-bold text-accent block mb-4">{companyName}</span>
+            )}
+            <p className="text-sm text-background/60 leading-relaxed mb-5">
+              Joanna Holidays Pvt Ltd is an IATA Accredited Travel Management Company. With over 8 years of excellence, we craft exceptional travel experiences tailored to your needs.
             </p>
-            <div className="flex gap-3 mt-4">
-              {[Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-8 h-8 rounded-full bg-background/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors">
+            <div className="flex gap-3">
+              {[Facebook, Instagram, Youtube, Globe].map((Icon, i) => (
+                <a key={i} href="#" className="w-9 h-9 rounded-full bg-background/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110">
                   <Icon className="h-4 w-4" />
                 </a>
               ))}
             </div>
           </div>
+
+          {/* Travel Itineraries */}
           <div>
-            <h4 className="font-semibold text-background mb-4 text-sm">Explore</h4>
-            <ul className="space-y-2 text-sm text-background/60">
-              <li><a href="#" className="hover:text-accent transition-colors">Holidays</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Flights</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Hotels</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Tours</a></li>
+            <h4 className="font-display font-semibold text-background mb-5 text-sm relative inline-block">
+              Travel Itineraries
+              <span className="absolute -bottom-1.5 left-0 w-8 h-0.5 bg-accent rounded-full" />
+            </h4>
+            <ul className="space-y-3 text-sm text-background/60">
+              {[
+                { label: "Tour Listings", href: "/tours" },
+                { label: "Holiday Packages", href: "/packages" },
+                { label: "Cruise Tours", href: "/cruises" },
+                { label: "Fixed Departures", href: "/departures" },
+                { label: "Destinations", href: "/tours" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link to={item.href} className="hover:text-accent transition-colors flex items-center gap-1.5 group">
+                    <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent" />
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
+
+          {/* Explore */}
           <div>
-            <h4 className="font-semibold text-background mb-4 text-sm">Company</h4>
-            <ul className="space-y-2 text-sm text-background/60">
-              <li><a href="#" className="hover:text-accent transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Careers</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Press</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Blog</a></li>
+            <h4 className="font-display font-semibold text-background mb-5 text-sm relative inline-block">
+              Explore Now
+              <span className="absolute -bottom-1.5 left-0 w-8 h-0.5 bg-accent rounded-full" />
+            </h4>
+            <ul className="space-y-3 text-sm text-background/60">
+              {[
+                { label: "About Us", href: "/about" },
+                { label: "Contact Us", href: "/contact" },
+                { label: "Privacy Policy", href: "#" },
+                { label: "Terms of Service", href: "#" },
+                { label: "Cookie Policy", href: "#" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link to={item.href} className="hover:text-accent transition-colors flex items-center gap-1.5 group">
+                    <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent" />
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
+
+          {/* Contact */}
           <div>
-            <h4 className="font-semibold text-background mb-4 text-sm">Contact</h4>
-            <ul className="space-y-2 text-sm text-background/60">
-              <li className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-accent" /> hello@travelhub.com</li>
-              <li className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-accent" /> +1 (800) 555-0199</li>
-              <li className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-accent" /> New York, NY</li>
+            <h4 className="font-display font-semibold text-background mb-5 text-sm relative inline-block">
+              Contact Info
+              <span className="absolute -bottom-1.5 left-0 w-8 h-0.5 bg-accent rounded-full" />
+            </h4>
+            <ul className="space-y-4 text-sm text-background/60">
+              <li className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                  <Phone className="h-4 w-4 text-accent" />
+                </div>
+                <div>
+                  <p className="font-medium text-background text-xs mb-0.5">Need Help?</p>
+                  <p>{companyPhone}</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                  <Mail className="h-4 w-4 text-accent" />
+                </div>
+                <div>
+                  <p className="font-medium text-background text-xs mb-0.5">Email Us</p>
+                  <p>{companyEmail}</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                  <MapPin className="h-4 w-4 text-accent" />
+                </div>
+                <div>
+                  <p className="font-medium text-background text-xs mb-0.5">Location</p>
+                  <p className="leading-relaxed">{companyAddress}</p>
+                </div>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-background/10 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-background/50">
-          <p>© 2026 TravelHub. All rights reserved.</p>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-accent transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-accent transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-accent transition-colors">Cookie Policy</a>
-          </div>
+        <div className="border-t border-background/10 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-background/40">
+          <p>© {new Date().getFullYear()} {companyName}. All rights reserved.</p>
+          <p>IATA Accredited Travel Management Company</p>
         </div>
       </div>
     </footer>
