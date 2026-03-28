@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/AuthPage";
 import PackagesListPage from "./pages/PackagesListPage";
 import PackageDetailPage from "./pages/PackageDetailPage";
+import ToursListPage from "./pages/ToursListPage";
+import TourDetailPage from "./pages/TourDetailPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import LeadsPage from "./pages/dashboard/LeadsPage";
