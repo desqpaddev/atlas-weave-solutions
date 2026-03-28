@@ -4,10 +4,10 @@ import { Menu, X, Phone, MapPin, Globe, Plane, Hotel, Compass, Ship, ChevronDown
 import { Link } from "react-router-dom";
 
 const navLinks = [
-  { label: "Holidays", href: "#packages", icon: Compass },
+  { label: "Holidays", href: "/packages", icon: Compass },
   { label: "Flights", href: "#flights", icon: Plane },
   { label: "Hotels", href: "#hotels", icon: Hotel },
-  { label: "Tours", href: "#tours", icon: Compass },
+  { label: "Tours", href: "/tours", icon: Compass },
   { label: "Cruise", href: "#cruise", icon: Ship },
 ];
 
