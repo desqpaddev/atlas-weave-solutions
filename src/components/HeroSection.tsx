@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, MapPin, CalendarDays, Users, Search, Play, Compass } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import heroSlide2 from "@/assets/hero-slide-2.jpg";
 import heroSlide3 from "@/assets/hero-slide-3.jpg";
 
@@ -31,25 +33,36 @@ const slides = [
   },
 ];
 
-const destinations = [
-  "Dubai", "Maldives", "Switzerland", "Paris", "London", "Italy",
-  "Japan", "Thailand", "Kenya", "Vietnam", "Spain", "Norway",
-];
-
-const activities = [
-  "Adventure Activities", "Cultural & Historical", "Relaxation & Nature",
-  "Water Activities", "Wildlife Activities",
-];
+type SearchTab = "all" | "holidays" | "cruises";
 
 export function HeroSection() {
   const [current, setCurrent] = useState(0);
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<SearchTab>("all");
   const [searchData, setSearchData] = useState({
     location: "",
     activity: "",
     checkIn: "",
     guests: "2 Adults",
   });
+
+  // Fetch real destinations & categories from tours DB
+  const { data: tourMeta } = useQuery({
+    queryKey: ["hero-tour-meta"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("tours")
+        .select("destination, category")
+        .eq("is_active", true);
+      const destinations = [...new Set((data ?? []).map((t) => t.destination).filter(Boolean))] as string[];
+      const categories = [...new Set((data ?? []).map((t) => t.category).filter(Boolean))] as string[];
+      return { destinations: destinations.sort(), categories: categories.sort() };
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const destinations = tourMeta?.destinations ?? [];
+  const categories = tourMeta?.categories ?? [];
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % slides.length), []);
   const prev = useCallback(() => setCurrent((c) => (c - 1 + slides.length) % slides.length), []);
@@ -65,8 +78,24 @@ export function HeroSection() {
     const params = new URLSearchParams();
     if (searchData.location) params.set("destination", searchData.location);
     if (searchData.activity) params.set("category", searchData.activity);
-    navigate(`/tours?${params.toString()}`);
+
+    if (activeTab === "holidays") {
+      navigate(`/packages?${params.toString()}`);
+    } else if (activeTab === "cruises") {
+      navigate(`/cruises?${params.toString()}`);
+    } else {
+      navigate(`/tours?${params.toString()}`);
+    }
   };
+
+  const handleTabClick = (tab: SearchTab) => {
+    setActiveTab(tab);
+  };
+
+  const tabClass = (tab: SearchTab) =>
+    tab === activeTab
+      ? "text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full cursor-pointer transition-colors"
+      : "text-xs font-medium text-muted-foreground hover:text-primary px-3 py-1.5 rounded-full cursor-pointer transition-colors";
 
   return (
     <section className="relative w-full overflow-hidden" style={{ height: "clamp(550px, 75vh, 800px)" }}>
@@ -150,44 +179,47 @@ export function HeroSection() {
         <div className="bg-background rounded-2xl shadow-elevated border border-border overflow-hidden">
           {/* Search tabs */}
           <div className="flex items-center gap-1 px-4 pt-3 pb-0">
-            <span className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full">All Tours</span>
-            <span className="text-xs font-medium text-muted-foreground hover:text-primary px-3 py-1.5 rounded-full cursor-pointer transition-colors">Holidays</span>
-            <span className="text-xs font-medium text-muted-foreground hover:text-primary px-3 py-1.5 rounded-full cursor-pointer transition-colors">Cruises</span>
+            <button type="button" onClick={() => handleTabClick("all")} className={tabClass("all")}>All Tours</button>
+            <button type="button" onClick={() => handleTabClick("holidays")} className={tabClass("holidays")}>Holidays</button>
+            <button type="button" onClick={() => handleTabClick("cruises")} className={tabClass("cruises")}>Cruises</button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-border p-2">
-            {/* Location */}
+            {/* Location — text input with datalist for autocomplete */}
             <div className="px-4 py-3 hover:bg-secondary/50 transition-colors rounded-xl">
               <label className="text-[11px] text-muted-foreground font-semibold flex items-center gap-1.5 mb-1 uppercase tracking-wider">
                 <MapPin className="h-3 w-3 text-primary" />
                 Location
               </label>
-              <select
+              <input
+                type="text"
+                list="hero-destinations"
+                placeholder="Type or select destination"
                 value={searchData.location}
                 onChange={(e) => setSearchData({ ...searchData, location: e.target.value })}
-                className="w-full bg-transparent text-sm font-medium text-foreground focus:outline-none appearance-none cursor-pointer"
-              >
-                <option value="">Where to next?</option>
+                className="w-full bg-transparent text-sm font-medium text-foreground focus:outline-none placeholder:text-muted-foreground/60"
+              />
+              <datalist id="hero-destinations">
                 {destinations.map((d) => (
-                  <option key={d} value={d}>{d}</option>
+                  <option key={d} value={d} />
                 ))}
-              </select>
+              </datalist>
             </div>
 
-            {/* Activities */}
+            {/* Activities — dynamic from DB */}
             <div className="px-4 py-3 hover:bg-secondary/50 transition-colors rounded-xl">
               <label className="text-[11px] text-muted-foreground font-semibold flex items-center gap-1.5 mb-1 uppercase tracking-wider">
                 <Compass className="h-3 w-3 text-primary" />
-                Activities
+                Category
               </label>
               <select
                 value={searchData.activity}
                 onChange={(e) => setSearchData({ ...searchData, activity: e.target.value })}
                 className="w-full bg-transparent text-sm font-medium text-foreground focus:outline-none appearance-none cursor-pointer"
               >
-                <option value="">Select Activity</option>
-                {activities.map((a) => (
-                  <option key={a} value={a}>{a}</option>
+                <option value="">All Categories</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             </div>
