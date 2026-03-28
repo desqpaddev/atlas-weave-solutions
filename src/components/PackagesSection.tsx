@@ -1,49 +1,25 @@
 import { Star, Clock, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import destBali from "@/assets/dest-bali.jpg";
-import destSwiss from "@/assets/dest-swiss.jpg";
-import destDubai from "@/assets/dest-dubai.jpg";
-
-const packages = [
-  {
-    title: "Bali Wellness Retreat",
-    slug: "bali-wellness-retreat",
-    duration: "7 Days / 6 Nights",
-    guests: "2-6 People",
-    rating: 4.9,
-    reviews: 324,
-    price: 1299,
-    originalPrice: 1699,
-    image: destBali,
-    tags: ["Spa", "Nature", "Yoga"],
-  },
-  {
-    title: "Swiss Alpine Adventure",
-    slug: "swiss-alpine-adventure",
-    duration: "5 Days / 4 Nights",
-    guests: "2-8 People",
-    rating: 4.8,
-    reviews: 218,
-    price: 2199,
-    originalPrice: 2799,
-    image: destSwiss,
-    tags: ["Adventure", "Skiing", "Luxury"],
-  },
-  {
-    title: "Dubai Gold Experience",
-    slug: "dubai-gold-experience",
-    duration: "4 Days / 3 Nights",
-    guests: "2-4 People",
-    rating: 4.9,
-    reviews: 456,
-    price: 1599,
-    originalPrice: 2099,
-    image: destDubai,
-    tags: ["City", "Luxury", "Shopping"],
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function PackagesSection() {
+  const { data: tours = [] } = useQuery({
+    queryKey: ["homepage-tours"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tours")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (tours.length === 0) return null;
+
   return (
     <section id="packages" className="py-16 bg-secondary">
       <div className="container mx-auto px-4">
@@ -62,56 +38,59 @@ export function PackagesSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {packages.map((pkg) => (
+          {tours.map((tour) => (
             <Link
-              key={pkg.slug}
-              to={`/tours/${pkg.slug}`}
+              key={tour.id}
+              to={`/tours/${tour.slug}`}
               className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-elevated transition-all duration-300 group block"
             >
-              <div className="relative aspect-[16/10] overflow-hidden">
-                <img
-                  src={pkg.image}
-                  alt={pkg.title}
-                  loading="lazy"
-                  width={640}
-                  height={400}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute top-3 right-3 bg-destructive text-destructive-foreground text-xs font-bold px-2.5 py-1 rounded-full">
-                  Save ${pkg.originalPrice - pkg.price}
+              {tour.cover_image && (
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={tour.cover_image}
+                    alt={tour.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                 </div>
-              </div>
+              )}
 
               <div className="p-5">
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {pkg.tags.map((tag) => (
-                    <span key={tag} className="text-xs bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full font-medium">
-                      {tag}
+                  {tour.category && (
+                    <span className="text-xs bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full font-medium">
+                      {tour.category}
                     </span>
-                  ))}
+                  )}
+                  {tour.difficulty && (
+                    <span className="text-xs bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full font-medium">
+                      {tour.difficulty}
+                    </span>
+                  )}
                 </div>
 
-                <h3 className="font-display text-lg font-bold text-foreground">{pkg.title}</h3>
+                <h3 className="font-display text-lg font-bold text-foreground">{tour.title}</h3>
 
                 <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" /> {pkg.duration}
+                    <Clock className="h-3.5 w-3.5" /> {tour.duration_days}D / {tour.duration_nights}N
                   </span>
-                  <span className="flex items-center gap-1">
-                    <Users className="h-3.5 w-3.5" /> {pkg.guests}
-                  </span>
+                  {tour.max_group_size && (
+                    <span className="flex items-center gap-1">
+                      <Users className="h-3.5 w-3.5" /> Max {tour.max_group_size}
+                    </span>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-1.5 mt-2">
-                  <Star className="h-4 w-4 text-accent fill-accent" />
-                  <span className="text-sm font-semibold text-foreground">{pkg.rating}</span>
-                  <span className="text-xs text-muted-foreground">({pkg.reviews} reviews)</span>
-                </div>
+                {tour.destination && (
+                  <p className="text-sm text-muted-foreground mt-2">{tour.destination}</p>
+                )}
 
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
                   <div>
-                    <span className="text-xs text-muted-foreground line-through">${pkg.originalPrice}</span>
-                    <p className="text-xl font-bold text-primary">${pkg.price}</p>
+                    <p className="text-xl font-bold text-primary">
+                      {tour.currency === 'GBP' ? '£' : '$'}{Number(tour.adult_price).toLocaleString()}
+                    </p>
                     <span className="text-xs text-muted-foreground">per person</span>
                   </div>
                   <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
