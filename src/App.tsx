@@ -23,6 +23,8 @@ import PackagesPage from "./pages/dashboard/PackagesPage";
 import PaymentsPage from "./pages/dashboard/PaymentsPage";
 import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
+import CruisesListPage from "./pages/CruisesListPage";
+import ContactPage from "./pages/ContactPage";
 
 const queryClient = new QueryClient();
 
