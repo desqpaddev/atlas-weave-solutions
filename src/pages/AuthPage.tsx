@@ -59,8 +59,8 @@ export default function AuthPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Plane className="h-8 w-8 text-gold" />
-            <span className="font-display text-3xl font-bold text-gradient-gold">TravelHub</span>
+            <Plane className="h-8 w-8 text-primary" />
+            <span className="font-display text-3xl font-bold text-gradient-blue">TravelHub</span>
           </div>
           <p className="text-muted-foreground">
             {isLogin ? "Welcome back" : "Create your account"}
@@ -138,7 +138,7 @@ export default function AuthPage() {
             {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-gold hover:text-gold-light transition-colors font-medium"
+              className="text-primary hover:text-primary-light transition-colors font-medium"
             >
               {isLogin ? "Sign Up" : "Sign In"}
             </button>

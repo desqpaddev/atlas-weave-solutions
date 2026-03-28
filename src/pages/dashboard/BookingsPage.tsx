@@ -58,7 +58,7 @@ export default function BookingsPage() {
             ) : (
               bookings.map((b) => (
                 <TableRow key={b.id} className="border-border">
-                  <TableCell className="font-mono text-xs text-gold">{b.reference_number}</TableCell>
+                  <TableCell className="font-mono text-xs text-primary">{b.reference_number}</TableCell>
                   <TableCell className="font-medium text-foreground">{b.title}</TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground capitalize">{b.booking_type}</TableCell>
                   <TableCell>
