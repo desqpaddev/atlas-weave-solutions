@@ -49,13 +49,6 @@ export default function AuthPage() {
     setSubmitting(false);
   };
 
-  const handleGoogleSignIn = async () => {
-    const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/auth",
-    });
-    if (error) toast.error("Google sign-in failed");
-  };
-
   if (loading) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
