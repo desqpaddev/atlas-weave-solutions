@@ -130,11 +130,13 @@ export default function LeadsPage() {
                 <div><p className="text-muted-foreground">Email</p><p className="text-foreground">{viewLead.email || "—"}</p></div>
                 <div><p className="text-muted-foreground">Phone</p><p className="text-foreground">{viewLead.phone || "—"}</p></div>
                 <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewLead.destination || "—"}</p></div>
-                <div><p className="text-muted-foreground">Budget</p><p className="text-foreground">{viewLead.budget ? `$${Number(viewLead.budget).toLocaleString()}` : "—"}</p></div>
-                <div><p className="text-muted-foreground">Source</p><p className="text-foreground">{viewLead.source || "—"}</p></div>
-                <div><p className="text-muted-foreground">Travelers</p><p className="text-foreground">{viewLead.pax}</p></div>
+                <div><p className="text-muted-foreground">Budget</p><p className="text-foreground font-semibold">{viewLead.budget ? `$${Number(viewLead.budget).toLocaleString()}` : "—"}</p></div>
+                <div><p className="text-muted-foreground">Source</p><p className="text-foreground capitalize">{viewLead.source || "—"}</p></div>
+                <div><p className="text-muted-foreground">Travelers</p><p className="text-foreground">{viewLead.pax || "—"}</p></div>
+                <div><p className="text-muted-foreground">Travel Dates</p><p className="text-foreground">{viewLead.travel_dates || "—"}</p></div>
+                <div><p className="text-muted-foreground">Created</p><p className="text-foreground">{new Date(viewLead.created_at).toLocaleDateString()}</p></div>
               </div>
-              {viewLead.notes && <div><p className="text-muted-foreground">Notes</p><p className="text-foreground whitespace-pre-wrap">{viewLead.notes}</p></div>}
+              {viewLead.notes && <div className="border-t border-border pt-3"><p className="text-muted-foreground">Notes</p><p className="text-foreground whitespace-pre-wrap">{viewLead.notes}</p></div>}
             </div>
           )}
         </DialogContent>
