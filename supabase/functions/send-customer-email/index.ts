@@ -199,19 +199,24 @@ async function sendViaSMTP(smtpHost: string, smtpPort: number, smtpUser: string,
   await sendCmd(activeConn, `RCPT TO:<${toEmail}>`);
   await sendCmd(activeConn, "DATA");
 
+  // Base64 encode the HTML to avoid SMTP line length issues
+  const htmlBase64 = btoa(unescape(encodeURIComponent(htmlBody)));
+  // Split base64 into 76-char lines per RFC 2045
+  const base64Lines = htmlBase64.match(/.{1,76}/g)?.join("\r\n") || htmlBase64;
+
   const boundary = `boundary_${Date.now()}`;
   const emailData = [
     `From: "${fromName}" <${fromEmail}>`,
     `To: ${toEmail}`,
-    `Subject: ${subject}`,
+    `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
     `MIME-Version: 1.0`,
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
     ``,
     `--${boundary}`,
     `Content-Type: text/html; charset=UTF-8`,
-    `Content-Transfer-Encoding: quoted-printable`,
+    `Content-Transfer-Encoding: base64`,
     ``,
-    htmlBody,
+    base64Lines,
     ``,
     `--${boundary}--`,
     `.`,
