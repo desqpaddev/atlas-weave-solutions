@@ -67,6 +67,7 @@ export default function PackagesPage() {
         inclusions: form.inclusions ? form.inclusions.split(",").map((s) => s.trim()) : [],
         exclusions: form.exclusions ? form.exclusions.split(",").map((s) => s.trim()) : [],
         highlights: form.highlights ? form.highlights.split(",").map((s) => s.trim()) : [],
+        itinerary: formItinerary.length > 0 ? (formItinerary as unknown as Json[]) : [],
       });
       if (error) throw error;
     },
