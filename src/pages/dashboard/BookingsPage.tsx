@@ -36,7 +36,7 @@ export default function BookingsPage() {
           <h1 className="font-display text-2xl font-bold text-foreground">Bookings</h1>
           <p className="text-muted-foreground text-sm">Manage all travel bookings across channels.</p>
         </div>
-        <Button variant="hero" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Booking</Button>
+        <Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Booking</Button>
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-hidden">
@@ -58,7 +58,7 @@ export default function BookingsPage() {
             ) : (
               bookings.map((b) => (
                 <TableRow key={b.id} className="border-border">
-                  <TableCell className="font-mono text-xs text-gold">{b.reference_number}</TableCell>
+                  <TableCell className="font-mono text-xs text-primary">{b.reference_number}</TableCell>
                   <TableCell className="font-medium text-foreground">{b.title}</TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground capitalize">{b.booking_type}</TableCell>
                   <TableCell>

@@ -91,7 +91,7 @@ export default function PackagesPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="hero" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Package</Button>
+            <Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Package</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto bg-card border-border">
             <DialogHeader>
@@ -154,7 +154,7 @@ export default function PackagesPage() {
                 <Checkbox checked={form.is_customizable} onCheckedChange={(c) => setForm({ ...form, is_customizable: !!c })} />
                 Allow customers to customize this package
               </label>
-              <Button variant="hero" onClick={() => createPackage.mutate()} disabled={!form.title || createPackage.isPending}>
+              <Button variant="brand" onClick={() => createPackage.mutate()} disabled={!form.title || createPackage.isPending}>
                 {createPackage.isPending ? "Creating..." : "Create Package"}
               </Button>
             </div>

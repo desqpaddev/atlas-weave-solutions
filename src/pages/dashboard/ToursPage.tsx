@@ -79,7 +79,7 @@ export default function ToursPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="hero" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Tour</Button>
+            <Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Tour</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto bg-card border-border">
             <DialogHeader>
@@ -146,7 +146,7 @@ export default function ToursPage() {
                 <Label className="text-foreground">Highlights (comma-separated)</Label>
                 <Input value={form.highlights} onChange={(e) => setForm({ ...form, highlights: e.target.value })} placeholder="Sunrise trek, Temple visit" className="bg-secondary border-border" />
               </div>
-              <Button variant="hero" onClick={() => createTour.mutate()} disabled={!form.title || createTour.isPending}>
+              <Button variant="brand" onClick={() => createTour.mutate()} disabled={!form.title || createTour.isPending}>
                 {createTour.isPending ? "Creating..." : "Create Tour"}
               </Button>
             </div>

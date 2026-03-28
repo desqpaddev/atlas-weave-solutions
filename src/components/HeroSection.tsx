@@ -1,109 +1,118 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Search, Plane, Hotel, MapPin, CalendarDays, Users } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import heroSlide1 from "@/assets/hero-slide-1.jpg";
+import heroSlide2 from "@/assets/hero-slide-2.jpg";
+import heroSlide3 from "@/assets/hero-slide-3.jpg";
 
-const tabs = [
-  { id: "flights", label: "Flights", icon: Plane },
-  { id: "hotels", label: "Hotels", icon: Hotel },
-  { id: "tours", label: "Tours", icon: MapPin },
+const slides = [
+  {
+    image: heroSlide1,
+    title: "Explore the Beauty of",
+    highlight: "Greece",
+    subtitle: "Starting at $1,299",
+    cta: "Explore Now",
+  },
+  {
+    image: heroSlide2,
+    title: "Escape to Paradise in",
+    highlight: "Maldives",
+    subtitle: "Starting at $2,499",
+    cta: "Book Now",
+  },
+  {
+    image: heroSlide3,
+    title: "Adventure Awaits in",
+    highlight: "Swiss Alps",
+    subtitle: "Starting at $2,199",
+    cta: "Discover More",
+  },
 ];
 
 export function HeroSection() {
-  const [activeTab, setActiveTab] = useState("flights");
+  const [current, setCurrent] = useState(0);
+
+  const next = useCallback(() => setCurrent((c) => (c + 1) % slides.length), []);
+  const prev = useCallback(() => setCurrent((c) => (c - 1 + slides.length) % slides.length), []);
+
+  useEffect(() => {
+    const timer = setInterval(next, 5000);
+    return () => clearInterval(timer);
+  }, [next]);
+
+  const slide = slides[current];
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0">
-        <img
-          src={heroBg}
-          alt="Luxury beach resort"
-          className="w-full h-full object-cover"
-          width={1920}
-          height={1080}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background" />
-      </div>
+    <section className="relative w-full overflow-hidden" style={{ height: "clamp(400px, 60vw, 600px)" }}>
+      {/* Slides */}
+      {slides.map((s, i) => (
+        <div
+          key={i}
+          className="absolute inset-0 transition-opacity duration-700"
+          style={{ opacity: i === current ? 1 : 0 }}
+        >
+          <img
+            src={s.image}
+            alt={s.highlight}
+            className="w-full h-full object-cover"
+            width={1920}
+            height={800}
+            {...(i === 0 ? {} : { loading: "lazy" as const })}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-foreground/60 via-foreground/30 to-transparent" />
+        </div>
+      ))}
 
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 pt-20 pb-12 text-center">
-        <p className="text-gold font-medium tracking-widest uppercase text-sm mb-4 animate-fade-up opacity-0" style={{ animationDelay: "0.1s" }}>
-          Luxury Travel Redefined
-        </p>
-        <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-bold text-foreground leading-tight mb-6 animate-fade-up opacity-0" style={{ animationDelay: "0.2s" }}>
-          Discover the World's
-          <br />
-          <span className="text-gradient-gold">Most Exquisite</span> Destinations
-        </h1>
-        <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10 animate-fade-up opacity-0" style={{ animationDelay: "0.3s" }}>
-          Curated journeys to extraordinary places. From pristine beaches to alpine retreats, 
-          your perfect escape awaits.
-        </p>
-
-        {/* Search Card */}
-        <div className="max-w-4xl mx-auto glass-card rounded-xl p-1 animate-fade-up opacity-0" style={{ animationDelay: "0.4s" }}>
-          {/* Tabs */}
-          <div className="flex gap-1 p-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === tab.id
-                    ? "bg-gold text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <tab.icon className="h-4 w-4" />
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Search Fields */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4">
-            <div className="flex items-center gap-3 bg-secondary/50 rounded-lg px-4 py-3">
-              <MapPin className="h-4 w-4 text-gold shrink-0" />
-              <div className="text-left">
-                <p className="text-xs text-muted-foreground">Destination</p>
-                <p className="text-sm text-foreground font-medium">Where to?</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 bg-secondary/50 rounded-lg px-4 py-3">
-              <CalendarDays className="h-4 w-4 text-gold shrink-0" />
-              <div className="text-left">
-                <p className="text-xs text-muted-foreground">Check In</p>
-                <p className="text-sm text-foreground font-medium">Select Date</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 bg-secondary/50 rounded-lg px-4 py-3">
-              <CalendarDays className="h-4 w-4 text-gold shrink-0" />
-              <div className="text-left">
-                <p className="text-xs text-muted-foreground">Check Out</p>
-                <p className="text-sm text-foreground font-medium">Select Date</p>
-              </div>
-            </div>
-            <Button variant="hero" className="h-full min-h-[52px] text-base gap-2">
-              <Search className="h-4 w-4" />
-              Search
+      {/* Content overlay */}
+      <div className="relative z-10 h-full flex items-center">
+        <div className="container mx-auto px-4">
+          <div className="max-w-xl" key={current}>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight animate-fade-up opacity-0" style={{ animationDelay: "0.1s" }}>
+              {slide.title}
+              <br />
+              <span className="text-accent">{slide.highlight}</span>
+            </h1>
+            <p className="text-white/90 text-lg md:text-xl mt-4 font-medium animate-fade-up opacity-0" style={{ animationDelay: "0.2s" }}>
+              {slide.subtitle}
+            </p>
+            <Button variant="brand-yellow" size="lg" className="mt-6 animate-fade-up opacity-0" style={{ animationDelay: "0.3s" }}>
+              {slide.cta}
             </Button>
           </div>
         </div>
+      </div>
 
-        {/* Stats */}
-        <div className="flex flex-wrap justify-center gap-8 md:gap-16 mt-12 animate-fade-up opacity-0" style={{ animationDelay: "0.5s" }}>
-          {[
-            { value: "500+", label: "Destinations" },
-            { value: "10K+", label: "Happy Travelers" },
-            { value: "4.9", label: "Average Rating" },
-            { value: "24/7", label: "Support" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="text-2xl md:text-3xl font-display font-bold text-gradient-gold">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
-            </div>
-          ))}
+      {/* Nav arrows */}
+      <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors">
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+      <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-colors">
+        <ChevronRight className="h-5 w-5" />
+      </button>
+
+      {/* Dots */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`w-3 h-3 rounded-full transition-all ${i === current ? "bg-white w-8" : "bg-white/50"}`}
+          />
+        ))}
+      </div>
+
+      {/* Search bar */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-20 w-full max-w-2xl px-4">
+        <div className="bg-background rounded-full shadow-elevated flex items-center px-6 py-3 gap-3">
+          <Search className="h-5 w-5 text-muted-foreground shrink-0" />
+          <input
+            type="text"
+            placeholder="Search destinations, packages, tours..."
+            className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-sm focus:outline-none"
+          />
+          <Button variant="brand" size="sm" className="rounded-full px-6">
+            Search
+          </Button>
         </div>
       </div>
     </section>

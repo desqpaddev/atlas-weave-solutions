@@ -87,7 +87,7 @@ export default function DeparturesPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="hero" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Departure</Button>
+            <Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Departure</Button>
           </DialogTrigger>
           <DialogContent className="max-w-md bg-card border-border">
             <DialogHeader>
@@ -129,7 +129,7 @@ export default function DeparturesPage() {
                 <Label className="text-foreground">Notes</Label>
                 <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} className="flex w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" />
               </div>
-              <Button variant="hero" onClick={() => createDeparture.mutate()} disabled={!form.tour_id || !form.departure_date || createDeparture.isPending}>
+              <Button variant="brand" onClick={() => createDeparture.mutate()} disabled={!form.tour_id || !form.departure_date || createDeparture.isPending}>
                 {createDeparture.isPending ? "Creating..." : "Create Departure"}
               </Button>
             </div>

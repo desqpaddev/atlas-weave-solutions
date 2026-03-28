@@ -32,10 +32,10 @@ export default function DashboardOverview() {
   });
 
   const stats = [
-    { label: "Total Leads", value: leadCount ?? 0, icon: TrendingUp, color: "text-gold" },
-    { label: "Bookings", value: bookingCount ?? 0, icon: CalendarDays, color: "text-gold" },
-    { label: "Customers", value: customerCount ?? 0, icon: Users, color: "text-gold" },
-    { label: "Revenue", value: "$0", icon: DollarSign, color: "text-gold" },
+    { label: "Total Leads", value: leadCount ?? 0, icon: TrendingUp, color: "text-primary" },
+    { label: "Bookings", value: bookingCount ?? 0, icon: CalendarDays, color: "text-primary" },
+    { label: "Customers", value: customerCount ?? 0, icon: Users, color: "text-primary" },
+    { label: "Revenue", value: "$0", icon: DollarSign, color: "text-primary" },
   ];
 
   return (

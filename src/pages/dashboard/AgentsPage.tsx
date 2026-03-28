@@ -24,7 +24,7 @@ export default function AgentsPage() {
           <h1 className="font-display text-2xl font-bold text-foreground">Agents</h1>
           <p className="text-muted-foreground text-sm">Manage travel agents and commission tracking.</p>
         </div>
-        <Button variant="hero" size="sm" className="gap-1"><Plus className="h-4 w-4" /> Add Agent</Button>
+        <Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> Add Agent</Button>
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-hidden">

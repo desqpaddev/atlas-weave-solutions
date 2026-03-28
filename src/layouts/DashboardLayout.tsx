@@ -32,7 +32,7 @@ export default function DashboardLayout() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-2 border-gold border-t-transparent rounded-full" />
+        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -60,8 +60,8 @@ export default function DashboardLayout() {
           {/* Logo */}
           <div className="h-16 flex items-center justify-between px-5 border-b border-border">
             <Link to="/" className="flex items-center gap-2">
-              <Plane className="h-5 w-5 text-gold" />
-              <span className="font-display text-xl font-bold text-gradient-gold">TravelHub</span>
+              <Plane className="h-5 w-5 text-primary" />
+              <span className="font-display text-xl font-bold text-gradient-blue">TravelHub</span>
             </Link>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-muted-foreground">
               <X className="h-5 w-5" />
@@ -79,7 +79,7 @@ export default function DashboardLayout() {
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium mb-1 transition-colors
                     ${isActive
-                      ? "bg-gold/10 text-gold"
+                      ? "bg-primary/10 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                     }`}
                 >
