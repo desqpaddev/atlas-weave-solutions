@@ -7,6 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/AuthPage";
+import PackagesListPage from "./pages/PackagesListPage";
+import PackageDetailPage from "./pages/PackageDetailPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import LeadsPage from "./pages/dashboard/LeadsPage";
