@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Star, Clock, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import destBali from "@/assets/dest-bali.jpg";
@@ -8,6 +7,7 @@ import destDubai from "@/assets/dest-dubai.jpg";
 const packages = [
   {
     title: "Bali Wellness Retreat",
+    slug: "bali-wellness-retreat",
     duration: "7 Days / 6 Nights",
     guests: "2-6 People",
     rating: 4.9,
@@ -19,6 +19,7 @@ const packages = [
   },
   {
     title: "Swiss Alpine Adventure",
+    slug: "swiss-alpine-adventure",
     duration: "5 Days / 4 Nights",
     guests: "2-8 People",
     rating: 4.8,
@@ -30,6 +31,7 @@ const packages = [
   },
   {
     title: "Dubai Gold Experience",
+    slug: "dubai-gold-experience",
     duration: "4 Days / 3 Nights",
     guests: "2-4 People",
     rating: 4.9,
@@ -54,16 +56,17 @@ export function PackagesSection() {
               Hand-picked packages for an unforgettable journey.
             </p>
           </div>
-          <Link to="/packages" className="hidden md:flex items-center gap-1 text-primary text-sm font-semibold hover:underline">
+          <Link to="/tours" className="hidden md:flex items-center gap-1 text-primary text-sm font-semibold hover:underline">
             View All <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {packages.map((pkg) => (
-            <div
-              key={pkg.title}
-              className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-elevated transition-all duration-300 group"
+            <Link
+              key={pkg.slug}
+              to={`/tours/${pkg.slug}`}
+              className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-elevated transition-all duration-300 group block"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
                 <img
@@ -111,14 +114,12 @@ export function PackagesSection() {
                     <p className="text-xl font-bold text-primary">${pkg.price}</p>
                     <span className="text-xs text-muted-foreground">per person</span>
                   </div>
-              <Link to="/packages">
-                    <Button variant="brand" size="sm" className="gap-1">
-                      Book Now <ArrowRight className="h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                    View Tour <ArrowRight className="h-3.5 w-3.5" />
+                  </span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

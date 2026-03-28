@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import destSantorini from "@/assets/dest-santorini.jpg";
 import destBali from "@/assets/dest-bali.jpg";
 import destSwiss from "@/assets/dest-swiss.jpg";
@@ -10,20 +10,20 @@ import destKyoto from "@/assets/dest-kyoto.jpg";
 
 const tabs = ["Domestic", "International"];
 
-const destinations: Record<string, { name: string; image: string; price: string }[]> = {
+const destinations: Record<string, { name: string; image: string; price: string; slug: string }[]> = {
   Domestic: [
-    { name: "Santorini", image: destSantorini, price: "From $1,299" },
-    { name: "Swiss Alps", image: destSwiss, price: "From $2,199" },
-    { name: "Kyoto", image: destKyoto, price: "From $1,799" },
-    { name: "Bali", image: destBali, price: "From $899" },
+    { name: "Santorini", image: destSantorini, price: "From $1,299", slug: "santorini-sunset-romance" },
+    { name: "Swiss Alps", image: destSwiss, price: "From $2,199", slug: "swiss-alpine-adventure" },
+    { name: "Kyoto", image: destKyoto, price: "From $1,799", slug: "kyoto-cultural-journey" },
+    { name: "Bali", image: destBali, price: "From $899", slug: "bali-wellness-retreat" },
   ],
   International: [
-    { name: "Dubai", image: destDubai, price: "From $1,599" },
-    { name: "Maldives", image: destMaldives, price: "From $2,499" },
-    { name: "Bali", image: destBali, price: "From $899" },
-    { name: "Santorini", image: destSantorini, price: "From $1,299" },
-    { name: "Swiss Alps", image: destSwiss, price: "From $2,199" },
-    { name: "Kyoto", image: destKyoto, price: "From $1,799" },
+    { name: "Dubai", image: destDubai, price: "From $1,599", slug: "dubai-gold-experience" },
+    { name: "Maldives", image: destMaldives, price: "From $2,499", slug: "maldives-ocean-escape" },
+    { name: "Bali", image: destBali, price: "From $899", slug: "bali-wellness-retreat" },
+    { name: "Santorini", image: destSantorini, price: "From $1,299", slug: "santorini-sunset-romance" },
+    { name: "Swiss Alps", image: destSwiss, price: "From $2,199", slug: "swiss-alpine-adventure" },
+    { name: "Kyoto", image: destKyoto, price: "From $1,799", slug: "kyoto-cultural-journey" },
   ],
 };
 
@@ -67,7 +67,7 @@ export function DestinationsSection() {
             {items.map((dest) => (
               <Link
                 key={dest.name + activeTab}
-                to={`/packages?destination=${encodeURIComponent(dest.name)}`}
+                to={`/tours/${dest.slug}`}
                 className="snap-start shrink-0 w-[220px] md:w-[260px] group"
               >
                 <div className="relative rounded-2xl overflow-hidden shadow-card">

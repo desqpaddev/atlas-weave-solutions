@@ -10,9 +10,182 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Check, X, Star, Users, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { Json } from "@/integrations/supabase/types";
+import destBali from "@/assets/dest-bali.jpg";
+import destSwiss from "@/assets/dest-swiss.jpg";
+import destDubai from "@/assets/dest-dubai.jpg";
+import destMaldives from "@/assets/dest-maldives.jpg";
+import destSantorini from "@/assets/dest-santorini.jpg";
+import destKyoto from "@/assets/dest-kyoto.jpg";
 
 type ItineraryDay = { day: number; title: string; description: string; activities: string[] };
+
+type TourFallback = {
+  slug: string;
+  title: string;
+  destination: string;
+  duration_days: number;
+  duration_nights: number;
+  adult_price: number;
+  child_price: number | null;
+  group_price: number | null;
+  category: string;
+  difficulty: string;
+  max_group_size: number;
+  cover_image: string;
+  description: string;
+  highlights: string[];
+  inclusions: string[];
+  exclusions: string[];
+  itinerary: ItineraryDay[];
+  company_id: string | null;
+};
+
+const fallbackToursBySlug: Record<string, TourFallback> = {
+  "bali-wellness-retreat": {
+    slug: "bali-wellness-retreat",
+    title: "Bali Wellness Retreat",
+    destination: "Bali",
+    duration_days: 7,
+    duration_nights: 6,
+    adult_price: 1299,
+    child_price: 899,
+    group_price: 6999,
+    category: "Wellness",
+    difficulty: "easy",
+    max_group_size: 12,
+    cover_image: destBali,
+    description: "Rejuvenate in Bali with curated spa rituals, yoga sessions, and immersive cultural experiences.",
+    highlights: ["Sunrise yoga", "Ubud cultural tour", "Private spa therapy", "Beachside sunset dinner"],
+    inclusions: ["6-night stay", "Daily breakfast", "Airport transfers", "Guided excursions", "Wellness sessions"],
+    exclusions: ["International flights", "Visa fees", "Personal expenses"],
+    itinerary: [
+      { day: 1, title: "Arrival in Bali", description: "Airport welcome and resort check-in.", activities: ["Private transfer", "Welcome dinner"] },
+      { day: 2, title: "Wellness & Relaxation", description: "Slow day focused on body and mind.", activities: ["Morning yoga", "Signature spa session"] },
+      { day: 3, title: "Ubud Discovery", description: "Explore Bali's cultural center.", activities: ["Rice terrace visit", "Temple walk", "Local market"] },
+    ],
+    company_id: null,
+  },
+  "swiss-alpine-adventure": {
+    slug: "swiss-alpine-adventure",
+    title: "Swiss Alpine Adventure",
+    destination: "Swiss Alps",
+    duration_days: 5,
+    duration_nights: 4,
+    adult_price: 2199,
+    child_price: 1599,
+    group_price: 10999,
+    category: "Adventure",
+    difficulty: "moderate",
+    max_group_size: 10,
+    cover_image: destSwiss,
+    description: "A scenic alpine journey through iconic Swiss peaks, mountain trains, and adrenaline activities.",
+    highlights: ["Glacier viewpoints", "Alpine rail routes", "Adventure activities", "Lakeside villages"],
+    inclusions: ["4-night stay", "Breakfast", "Transport pass", "Guided mountain experience"],
+    exclusions: ["Visa fees", "Travel insurance", "Lunch and dinners"],
+    itinerary: [
+      { day: 1, title: "Arrival & Orientation", description: "Settle into your alpine base.", activities: ["Hotel check-in", "Town orientation walk"] },
+      { day: 2, title: "Peak Experience", description: "Day at high altitude viewpoints.", activities: ["Cable car ascent", "Glacier platform visit"] },
+      { day: 3, title: "Adventure Day", description: "Choose your thrill in the Alps.", activities: ["Optional skiing", "Mountain trek", "Photo stops"] },
+    ],
+    company_id: null,
+  },
+  "dubai-gold-experience": {
+    slug: "dubai-gold-experience",
+    title: "Dubai Gold Experience",
+    destination: "Dubai",
+    duration_days: 4,
+    duration_nights: 3,
+    adult_price: 1599,
+    child_price: 1099,
+    group_price: 7999,
+    category: "City",
+    difficulty: "easy",
+    max_group_size: 15,
+    cover_image: destDubai,
+    description: "Experience Dubai's luxury lifestyle with skyline views, desert adventure, and premium shopping.",
+    highlights: ["Burj skyline views", "Desert safari", "Luxury shopping", "Marina cruise"],
+    inclusions: ["3-night stay", "Daily breakfast", "Airport transfers", "Desert safari"],
+    exclusions: ["Visa", "Personal shopping", "Travel insurance"],
+    itinerary: [
+      { day: 1, title: "Welcome to Dubai", description: "Arrival and evening marina leisure.", activities: ["Airport transfer", "Marina walk"] },
+      { day: 2, title: "Iconic City Tour", description: "Discover landmarks and cultural zones.", activities: ["City tour", "Observation deck", "Fountain show"] },
+      { day: 3, title: "Desert & Entertainment", description: "Evening dune adventure and show.", activities: ["Desert safari", "BBQ dinner", "Live performances"] },
+    ],
+    company_id: null,
+  },
+  "maldives-ocean-escape": {
+    slug: "maldives-ocean-escape",
+    title: "Maldives Ocean Escape",
+    destination: "Maldives",
+    duration_days: 6,
+    duration_nights: 5,
+    adult_price: 2499,
+    child_price: 1799,
+    group_price: 12499,
+    category: "Beach",
+    difficulty: "easy",
+    max_group_size: 8,
+    cover_image: destMaldives,
+    description: "A luxury island retreat with turquoise lagoons, water villas, and curated experiences.",
+    highlights: ["Overwater villa", "Coral snorkeling", "Sunset cruise", "Island hopping"],
+    inclusions: ["5-night stay", "All meals", "Boat transfers", "Water activities"],
+    exclusions: ["International airfare", "Personal expenses"],
+    itinerary: [
+      { day: 1, title: "Island Arrival", description: "Transfer to your island resort.", activities: ["Speedboat transfer", "Resort orientation"] },
+      { day: 2, title: "Ocean Discovery", description: "Explore reefs and marine life.", activities: ["Snorkeling", "Lagoon kayaking"] },
+      { day: 3, title: "Leisure & Sunset", description: "Slow travel day in paradise.", activities: ["Spa session", "Sunset cruise"] },
+    ],
+    company_id: null,
+  },
+  "santorini-sunset-romance": {
+    slug: "santorini-sunset-romance",
+    title: "Santorini Sunset Romance",
+    destination: "Santorini",
+    duration_days: 5,
+    duration_nights: 4,
+    adult_price: 1499,
+    child_price: 999,
+    group_price: 7499,
+    category: "Romance",
+    difficulty: "easy",
+    max_group_size: 10,
+    cover_image: destSantorini,
+    description: "Romantic cliffside stays, caldera views, and Greek island charm.",
+    highlights: ["Caldera sunset", "Winery tasting", "Blue-dome photo spots", "Catamaran cruise"],
+    inclusions: ["4-night stay", "Breakfast", "Port transfers", "Sunset cruise"],
+    exclusions: ["Flights", "Visa fees"],
+    itinerary: [
+      { day: 1, title: "Arrival in Santorini", description: "Check in to a cliffside hotel.", activities: ["Transfer", "Village walk"] },
+      { day: 2, title: "Caldera Discovery", description: "Explore iconic viewpoints.", activities: ["Oia visit", "Sunset photos"] },
+      { day: 3, title: "Sea & Wine", description: "Cruise and tasting day.", activities: ["Catamaran cruise", "Winery experience"] },
+    ],
+    company_id: null,
+  },
+  "kyoto-cultural-journey": {
+    slug: "kyoto-cultural-journey",
+    title: "Kyoto Cultural Journey",
+    destination: "Kyoto",
+    duration_days: 6,
+    duration_nights: 5,
+    adult_price: 1799,
+    child_price: 1299,
+    group_price: 8999,
+    category: "Culture",
+    difficulty: "easy",
+    max_group_size: 14,
+    cover_image: destKyoto,
+    description: "A deep cultural immersion into Kyoto's temples, traditions, and culinary gems.",
+    highlights: ["Historic temples", "Tea ceremony", "Arashiyama district", "Traditional cuisine"],
+    inclusions: ["5-night stay", "Daily breakfast", "Local guide", "Cultural activities"],
+    exclusions: ["International flights", "Personal shopping"],
+    itinerary: [
+      { day: 1, title: "Arrival & Check-in", description: "Welcome to Kyoto.", activities: ["Transfer", "Evening stroll"] },
+      { day: 2, title: "Temple Circuit", description: "Visit iconic heritage sites.", activities: ["Temple visits", "Zen garden experience"] },
+      { day: 3, title: "Cultural Workshop", description: "Hands-on local experiences.", activities: ["Tea ceremony", "Local market walk"] },
+    ],
+    company_id: null,
+  },
+};
 
 export default function TourDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -29,29 +202,41 @@ export default function TourDetailPage() {
         .select("*")
         .eq("slug", slug!)
         .eq("is_active", true)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
     enabled: !!slug,
   });
 
+  const activeTour = tour ?? (slug ? fallbackToursBySlug[slug] : undefined);
+
+  const itinerary: ItineraryDay[] = Array.isArray(activeTour?.itinerary)
+    ? (activeTour.itinerary as unknown as ItineraryDay[])
+    : [];
+
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tour) return;
+    if (!activeTour) return;
+
+    if (!activeTour.company_id) {
+      toast.info("This tour is in preview mode. Add this tour in admin to capture leads in CRM.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const { error } = await supabase.from("leads").insert({
-        company_id: tour.company_id,
+        company_id: activeTour.company_id,
         full_name: bookingForm.fullName,
         email: bookingForm.email,
         phone: bookingForm.phone,
         pax: bookingForm.pax,
-        destination: tour.destination,
+        destination: activeTour.destination,
         travel_dates: bookingForm.checkIn,
-        budget: tour.adult_price * bookingForm.pax,
+        budget: activeTour.adult_price * bookingForm.pax,
         source: "website",
-        notes: `Tour: ${tour.title}\n${bookingForm.notes}`,
+        notes: `Tour: ${activeTour.title}\n${bookingForm.notes}`,
         status: "new",
       });
       if (error) throw error;
@@ -64,10 +249,6 @@ export default function TourDetailPage() {
     }
   };
 
-  const itinerary: ItineraryDay[] = Array.isArray(tour?.itinerary)
-    ? (tour.itinerary as unknown as ItineraryDay[])
-    : [];
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -79,7 +260,7 @@ export default function TourDetailPage() {
     );
   }
 
-  if (!tour) {
+  if (!activeTour) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -102,7 +283,7 @@ export default function TourDetailPage() {
           <ChevronRight className="h-3 w-3" />
           <Link to="/tours" className="hover:text-primary">Tours</Link>
           <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground">{tour.title}</span>
+          <span className="text-foreground">{activeTour.title}</span>
         </div>
       </div>
 
@@ -110,32 +291,32 @@ export default function TourDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <div>
-              <h1 className="font-display text-2xl md:text-4xl font-bold text-foreground">{tour.title}</h1>
+              <h1 className="font-display text-2xl md:text-4xl font-bold text-foreground">{activeTour.title}</h1>
               <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground">
-                {tour.destination && <span className="flex items-center gap-1"><MapPin className="h-4 w-4 text-primary" /> {tour.destination}</span>}
-                <span className="flex items-center gap-1"><Clock className="h-4 w-4 text-primary" /> {tour.duration_days}D / {tour.duration_nights}N</span>
-                {tour.category && <Badge variant="outline">{tour.category}</Badge>}
-                {tour.difficulty && <Badge variant="outline">{tour.difficulty}</Badge>}
-                {tour.max_group_size && <span className="flex items-center gap-1"><Users className="h-4 w-4 text-primary" /> Max {tour.max_group_size}</span>}
+                {activeTour.destination && <span className="flex items-center gap-1"><MapPin className="h-4 w-4 text-primary" /> {activeTour.destination}</span>}
+                <span className="flex items-center gap-1"><Clock className="h-4 w-4 text-primary" /> {activeTour.duration_days}D / {activeTour.duration_nights}N</span>
+                {activeTour.category && <Badge variant="outline">{activeTour.category}</Badge>}
+                {activeTour.difficulty && <Badge variant="outline">{activeTour.difficulty}</Badge>}
+                {activeTour.max_group_size && <span className="flex items-center gap-1"><Users className="h-4 w-4 text-primary" /> Max {activeTour.max_group_size}</span>}
               </div>
             </div>
 
-            {tour.cover_image && (
-              <img src={tour.cover_image} alt={tour.title} className="w-full rounded-xl object-cover max-h-[400px]" />
+            {activeTour.cover_image && (
+              <img src={activeTour.cover_image} alt={activeTour.title} className="w-full rounded-xl object-cover max-h-[400px]" />
             )}
 
-            {tour.description && (
+            {activeTour.description && (
               <div>
                 <h2 className="font-display text-xl font-bold text-foreground mb-3">Overview</h2>
-                <p className="text-muted-foreground leading-relaxed">{tour.description}</p>
+                <p className="text-muted-foreground leading-relaxed">{activeTour.description}</p>
               </div>
             )}
 
-            {tour.highlights && tour.highlights.length > 0 && (
+            {activeTour.highlights && activeTour.highlights.length > 0 && (
               <div>
                 <h2 className="font-display text-xl font-bold text-foreground mb-3">Highlights</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {tour.highlights.map((h, i) => (
+                  {activeTour.highlights.map((h, i) => (
                     <div key={i} className="flex items-start gap-2 text-sm">
                       <Star className="h-4 w-4 text-accent shrink-0 mt-0.5" />
                       <span className="text-muted-foreground">{h}</span>
@@ -172,23 +353,23 @@ export default function TourDetailPage() {
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {tour.inclusions && tour.inclusions.length > 0 && (
+              {activeTour.inclusions && activeTour.inclusions.length > 0 && (
                 <div>
                   <h2 className="font-display text-lg font-bold text-foreground mb-3">Inclusions</h2>
                   <ul className="space-y-2">
-                    {tour.inclusions.map((item, i) => (
+                    {activeTour.inclusions.map((item, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Check className="h-4 w-4 text-green-500 shrink-0" /> {item}
+                        <Check className="h-4 w-4 text-primary shrink-0" /> {item}
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
-              {tour.exclusions && tour.exclusions.length > 0 && (
+              {activeTour.exclusions && activeTour.exclusions.length > 0 && (
                 <div>
                   <h2 className="font-display text-lg font-bold text-foreground mb-3">Exclusions</h2>
                   <ul className="space-y-2">
-                    {tour.exclusions.map((item, i) => (
+                    {activeTour.exclusions.map((item, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
                         <X className="h-4 w-4 text-destructive shrink-0" /> {item}
                       </li>
@@ -198,36 +379,34 @@ export default function TourDetailPage() {
               )}
             </div>
 
-            {/* Pricing table */}
             <div>
               <h2 className="font-display text-xl font-bold text-foreground mb-3">Pricing</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-card border border-border rounded-xl p-4 text-center">
                   <p className="text-xs text-muted-foreground mb-1">Adult</p>
-                  <p className="text-2xl font-bold text-primary">${Number(tour.adult_price).toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-primary">${Number(activeTour.adult_price).toLocaleString()}</p>
                 </div>
-                {tour.child_price && Number(tour.child_price) > 0 && (
+                {activeTour.child_price && Number(activeTour.child_price) > 0 && (
                   <div className="bg-card border border-border rounded-xl p-4 text-center">
                     <p className="text-xs text-muted-foreground mb-1">Child</p>
-                    <p className="text-2xl font-bold text-primary">${Number(tour.child_price).toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-primary">${Number(activeTour.child_price).toLocaleString()}</p>
                   </div>
                 )}
-                {tour.group_price && Number(tour.group_price) > 0 && (
+                {activeTour.group_price && Number(activeTour.group_price) > 0 && (
                   <div className="bg-card border border-border rounded-xl p-4 text-center">
                     <p className="text-xs text-muted-foreground mb-1">Group</p>
-                    <p className="text-2xl font-bold text-primary">${Number(tour.group_price).toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-primary">${Number(activeTour.group_price).toLocaleString()}</p>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Booking sidebar */}
           <div>
             <div className="sticky top-28 bg-card border border-border rounded-xl p-6 shadow-card">
               <div className="mb-5">
                 <p className="text-xs text-muted-foreground">Starting from</p>
-                <p className="text-3xl font-bold text-primary font-display">${Number(tour.adult_price).toLocaleString()}</p>
+                <p className="text-3xl font-bold text-primary font-display">${Number(activeTour.adult_price).toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">per adult</p>
               </div>
 
