@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Check, X, Star, Users, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { MockPaymentDialog } from "@/components/MockPaymentDialog";
 import destBali from "@/assets/dest-bali.jpg";
 import destSwiss from "@/assets/dest-swiss.jpg";
 import destDubai from "@/assets/dest-dubai.jpg";
