@@ -3,8 +3,19 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { AuthProvider } from "@/contexts/AuthContext";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
+import AuthPage from "./pages/AuthPage";
+import DashboardLayout from "./layouts/DashboardLayout";
+import DashboardOverview from "./pages/dashboard/DashboardOverview";
+import LeadsPage from "./pages/dashboard/LeadsPage";
+import CustomersPage from "./pages/dashboard/CustomersPage";
+import AgentsPage from "./pages/dashboard/AgentsPage";
+import BookingsPage from "./pages/dashboard/BookingsPage";
+import PaymentsPage from "./pages/dashboard/PaymentsPage";
+import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
+import SettingsPage from "./pages/dashboard/SettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -14,11 +25,23 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<DashboardOverview />} />
+              <Route path="leads" element={<LeadsPage />} />
+              <Route path="customers" element={<CustomersPage />} />
+              <Route path="agents" element={<AgentsPage />} />
+              <Route path="bookings" element={<BookingsPage />} />
+              <Route path="payments" element={<PaymentsPage />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
