@@ -76,7 +76,7 @@ export function HeroSection() {
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (searchData.location) params.set("destination", searchData.location);
+    if (searchData.location) params.set("search", searchData.location);
     if (searchData.activity) params.set("category", searchData.activity);
 
     if (activeTab === "holidays") {
