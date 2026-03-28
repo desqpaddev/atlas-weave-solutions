@@ -249,8 +249,8 @@ export default function PackagesPage() {
                 </div>
               </div>
 
-              <Button variant="brand" onClick={() => createPackage.mutate()} disabled={!form.title || createPackage.isPending}>
-                {createPackage.isPending ? "Creating..." : "Create Package"}
+              <Button variant="brand" onClick={() => savePackage.mutate()} disabled={!form.title || savePackage.isPending}>
+                {savePackage.isPending ? "Saving..." : editId ? "Update Package" : "Create Package"}
               </Button>
             </div>
           </DialogContent>
