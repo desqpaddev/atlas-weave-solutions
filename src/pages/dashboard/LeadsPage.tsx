@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Pencil, Trash2, Eye } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Eye, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Database } from "@/integrations/supabase/types";
@@ -44,6 +44,35 @@ export default function LeadsPage() {
   const remove = useMutation({
     mutationFn: async (id: string) => { const { error } = await supabase.from("leads").delete().eq("id", id); if (error) throw error; },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["leads"] }); toast.success("Lead deleted"); },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const convertToCustomer = useMutation({
+    mutationFn: async (lead: any) => {
+      if (!profile?.company_id) throw new Error("No company assigned");
+      // Check if customer already exists by email
+      if (lead.email) {
+        const { data: existing } = await supabase.from("customers").select("id").eq("email", lead.email).eq("company_id", profile.company_id).maybeSingle();
+        if (existing) throw new Error("A customer with this email already exists");
+      }
+      // Create customer from lead data
+      const { error: custErr } = await supabase.from("customers").insert({
+        company_id: profile.company_id,
+        full_name: lead.full_name,
+        email: lead.email || null,
+        phone: lead.phone || null,
+        notes: `Converted from lead. Destination: ${lead.destination || "N/A"}. Budget: ${lead.budget || "N/A"}. Travel dates: ${lead.travel_dates || "N/A"}. ${lead.notes || ""}`.trim(),
+      });
+      if (custErr) throw custErr;
+      // Update lead status to "won"
+      const { error: leadErr } = await supabase.from("leads").update({ status: "won" as LeadStatus, customer_id: null }).eq("id", lead.id);
+      if (leadErr) throw leadErr;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["leads"] });
+      qc.invalidateQueries({ queryKey: ["customers"] });
+      toast.success("Lead converted to customer successfully!");
+    },
     onError: (e) => toast.error(e.message),
   });
 
@@ -107,9 +136,12 @@ export default function LeadsPage() {
                 <TableCell className="hidden xl:table-cell text-muted-foreground">{l.travel_dates || "—"}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(l.id)}><Eye className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(l)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this lead?")) remove.mutate(l.id); }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(l.id)} title="View"><Eye className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(l)} title="Edit"><Pencil className="h-3.5 w-3.5" /></Button>
+                    {l.status !== "won" && (
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-green-500 hover:text-green-400" onClick={() => { if (confirm("Convert this lead to a customer?")) convertToCustomer.mutate(l); }} title="Convert to Customer" disabled={convertToCustomer.isPending}><UserCheck className="h-3.5 w-3.5" /></Button>
+                    )}
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this lead?")) remove.mutate(l.id); }} title="Delete"><Trash2 className="h-3.5 w-3.5" /></Button>
                   </div>
                 </TableCell>
               </TableRow>
