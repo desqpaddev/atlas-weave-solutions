@@ -25,6 +25,7 @@ import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import CruisesListPage from "./pages/CruisesListPage";
 import ContactPage from "./pages/ContactPage";
+import FixedDeparturesPage from "./pages/FixedDeparturesPage";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/tours/:slug" element={<TourDetailPage />} />
             <Route path="/cruises" element={<CruisesListPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/departures" element={<FixedDeparturesPage />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<DashboardOverview />} />
               <Route path="leads" element={<LeadsPage />} />

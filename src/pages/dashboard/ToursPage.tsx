@@ -9,10 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, MapPin, Clock, Pencil, Trash2, Eye } from "lucide-react";
+import { Plus, MapPin, Clock, Pencil, Trash2, Eye, X } from "lucide-react";
 import { toast } from "sonner";
 
-const emptyForm = { title: "", destination: "", duration_days: 1, duration_nights: 0, adult_price: 0, child_price: 0, category: "tour", difficulty: "easy", max_group_size: 20, description: "", inclusions: "", exclusions: "", highlights: "", is_active: true };
+const defaultCategories = ["tour", "activity", "experience", "adventure", "cultural", "cruise", "wildlife", "honeymoon", "pilgrimage", "trekking"];
+
+const emptyForm = { title: "", destination: "", duration_days: 1, duration_nights: 0, adult_price: 0, child_price: 0, category: "tour", difficulty: "easy", max_group_size: 20, description: "", inclusions: "", exclusions: "", highlights: "", is_active: true, cover_image: "", newCategory: "" };
 
 export default function ToursPage() {
   const { profile } = useAuth();
@@ -22,19 +24,40 @@ export default function ToursPage() {
   const [viewId, setViewId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
 
+  // Fetch distinct categories from existing tours
+  const { data: dynamicCategories = [] } = useQuery({
+    queryKey: ["tour-categories"],
+    queryFn: async () => {
+      const { data } = await supabase.from("tours").select("category");
+      if (!data) return [];
+      const cats = [...new Set(data.map(t => t.category).filter(Boolean))] as string[];
+      return cats;
+    },
+  });
+
+  const allCategories = [...new Set([...defaultCategories, ...dynamicCategories])].sort();
+
   const { data: tours = [], isLoading } = useQuery({
-    queryKey: ["tours"], queryFn: async () => { const { data, error } = await supabase.from("tours").select("*").order("created_at", { ascending: false }); if (error) throw error; return data; },
+    queryKey: ["tours"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tours").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
   });
 
   const save = useMutation({
     mutationFn: async () => {
       if (!profile?.company_id) throw new Error("No company assigned");
       const slug = form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+      const category = form.category === "__new__" ? form.newCategory.trim().toLowerCase() : form.category;
+      if (!category) throw new Error("Category is required");
       const payload = {
         company_id: profile.company_id, title: form.title, slug, destination: form.destination || null,
         duration_days: form.duration_days, duration_nights: form.duration_nights, adult_price: form.adult_price,
-        child_price: form.child_price, category: form.category, difficulty: form.difficulty,
+        child_price: form.child_price, category, difficulty: form.difficulty,
         max_group_size: form.max_group_size || null, description: form.description || null, is_active: form.is_active,
+        cover_image: form.cover_image || null,
         inclusions: form.inclusions ? form.inclusions.split(",").map(s => s.trim()) : [],
         exclusions: form.exclusions ? form.exclusions.split(",").map(s => s.trim()) : [],
         highlights: form.highlights ? form.highlights.split(",").map(s => s.trim()) : [],
@@ -42,7 +65,7 @@ export default function ToursPage() {
       if (editId) { const { error } = await supabase.from("tours").update(payload).eq("id", editId); if (error) throw error; }
       else { const { error } = await supabase.from("tours").insert(payload); if (error) throw error; }
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tours"] }); toast.success(editId ? "Tour updated!" : "Tour created!"); closeDialog(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tours"] }); qc.invalidateQueries({ queryKey: ["tour-categories"] }); toast.success(editId ? "Tour updated!" : "Tour created!"); closeDialog(); },
     onError: (e) => toast.error(e.message),
   });
 
@@ -55,7 +78,7 @@ export default function ToursPage() {
   const closeDialog = () => { setOpen(false); setEditId(null); setForm(emptyForm); };
   const openEdit = (t: any) => {
     setEditId(t.id);
-    setForm({ title: t.title, destination: t.destination || "", duration_days: t.duration_days, duration_nights: t.duration_nights, adult_price: Number(t.adult_price), child_price: Number(t.child_price || 0), category: t.category || "tour", difficulty: t.difficulty || "easy", max_group_size: t.max_group_size || 20, description: t.description || "", is_active: t.is_active ?? true, inclusions: (t.inclusions || []).join(", "), exclusions: (t.exclusions || []).join(", "), highlights: (t.highlights || []).join(", ") });
+    setForm({ title: t.title, destination: t.destination || "", duration_days: t.duration_days, duration_nights: t.duration_nights, adult_price: Number(t.adult_price), child_price: Number(t.child_price || 0), category: t.category || "tour", difficulty: t.difficulty || "easy", max_group_size: t.max_group_size || 20, description: t.description || "", is_active: t.is_active ?? true, inclusions: (t.inclusions || []).join(", "), exclusions: (t.exclusions || []).join(", "), highlights: (t.highlights || []).join(", "), cover_image: t.cover_image || "", newCategory: "" });
     setOpen(true);
   };
   const viewTour = tours.find(t => t.id === viewId);
@@ -72,8 +95,18 @@ export default function ToursPage() {
               <div><Label>Title *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required className="mt-1" /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Destination</Label><Input value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} className="mt-1" /></div>
-                <div><Label>Category</Label><select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="mt-1 flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"><option value="tour">Tour</option><option value="activity">Activity</option><option value="experience">Experience</option><option value="adventure">Adventure</option><option value="cultural">Cultural</option></select></div>
+                <div>
+                  <Label>Category</Label>
+                  <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="mt-1 flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground">
+                    {allCategories.map(c => <option key={c} value={c} className="capitalize">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+                    <option value="__new__">+ Add New Category</option>
+                  </select>
+                  {form.category === "__new__" && (
+                    <Input placeholder="Enter new category" value={form.newCategory} onChange={(e) => setForm({ ...form, newCategory: e.target.value })} className="mt-2" />
+                  )}
+                </div>
               </div>
+              <div><Label>Cover Image URL</Label><Input value={form.cover_image} onChange={(e) => setForm({ ...form, cover_image: e.target.value })} placeholder="https://..." className="mt-1" /></div>
               <div className="grid grid-cols-3 gap-3">
                 <div><Label>Days</Label><Input type="number" min={1} value={form.duration_days} onChange={(e) => setForm({ ...form, duration_days: Number(e.target.value) })} className="mt-1" /></div>
                 <div><Label>Nights</Label><Input type="number" min={0} value={form.duration_nights} onChange={(e) => setForm({ ...form, duration_nights: Number(e.target.value) })} className="mt-1" /></div>
@@ -125,6 +158,7 @@ export default function ToursPage() {
           <DialogHeader><DialogTitle className="font-display">Tour Details</DialogTitle></DialogHeader>
           {viewTour && (
             <div className="space-y-3 text-sm">
+              {viewTour.cover_image && <img src={viewTour.cover_image} alt={viewTour.title} className="w-full h-40 object-cover rounded-lg" />}
               <div className="grid grid-cols-2 gap-3">
                 <div><p className="text-muted-foreground">Title</p><p className="font-medium text-foreground">{viewTour.title}</p></div>
                 <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewTour.destination || "—"}</p></div>
