@@ -75,6 +75,8 @@ export default function PackagesPage() {
       queryClient.invalidateQueries({ queryKey: ["packages"] });
       setOpen(false);
       setForm({ title: "", destination: "", duration_days: 1, duration_nights: 0, base_price: 0, description: "", includes_flight: false, includes_hotel: false, includes_tour: false, includes_transfer: false, is_customizable: true, inclusions: "", exclusions: "", highlights: "" });
+      setFormItinerary([]);
+      setFormNewActivity({});
       toast.success("Package created!");
     },
     onError: (e) => toast.error(e.message),
