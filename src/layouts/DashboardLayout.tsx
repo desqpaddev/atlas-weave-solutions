@@ -4,7 +4,7 @@ import { useNavigate, Outlet, Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, UserCheck, Briefcase, CalendarDays,
   DollarSign, BarChart3, Settings, LogOut, Menu, X, Plane,
-  ChevronRight
+  ChevronRight, Map, Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
