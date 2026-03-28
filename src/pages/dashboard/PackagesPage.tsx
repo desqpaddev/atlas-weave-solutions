@@ -96,13 +96,13 @@ export default function PackagesPage() {
           <h1 className="font-display text-2xl font-bold text-foreground">Holiday Packages</h1>
           <p className="text-muted-foreground text-sm">Pre-built travel packages combining flights, hotels & tours.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(o) => { if (!o) closeDialog(); else setOpen(true); }}>
           <DialogTrigger asChild>
             <Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Package</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto bg-card border-border">
             <DialogHeader>
-              <DialogTitle className="text-foreground">Create Package</DialogTitle>
+              <DialogTitle className="text-foreground">{editId ? "Edit Package" : "Create Package"}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-2">
               <div className="grid gap-2">
