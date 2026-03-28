@@ -31,6 +31,8 @@ export default function PackagesPage() {
     is_customizable: true,
     inclusions: "", exclusions: "", highlights: "",
   });
+  const [formItinerary, setFormItinerary] = useState<ItineraryDay[]>([]);
+  const [formNewActivity, setFormNewActivity] = useState<Record<number, string>>({});
 
   const { data: packages = [], isLoading } = useQuery({
     queryKey: ["packages"],
