@@ -13,74 +13,72 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, MapPin, Clock, Plane, Hotel, Map, Car, Trash2, GripVertical, Edit } from "lucide-react";
+import { Plus, MapPin, Clock, Plane, Hotel, Map, Car, Trash2, GripVertical, Edit, Pencil, Eye } from "lucide-react";
 import { toast } from "sonner";
 import type { Json } from "@/integrations/supabase/types";
 
 type ItineraryDay = { day: number; title: string; description: string; activities: string[] };
 
+const defaultForm = { title: "", destination: "", duration_days: 1, duration_nights: 0, base_price: 0, description: "", includes_flight: false, includes_hotel: false, includes_tour: false, includes_transfer: false, is_customizable: true, inclusions: "", exclusions: "", highlights: "" };
+
 export default function PackagesPage() {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [viewId, setViewId] = useState<string | null>(null);
   const [itineraryOpen, setItineraryOpen] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    title: "", destination: "", duration_days: 1, duration_nights: 0,
-    base_price: 0, description: "",
-    includes_flight: false, includes_hotel: false, includes_tour: false, includes_transfer: false,
-    is_customizable: true,
-    inclusions: "", exclusions: "", highlights: "",
-  });
+  const [form, setForm] = useState(defaultForm);
   const [formItinerary, setFormItinerary] = useState<ItineraryDay[]>([]);
   const [formNewActivity, setFormNewActivity] = useState<Record<number, string>>({});
 
   const { data: packages = [], isLoading } = useQuery({
     queryKey: ["packages"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("packages")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("packages").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
   });
 
-  const createPackage = useMutation({
+  const closeDialog = () => { setOpen(false); setEditId(null); setForm(defaultForm); setFormItinerary([]); setFormNewActivity({}); };
+
+  const openEdit = (p: any) => {
+    setEditId(p.id);
+    setForm({ title: p.title, destination: p.destination || "", duration_days: p.duration_days, duration_nights: p.duration_nights, base_price: Number(p.base_price), description: p.description || "", includes_flight: p.includes_flight ?? false, includes_hotel: p.includes_hotel ?? false, includes_tour: p.includes_tour ?? false, includes_transfer: p.includes_transfer ?? false, is_customizable: p.is_customizable ?? true, inclusions: (p.inclusions || []).join(", "), exclusions: (p.exclusions || []).join(", "), highlights: (p.highlights || []).join(", ") });
+    setFormItinerary(Array.isArray(p.itinerary) ? (p.itinerary as unknown as ItineraryDay[]) : []);
+    setOpen(true);
+  };
+
+  const savePackage = useMutation({
     mutationFn: async () => {
       if (!profile?.company_id) throw new Error("No company assigned");
       const slug = form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-      const { error } = await supabase.from("packages").insert({
-        company_id: profile.company_id,
-        title: form.title,
-        slug,
-        destination: form.destination || null,
-        duration_days: form.duration_days,
-        duration_nights: form.duration_nights,
-        base_price: form.base_price,
-        description: form.description || null,
-        includes_flight: form.includes_flight,
-        includes_hotel: form.includes_hotel,
-        includes_tour: form.includes_tour,
-        includes_transfer: form.includes_transfer,
+      const payload = {
+        company_id: profile.company_id, title: form.title, slug,
+        destination: form.destination || null, duration_days: form.duration_days, duration_nights: form.duration_nights,
+        base_price: form.base_price, description: form.description || null,
+        includes_flight: form.includes_flight, includes_hotel: form.includes_hotel, includes_tour: form.includes_tour, includes_transfer: form.includes_transfer,
         is_customizable: form.is_customizable,
         inclusions: form.inclusions ? form.inclusions.split(",").map((s) => s.trim()) : [],
         exclusions: form.exclusions ? form.exclusions.split(",").map((s) => s.trim()) : [],
         highlights: form.highlights ? form.highlights.split(",").map((s) => s.trim()) : [],
         itinerary: formItinerary.length > 0 ? (formItinerary as unknown as Json[]) : [],
-      });
-      if (error) throw error;
+      };
+      if (editId) { const { error } = await supabase.from("packages").update(payload).eq("id", editId); if (error) throw error; }
+      else { const { error } = await supabase.from("packages").insert(payload); if (error) throw error; }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["packages"] });
-      setOpen(false);
-      setForm({ title: "", destination: "", duration_days: 1, duration_nights: 0, base_price: 0, description: "", includes_flight: false, includes_hotel: false, includes_tour: false, includes_transfer: false, is_customizable: true, inclusions: "", exclusions: "", highlights: "" });
-      setFormItinerary([]);
-      setFormNewActivity({});
-      toast.success("Package created!");
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["packages"] }); toast.success(editId ? "Package updated!" : "Package created!"); closeDialog(); },
     onError: (e) => toast.error(e.message),
   });
+
+  const removePackage = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from("packages").delete().eq("id", id); if (error) throw error; },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["packages"] }); toast.success("Package deleted"); },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const viewPkg = packages.find(p => p.id === viewId);
 
   const IncludesIcons = ({ pkg }: { pkg: any }) => (
     <div className="flex gap-1.5">
@@ -98,13 +96,13 @@ export default function PackagesPage() {
           <h1 className="font-display text-2xl font-bold text-foreground">Holiday Packages</h1>
           <p className="text-muted-foreground text-sm">Pre-built travel packages combining flights, hotels & tours.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(o) => { if (!o) closeDialog(); else setOpen(true); }}>
           <DialogTrigger asChild>
             <Button variant="brand" size="sm" className="gap-1"><Plus className="h-4 w-4" /> New Package</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto bg-card border-border">
             <DialogHeader>
-              <DialogTitle className="text-foreground">Create Package</DialogTitle>
+              <DialogTitle className="text-foreground">{editId ? "Edit Package" : "Create Package"}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-2">
               <div className="grid gap-2">
@@ -251,8 +249,8 @@ export default function PackagesPage() {
                 </div>
               </div>
 
-              <Button variant="brand" onClick={() => createPackage.mutate()} disabled={!form.title || createPackage.isPending}>
-                {createPackage.isPending ? "Creating..." : "Create Package"}
+              <Button variant="brand" onClick={() => savePackage.mutate()} disabled={!form.title || savePackage.isPending}>
+                {savePackage.isPending ? "Saving..." : editId ? "Update Package" : "Create Package"}
               </Button>
             </div>
           </DialogContent>
@@ -266,57 +264,31 @@ export default function PackagesPage() {
               <TableHead>Package</TableHead>
               <TableHead className="hidden md:table-cell">Destination</TableHead>
               <TableHead className="hidden sm:table-cell">Duration</TableHead>
-              <TableHead>Includes</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Itinerary</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
             ) : packages.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No packages yet. Create your first package!</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No packages yet.</TableCell></TableRow>
             ) : (
               packages.map((p) => (
                 <TableRow key={p.id} className="border-border">
+                  <TableCell><div><p className="font-medium text-foreground">{p.title}</p>{p.is_customizable && <p className="text-xs text-muted-foreground">Customizable</p>}</div></TableCell>
+                  <TableCell className="hidden md:table-cell"><span className="flex items-center gap-1 text-muted-foreground text-sm"><MapPin className="h-3 w-3" /> {p.destination || "—"}</span></TableCell>
+                  <TableCell className="hidden sm:table-cell"><span className="flex items-center gap-1 text-muted-foreground text-sm"><Clock className="h-3 w-3" /> {p.duration_days}D/{p.duration_nights}N</span></TableCell>
+                  <TableCell className="text-foreground font-medium">${Number(p.base_price).toLocaleString()}</TableCell>
+                  <TableCell><Badge variant="secondary" className={p.is_active ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}>{p.is_active ? "Active" : "Inactive"}</Badge></TableCell>
                   <TableCell>
-                    <div>
-                      <p className="font-medium text-foreground">{p.title}</p>
-                      {p.is_customizable && <p className="text-xs text-muted-foreground">Customizable</p>}
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(p.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setItineraryOpen(p.id)}><Edit className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(p)}><Pencil className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this package?")) removePackage.mutate(p.id); }}><Trash2 className="h-3.5 w-3.5" /></Button>
                     </div>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    <span className="flex items-center gap-1 text-muted-foreground text-sm">
-                      <MapPin className="h-3 w-3" /> {p.destination || "—"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    <span className="flex items-center gap-1 text-muted-foreground text-sm">
-                      <Clock className="h-3 w-3" /> {p.duration_days}D/{p.duration_nights}N
-                    </span>
-                  </TableCell>
-                  <TableCell><IncludesIcons pkg={p} /></TableCell>
-                  <TableCell className="text-foreground font-medium">
-                    ${Number(p.base_price).toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1 text-xs"
-                      onClick={() => setItineraryOpen(p.id)}
-                    >
-                      <Edit className="h-3 w-3" />
-                      {Array.isArray(p.itinerary) && (p.itinerary as unknown as ItineraryDay[]).length > 0
-                        ? `${(p.itinerary as unknown as ItineraryDay[]).length} days`
-                        : "Add"}
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={p.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
-                      {p.is_active ? "Active" : "Inactive"}
-                    </Badge>
                   </TableCell>
                 </TableRow>
               ))
@@ -325,14 +297,27 @@ export default function PackagesPage() {
         </Table>
       </div>
 
-      {/* Itinerary Builder Dialog */}
       {itineraryOpen && (
-        <ItineraryBuilderDialog
-          packageId={itineraryOpen}
-          pkg={packages.find((p) => p.id === itineraryOpen)!}
-          onClose={() => setItineraryOpen(null)}
-        />
+        <ItineraryBuilderDialog packageId={itineraryOpen} pkg={packages.find((p) => p.id === itineraryOpen)!} onClose={() => setItineraryOpen(null)} />
       )}
+
+      <Dialog open={!!viewId} onOpenChange={() => setViewId(null)}>
+        <DialogContent className="bg-card border-border max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader><DialogTitle className="font-display">Package Details</DialogTitle></DialogHeader>
+          {viewPkg && (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div><p className="text-muted-foreground">Title</p><p className="font-medium text-foreground">{viewPkg.title}</p></div>
+                <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewPkg.destination || "—"}</p></div>
+                <div><p className="text-muted-foreground">Duration</p><p className="text-foreground">{viewPkg.duration_days}D / {viewPkg.duration_nights}N</p></div>
+                <div><p className="text-muted-foreground">Price</p><p className="text-foreground">${Number(viewPkg.base_price).toLocaleString()}</p></div>
+              </div>
+              <div><p className="text-muted-foreground">Includes</p><p className="text-foreground">{[viewPkg.includes_flight && "Flights", viewPkg.includes_hotel && "Hotels", viewPkg.includes_tour && "Tours", viewPkg.includes_transfer && "Transfers"].filter(Boolean).join(", ") || "—"}</p></div>
+              {viewPkg.description && <div><p className="text-muted-foreground">Description</p><p className="text-foreground">{viewPkg.description}</p></div>}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
