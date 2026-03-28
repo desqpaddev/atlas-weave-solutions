@@ -13,6 +13,9 @@ import LeadsPage from "./pages/dashboard/LeadsPage";
 import CustomersPage from "./pages/dashboard/CustomersPage";
 import AgentsPage from "./pages/dashboard/AgentsPage";
 import BookingsPage from "./pages/dashboard/BookingsPage";
+import ToursPage from "./pages/dashboard/ToursPage";
+import DeparturesPage from "./pages/dashboard/DeparturesPage";
+import PackagesPage from "./pages/dashboard/PackagesPage";
 import PaymentsPage from "./pages/dashboard/PaymentsPage";
 import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
@@ -34,6 +37,9 @@ const App = () => (
               <Route path="leads" element={<LeadsPage />} />
               <Route path="customers" element={<CustomersPage />} />
               <Route path="agents" element={<AgentsPage />} />
+              <Route path="tours" element={<ToursPage />} />
+              <Route path="departures" element={<DeparturesPage />} />
+              <Route path="packages" element={<PackagesPage />} />
               <Route path="bookings" element={<BookingsPage />} />
               <Route path="payments" element={<PaymentsPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />

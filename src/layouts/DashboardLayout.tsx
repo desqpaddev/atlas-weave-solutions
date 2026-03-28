@@ -4,7 +4,7 @@ import { useNavigate, Outlet, Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, UserCheck, Briefcase, CalendarDays,
   DollarSign, BarChart3, Settings, LogOut, Menu, X, Plane,
-  ChevronRight
+  ChevronRight, Map, Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,6 +14,9 @@ const navItems = [
   { label: "Leads", icon: Users, path: "/dashboard/leads" },
   { label: "Customers", icon: UserCheck, path: "/dashboard/customers" },
   { label: "Agents", icon: Briefcase, path: "/dashboard/agents" },
+  { label: "Tours", icon: Map, path: "/dashboard/tours" },
+  { label: "Departures", icon: CalendarDays, path: "/dashboard/departures" },
+  { label: "Packages", icon: Package, path: "/dashboard/packages" },
   { label: "Bookings", icon: CalendarDays, path: "/dashboard/bookings" },
   { label: "Payments", icon: DollarSign, path: "/dashboard/payments" },
   { label: "Analytics", icon: BarChart3, path: "/dashboard/analytics" },
