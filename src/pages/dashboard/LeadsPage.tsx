@@ -90,17 +90,21 @@ export default function LeadsPage() {
 
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <Table>
-          <TableHeader><TableRow className="border-border hover:bg-transparent"><TableHead>Name</TableHead><TableHead className="hidden md:table-cell">Email</TableHead><TableHead className="hidden sm:table-cell">Destination</TableHead><TableHead>Status</TableHead><TableHead className="hidden lg:table-cell">Budget</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow className="border-border hover:bg-transparent"><TableHead>Name</TableHead><TableHead className="hidden md:table-cell">Email</TableHead><TableHead className="hidden sm:table-cell">Phone</TableHead><TableHead className="hidden sm:table-cell">Destination</TableHead><TableHead>Status</TableHead><TableHead className="hidden lg:table-cell">Budget</TableHead><TableHead className="hidden lg:table-cell">Pax</TableHead><TableHead className="hidden xl:table-cell">Source</TableHead><TableHead className="hidden xl:table-cell">Travel Dates</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
           <TableBody>
-            {isLoading ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow> :
-            filtered.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No leads found.</TableCell></TableRow> :
+            {isLoading ? <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow> :
+            filtered.length === 0 ? <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">No leads found.</TableCell></TableRow> :
             filtered.map((l) => (
               <TableRow key={l.id} className="border-border">
                 <TableCell className="font-medium text-foreground">{l.full_name}</TableCell>
                 <TableCell className="hidden md:table-cell text-muted-foreground">{l.email || "—"}</TableCell>
+                <TableCell className="hidden sm:table-cell text-muted-foreground">{l.phone || "—"}</TableCell>
                 <TableCell className="hidden sm:table-cell text-muted-foreground">{l.destination || "—"}</TableCell>
                 <TableCell><Badge variant="secondary" className={statusColors[l.status as LeadStatus]}>{l.status}</Badge></TableCell>
                 <TableCell className="hidden lg:table-cell text-muted-foreground">{l.budget ? `$${Number(l.budget).toLocaleString()}` : "—"}</TableCell>
+                <TableCell className="hidden lg:table-cell text-muted-foreground">{l.pax || "—"}</TableCell>
+                <TableCell className="hidden xl:table-cell text-muted-foreground capitalize">{l.source || "—"}</TableCell>
+                <TableCell className="hidden xl:table-cell text-muted-foreground">{l.travel_dates || "—"}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(l.id)}><Eye className="h-3.5 w-3.5" /></Button>
@@ -126,11 +130,13 @@ export default function LeadsPage() {
                 <div><p className="text-muted-foreground">Email</p><p className="text-foreground">{viewLead.email || "—"}</p></div>
                 <div><p className="text-muted-foreground">Phone</p><p className="text-foreground">{viewLead.phone || "—"}</p></div>
                 <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewLead.destination || "—"}</p></div>
-                <div><p className="text-muted-foreground">Budget</p><p className="text-foreground">{viewLead.budget ? `$${Number(viewLead.budget).toLocaleString()}` : "—"}</p></div>
-                <div><p className="text-muted-foreground">Source</p><p className="text-foreground">{viewLead.source || "—"}</p></div>
-                <div><p className="text-muted-foreground">Travelers</p><p className="text-foreground">{viewLead.pax}</p></div>
+                <div><p className="text-muted-foreground">Budget</p><p className="text-foreground font-semibold">{viewLead.budget ? `$${Number(viewLead.budget).toLocaleString()}` : "—"}</p></div>
+                <div><p className="text-muted-foreground">Source</p><p className="text-foreground capitalize">{viewLead.source || "—"}</p></div>
+                <div><p className="text-muted-foreground">Travelers</p><p className="text-foreground">{viewLead.pax || "—"}</p></div>
+                <div><p className="text-muted-foreground">Travel Dates</p><p className="text-foreground">{viewLead.travel_dates || "—"}</p></div>
+                <div><p className="text-muted-foreground">Created</p><p className="text-foreground">{new Date(viewLead.created_at).toLocaleDateString()}</p></div>
               </div>
-              {viewLead.notes && <div><p className="text-muted-foreground">Notes</p><p className="text-foreground whitespace-pre-wrap">{viewLead.notes}</p></div>}
+              {viewLead.notes && <div className="border-t border-border pt-3"><p className="text-muted-foreground">Notes</p><p className="text-foreground whitespace-pre-wrap">{viewLead.notes}</p></div>}
             </div>
           )}
         </DialogContent>

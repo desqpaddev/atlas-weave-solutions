@@ -124,16 +124,24 @@ export default function BookingsPage() {
       ) : (
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <Table>
-            <TableHeader><TableRow className="border-border hover:bg-transparent"><TableHead>Reference</TableHead><TableHead>Title</TableHead><TableHead className="hidden md:table-cell">Type</TableHead><TableHead>Status</TableHead><TableHead className="hidden sm:table-cell">Amount</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow className="border-border hover:bg-transparent"><TableHead>Reference</TableHead><TableHead>Title</TableHead><TableHead className="hidden md:table-cell">Type</TableHead><TableHead>Status</TableHead><TableHead className="hidden sm:table-cell">Destination</TableHead><TableHead className="hidden lg:table-cell">Pax</TableHead><TableHead className="hidden sm:table-cell">Amount</TableHead><TableHead className="hidden lg:table-cell">Paid</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
             <TableBody>
-              {isLoading ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow> :
-              bookings.map((b) => (
+              {isLoading ? <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow> :
+              bookings.map((b) => {
+                const meta = (b.metadata && typeof b.metadata === 'object' && !Array.isArray(b.metadata)) ? b.metadata as Record<string, any> : {};
+                return (
                 <TableRow key={b.id} className="border-border">
                   <TableCell className="font-mono text-xs text-primary">{b.reference_number}</TableCell>
-                  <TableCell className="font-medium text-foreground">{b.title}</TableCell>
+                  <TableCell>
+                    <p className="font-medium text-foreground">{b.title}</p>
+                    {meta.customer_name && <p className="text-xs text-muted-foreground">{meta.customer_name}</p>}
+                  </TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground capitalize">{b.booking_type}</TableCell>
                   <TableCell><Badge variant="secondary" className={statusColors[b.status as BookingStatus]}>{b.status}</Badge></TableCell>
+                  <TableCell className="hidden sm:table-cell text-muted-foreground">{b.destination || "—"}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-muted-foreground">{b.pax}</TableCell>
                   <TableCell className="hidden sm:table-cell text-foreground font-medium">${Number(b.total_amount).toLocaleString()}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-muted-foreground">${Number(b.paid_amount).toLocaleString()}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(b.id)}><Eye className="h-3.5 w-3.5" /></Button>
@@ -146,30 +154,48 @@ export default function BookingsPage() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              )})}
             </TableBody>
           </Table>
         </div>
       )}
 
       <Dialog open={!!viewId} onOpenChange={() => setViewId(null)}>
-        <DialogContent className="bg-card border-border">
+        <DialogContent className="bg-card border-border max-h-[80vh] overflow-y-auto">
           <DialogHeader><DialogTitle className="font-display">Booking Details</DialogTitle></DialogHeader>
-          {viewBooking && (
+          {viewBooking && (() => {
+            const meta = (viewBooking.metadata && typeof viewBooking.metadata === 'object' && !Array.isArray(viewBooking.metadata)) ? viewBooking.metadata as Record<string, any> : {};
+            return (
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-2 gap-3">
                 <div><p className="text-muted-foreground">Reference</p><p className="font-mono text-primary">{viewBooking.reference_number}</p></div>
                 <div><p className="text-muted-foreground">Status</p><Badge variant="secondary" className={statusColors[viewBooking.status as BookingStatus]}>{viewBooking.status}</Badge></div>
                 <div><p className="text-muted-foreground">Title</p><p className="font-medium text-foreground">{viewBooking.title}</p></div>
                 <div><p className="text-muted-foreground">Type</p><p className="text-foreground capitalize">{viewBooking.booking_type}</p></div>
-                <div><p className="text-muted-foreground">Total</p><p className="text-foreground">${Number(viewBooking.total_amount).toLocaleString()}</p></div>
-                <div><p className="text-muted-foreground">Paid</p><p className="text-foreground">${Number(viewBooking.paid_amount).toLocaleString()}</p></div>
+                <div><p className="text-muted-foreground">Total Amount</p><p className="text-foreground font-semibold">${Number(viewBooking.total_amount).toLocaleString()}</p></div>
+                <div><p className="text-muted-foreground">Paid Amount</p><p className="text-foreground">${Number(viewBooking.paid_amount).toLocaleString()}</p></div>
+                <div><p className="text-muted-foreground">Payment Status</p><p className="text-foreground capitalize">{viewBooking.payment_status || "pending"}</p></div>
                 <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewBooking.destination || "—"}</p></div>
                 <div><p className="text-muted-foreground">Travelers</p><p className="text-foreground">{viewBooking.pax}</p></div>
+                <div><p className="text-muted-foreground">Check-in</p><p className="text-foreground">{viewBooking.check_in || "—"}</p></div>
+                <div><p className="text-muted-foreground">Check-out</p><p className="text-foreground">{viewBooking.check_out || "—"}</p></div>
+                <div><p className="text-muted-foreground">Created</p><p className="text-foreground">{new Date(viewBooking.created_at).toLocaleDateString()}</p></div>
               </div>
-              {viewBooking.description && <div><p className="text-muted-foreground">Description</p><p className="text-foreground">{viewBooking.description}</p></div>}
+              {(meta.customer_name || meta.customer_email || meta.customer_phone) && (
+                <div className="border-t border-border pt-3">
+                  <p className="text-muted-foreground font-medium mb-2">Customer Info</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {meta.customer_name && <div><p className="text-muted-foreground text-xs">Name</p><p className="text-foreground">{meta.customer_name}</p></div>}
+                    {meta.customer_email && <div><p className="text-muted-foreground text-xs">Email</p><p className="text-foreground">{meta.customer_email}</p></div>}
+                    {meta.customer_phone && <div><p className="text-muted-foreground text-xs">Phone</p><p className="text-foreground">{meta.customer_phone}</p></div>}
+                    {meta.adults != null && <div><p className="text-muted-foreground text-xs">Adults</p><p className="text-foreground">{meta.adults}</p></div>}
+                    {meta.children != null && <div><p className="text-muted-foreground text-xs">Children</p><p className="text-foreground">{meta.children}</p></div>}
+                  </div>
+                </div>
+              )}
+              {viewBooking.description && <div className="border-t border-border pt-3"><p className="text-muted-foreground">Description</p><p className="text-foreground whitespace-pre-wrap">{viewBooking.description}</p></div>}
             </div>
-          )}
+          );})()}
         </DialogContent>
       </Dialog>
     </div>
