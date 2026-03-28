@@ -34,7 +34,7 @@ export function DestinationsSection() {
   const layoutSizes = ["col-span-2 row-span-2", "col-span-1 row-span-1", "col-span-1 row-span-1", "col-span-1 row-span-1", "col-span-1 row-span-1", "col-span-2 row-span-1"];
 
   return (
-    <section id="destinations" className="py-20 pt-28 bg-secondary/30">
+    <section id="destinations" className="py-20 pt-40 bg-secondary/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <span className="inline-block text-primary font-semibold text-sm tracking-widest uppercase mb-3">
