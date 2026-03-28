@@ -10,6 +10,7 @@ const navLinks = [
   { label: "Tours", href: "/tours", icon: Compass },
   { label: "Cruise", href: "/cruises", icon: Ship },
   { label: "Fixed Departures", href: "/departures", icon: CalendarDays },
+  { label: "About Us", href: "/about", icon: Globe },
   { label: "Contact", href: "/contact", icon: Phone },
 ];
 
