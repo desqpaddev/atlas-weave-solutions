@@ -63,14 +63,20 @@ export default function TourDetailPage() {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeTour) return;
-    if (!activeTour.company_id) {
-      toast.info("This tour is in preview mode. Add this tour in admin to capture leads in CRM.");
-      return;
-    }
     setSubmitting(true);
     try {
+      let companyId = activeTour.company_id;
+      if (!companyId) {
+        const { data: company } = await supabase.from("companies").select("id").limit(1).single();
+        companyId = company?.id ?? null;
+      }
+      if (!companyId) {
+        toast.error("No company configured. Please contact support.");
+        setSubmitting(false);
+        return;
+      }
       const { error } = await supabase.from("leads").insert({
-        company_id: activeTour.company_id,
+        company_id: companyId,
         full_name: bookingForm.fullName, email: bookingForm.email, phone: bookingForm.phone,
         pax: bookingForm.adults + bookingForm.children,
         destination: activeTour.destination, travel_dates: bookingForm.checkIn,
