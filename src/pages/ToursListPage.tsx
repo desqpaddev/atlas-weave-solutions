@@ -43,7 +43,7 @@ export default function ToursListPage() {
     return tours.filter((tour) => {
       const destination = normalizeText(tour.destination);
       const category = normalizeText(tour.category);
-      const searchable = normalizeText(`${tour.title} ${tour.destination ?? ""} ${tour.category ?? ""} ${tour.description ?? ""}`);
+      const searchable = normalizeText(`${tour.title} ${tour.destination ?? ""} ${tour.category ?? ""} ${tour.description ?? ""} ${tour.difficulty ?? ""} ${(tour.highlights ?? []).join(" ")} ${(tour.inclusions ?? []).join(" ")}`);
 
       if (!matchesFilter(destination, destinationFilter)) return false;
       if (!matchesFilter(category, categoryFilter)) return false;
