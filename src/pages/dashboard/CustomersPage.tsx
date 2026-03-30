@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Pencil, Trash2, Eye, Search, Send, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, Search, Send, Loader2, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -101,6 +101,39 @@ export default function CustomersPage() {
   const toggleTour = (id: string) => setSelectedTours(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
   const toggleDeparture = (id: string) => setSelectedDepartures(prev => prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]);
 
+  const buildWhatsAppMessage = () => {
+    const selectedTourItems = tours.filter(t => selectedTours.includes(t.id));
+    const selectedDepartureItems = departures.filter((d: any) => selectedDepartures.includes(d.id));
+    
+    let msg = emailMessage ? `${emailMessage}\n\n` : `Hi ${sendDialogCustomer?.full_name}! 🌍\n\nWe have some amazing travel offers for you:\n\n`;
+    
+    selectedTourItems.forEach((t) => {
+      msg += `🏖️ *${t.title}*\n📍 ${t.destination || "Various destinations"}\n💰 ${t.currency} ${Number(t.adult_price).toLocaleString()}\n\n`;
+    });
+    
+    selectedDepartureItems.forEach((d: any) => {
+      msg += `📅 *${d.tours?.title || "Tour"}*\n🗓️ Departure: ${new Date(d.departure_date).toLocaleDateString()}\n🪑 ${d.total_seats - d.booked_seats} seats available\n\n`;
+    });
+    
+    msg += `For bookings & enquiries, feel free to reach out!\n🌐 joannaholidays.uk`;
+    return msg;
+  };
+
+  const sendViaWhatsApp = () => {
+    if (!sendDialogCustomer?.phone) {
+      toast.error("Customer has no phone number");
+      return;
+    }
+    if (selectedTours.length === 0 && selectedDepartures.length === 0) {
+      toast.error("Please select at least one tour or departure");
+      return;
+    }
+    const phone = sendDialogCustomer.phone.replace(/[^0-9+]/g, "").replace(/^\+/, "");
+    const message = encodeURIComponent(buildWhatsAppMessage());
+    window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+    toast.success("WhatsApp opened with tour details!");
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -145,7 +178,7 @@ export default function CustomersPage() {
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(c.id)} title="View"><Eye className="h-3.5 w-3.5" /></Button>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(c)} title="Edit"><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-primary" onClick={() => openSendDialog(c)} title="Send Tours" disabled={!c.email}><Send className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-primary" onClick={() => openSendDialog(c)} title="Send Tours" disabled={!c.email && !c.phone}><Send className="h-3.5 w-3.5" /></Button>
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this customer?")) remove.mutate(c.id); }} title="Delete"><Trash2 className="h-3.5 w-3.5" /></Button>
                   </div>
                 </TableCell>
@@ -230,9 +263,14 @@ export default function CustomersPage() {
               <p className="text-xs text-muted-foreground">
                 {selectedTours.length + selectedDepartures.length} items selected
               </p>
-              <Button variant="brand" onClick={() => sendEmail.mutate()} disabled={sendEmail.isPending || (selectedTours.length === 0 && selectedDepartures.length === 0)}>
-                {sendEmail.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><Send className="h-4 w-4" /> Send Email</>}
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={sendViaWhatsApp} disabled={selectedTours.length === 0 && selectedDepartures.length === 0} className="gap-1.5 text-green-600 border-green-600/30 hover:bg-green-50 hover:text-green-700">
+                  <MessageCircle className="h-4 w-4" /> WhatsApp
+                </Button>
+                <Button variant="brand" onClick={() => sendEmail.mutate()} disabled={sendEmail.isPending || (selectedTours.length === 0 && selectedDepartures.length === 0 || !sendDialogCustomer?.email)}>
+                  {sendEmail.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><Send className="h-4 w-4" /> Email</>}
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>
