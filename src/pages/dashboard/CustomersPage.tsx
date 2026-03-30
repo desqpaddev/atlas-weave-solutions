@@ -101,6 +101,39 @@ export default function CustomersPage() {
   const toggleTour = (id: string) => setSelectedTours(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
   const toggleDeparture = (id: string) => setSelectedDepartures(prev => prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]);
 
+  const buildWhatsAppMessage = () => {
+    const selectedTourItems = tours.filter(t => selectedTours.includes(t.id));
+    const selectedDepartureItems = departures.filter((d: any) => selectedDepartures.includes(d.id));
+    
+    let msg = emailMessage ? `${emailMessage}\n\n` : `Hi ${sendDialogCustomer?.full_name}! 🌍\n\nWe have some amazing travel offers for you:\n\n`;
+    
+    selectedTourItems.forEach((t) => {
+      msg += `🏖️ *${t.title}*\n📍 ${t.destination || "Various destinations"}\n💰 ${t.currency} ${Number(t.adult_price).toLocaleString()}\n\n`;
+    });
+    
+    selectedDepartureItems.forEach((d: any) => {
+      msg += `📅 *${d.tours?.title || "Tour"}*\n🗓️ Departure: ${new Date(d.departure_date).toLocaleDateString()}\n🪑 ${d.total_seats - d.booked_seats} seats available\n\n`;
+    });
+    
+    msg += `For bookings & enquiries, feel free to reach out!\n🌐 joannaholidays.uk`;
+    return msg;
+  };
+
+  const sendViaWhatsApp = () => {
+    if (!sendDialogCustomer?.phone) {
+      toast.error("Customer has no phone number");
+      return;
+    }
+    if (selectedTours.length === 0 && selectedDepartures.length === 0) {
+      toast.error("Please select at least one tour or departure");
+      return;
+    }
+    const phone = sendDialogCustomer.phone.replace(/[^0-9+]/g, "").replace(/^\+/, "");
+    const message = encodeURIComponent(buildWhatsAppMessage());
+    window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+    toast.success("WhatsApp opened with tour details!");
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
