@@ -263,9 +263,14 @@ export default function CustomersPage() {
               <p className="text-xs text-muted-foreground">
                 {selectedTours.length + selectedDepartures.length} items selected
               </p>
-              <Button variant="brand" onClick={() => sendEmail.mutate()} disabled={sendEmail.isPending || (selectedTours.length === 0 && selectedDepartures.length === 0)}>
-                {sendEmail.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><Send className="h-4 w-4" /> Send Email</>}
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={sendViaWhatsApp} disabled={selectedTours.length === 0 && selectedDepartures.length === 0} className="gap-1.5 text-green-600 border-green-600/30 hover:bg-green-50 hover:text-green-700">
+                  <MessageCircle className="h-4 w-4" /> WhatsApp
+                </Button>
+                <Button variant="brand" onClick={() => sendEmail.mutate()} disabled={sendEmail.isPending || (selectedTours.length === 0 && selectedDepartures.length === 0 || !sendDialogCustomer?.email)}>
+                  {sendEmail.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><Send className="h-4 w-4" /> Email</>}
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>
