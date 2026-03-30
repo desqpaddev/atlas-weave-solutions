@@ -178,7 +178,7 @@ export default function CustomersPage() {
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(c.id)} title="View"><Eye className="h-3.5 w-3.5" /></Button>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(c)} title="Edit"><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-primary" onClick={() => openSendDialog(c)} title="Send Tours" disabled={!c.email}><Send className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-primary" onClick={() => openSendDialog(c)} title="Send Tours" disabled={!c.email && !c.phone}><Send className="h-3.5 w-3.5" /></Button>
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { if (confirm("Delete this customer?")) remove.mutate(c.id); }} title="Delete"><Trash2 className="h-3.5 w-3.5" /></Button>
                   </div>
                 </TableCell>
