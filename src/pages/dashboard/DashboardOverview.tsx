@@ -20,29 +20,64 @@ export default function DashboardOverview() {
 }
 
 function CustomerDashboard({ user, profile }: { user: any; profile: any }) {
-  const { data: customerRecord } = useQuery({
-    queryKey: ["my-customer-record", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase.from("customers").select("id").eq("user_id", user!.id).maybeSingle();
-      return data;
-    },
-    enabled: !!user?.id,
-  });
+  const userEmail = user?.email;
 
   const { data: myBookings = [] } = useQuery({
-    queryKey: ["my-bookings", customerRecord?.id],
+    queryKey: ["my-bookings", userEmail],
     queryFn: async () => {
-      const { data } = await supabase.from("bookings").select("*").eq("customer_id", customerRecord!.id).order("created_at", { ascending: false }).limit(5);
-      return data || [];
+      if (!userEmail) return [];
+      // Fetch all bookings and filter by customer_id link OR metadata email match
+      const results: any[] = [];
+      
+      // 1. Check if there's a customer record linked to this user
+      const { data: customerRecord } = await supabase
+        .from("customers")
+        .select("id")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      
+      if (customerRecord?.id) {
+        const { data: linkedBookings } = await supabase
+          .from("bookings")
+          .select("*")
+          .eq("customer_id", customerRecord.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        if (linkedBookings) results.push(...linkedBookings);
+      }
+
+      // 2. Also find bookings where metadata contains the user's email
+      const { data: allBookings } = await supabase
+        .from("bookings")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      
+      if (allBookings) {
+        const metadataMatches = allBookings.filter((b: any) => {
+          const meta = b.metadata as any;
+          if (!meta) return false;
+          const metaEmail = meta.customer_email || meta.email;
+          return metaEmail && metaEmail.toLowerCase() === userEmail.toLowerCase();
+        });
+        // Add only bookings not already in results
+        const existingIds = new Set(results.map(r => r.id));
+        metadataMatches.forEach((b: any) => {
+          if (!existingIds.has(b.id)) results.push(b);
+        });
+      }
+
+      // Sort by created_at descending
+      results.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      return results.slice(0, 10);
     },
-    enabled: !!customerRecord?.id,
+    enabled: !!userEmail,
   });
 
   const { data: myPayments = [] } = useQuery({
-    queryKey: ["my-payments-summary", customerRecord?.id],
+    queryKey: ["my-payments-summary", myBookings.map((b: any) => b.id).join(",")],
     queryFn: async () => {
-      if (!customerRecord?.id) return [];
-      const bookingIds = myBookings.map(b => b.id);
+      const bookingIds = myBookings.map((b: any) => b.id);
       if (bookingIds.length === 0) return [];
       const { data } = await supabase.from("payments").select("*").in("booking_id", bookingIds).order("created_at", { ascending: false });
       return data || [];
