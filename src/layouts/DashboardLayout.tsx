@@ -50,13 +50,16 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { data: company } = useQuery({
-    queryKey: ["dashboard-company-branding"],
+    queryKey: ["dashboard-company-branding", profile?.company_id ?? "default"],
     queryFn: async () => {
-      if (!profile?.company_id) return null;
-      const { data } = await supabase.from("companies").select("name, logo_url").eq("id", profile.company_id).single();
+      if (profile?.company_id) {
+        const { data } = await supabase.from("companies").select("name, logo_url").eq("id", profile.company_id).maybeSingle();
+        return data;
+      }
+      // Customers and unauth'd users: fall back to the tenant's default branding
+      const { data } = await supabase.from("companies").select("name, logo_url").limit(1).maybeSingle();
       return data;
     },
-    enabled: !!profile?.company_id,
     staleTime: 1000 * 60 * 5,
   });
 
