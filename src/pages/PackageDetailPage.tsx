@@ -269,15 +269,28 @@ export default function PackageDetailPage() {
                   </div>
                 )}
 
-                <Button variant="brand-yellow" size="lg" className="w-full" disabled={submitting}>
-                  {submitting ? "Submitting..." : "Book Now"}
+                <Button variant="brand-yellow" size="lg" className="w-full">
+                  Pay £{(Number(pkg.base_price) * bookingForm.pax).toLocaleString()} & Book Now
                 </Button>
-                <p className="text-xs text-center text-muted-foreground">No payment required. We'll contact you to confirm.</p>
+                <p className="text-xs text-center text-muted-foreground">Secure payment via Stripe. Test mode in preview.</p>
               </form>
             </div>
           </div>
         </div>
       </div>
+
+      {pkg && checkoutPayload && (
+        <StripeCheckoutDialog
+          open={showPayment}
+          onClose={() => setShowPayment(false)}
+          amount={Number(pkg.base_price) * bookingForm.pax}
+          currency="GBP"
+          productName={pkg.title}
+          customerEmail={bookingForm.email}
+          bookingType="package"
+          bookingPayload={checkoutPayload}
+        />
+      )}
 
       <Footer />
     </div>
