@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
 import { Globe, ChevronDown } from "lucide-react";
 
 const LANGS = [
-  { code: "", label: "English" },
+  { code: "en", label: "English" },
   { code: "es", label: "Spanish" },
   { code: "fr", label: "French" },
   { code: "de", label: "German" },
@@ -18,22 +19,55 @@ const LANGS = [
   { code: "tr", label: "Turkish" },
 ];
 
+function readCurrentLang(): string {
+  const match = document.cookie.match(/(?:^|;\s*)googtrans=([^;]+)/);
+  if (!match) return "en";
+  const val = decodeURIComponent(match[1]); // e.g. /en/fr
+  const parts = val.split("/");
+  return parts[2] || "en";
+}
+
 function setGoogleTranslateCookie(lang: string) {
-  const value = lang ? `/en/${lang}` : "/en/en";
-  // Cookie must be set on the current host and on the parent domain for the widget to pick it up
+  const value = lang && lang !== "en" ? `/en/${lang}` : "";
   const host = window.location.hostname;
   const parts = host.split(".");
   const root = parts.length > 1 ? "." + parts.slice(-2).join(".") : host;
   const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+  const past = "Thu, 01 Jan 1970 00:00:00 GMT";
+
+  if (!value) {
+    // Clear cookie on every scope
+    ["/", "/;domain=" + host, "/;domain=" + root].forEach((p) => {
+      document.cookie = `googtrans=;expires=${past};path=${p}`;
+    });
+    return;
+  }
   document.cookie = `googtrans=${value};expires=${expires};path=/`;
   document.cookie = `googtrans=${value};expires=${expires};path=/;domain=${host}`;
   document.cookie = `googtrans=${value};expires=${expires};path=/;domain=${root}`;
 }
 
 export function GoogleTranslate() {
+  const [current, setCurrent] = useState<string>("en");
+
+  useEffect(() => {
+    setCurrent(readCurrentLang());
+  }, []);
+
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setGoogleTranslateCookie(e.target.value);
-    window.location.reload();
+    const lang = e.target.value;
+    setGoogleTranslateCookie(lang);
+
+    // Try to use the live Google combo if present (no reload needed)
+    const combo = document.querySelector<HTMLSelectElement>("select.goog-te-combo");
+    if (combo) {
+      combo.value = lang === "en" ? "" : lang;
+      combo.dispatchEvent(new Event("change"));
+      // Some pages still need a reload to fully apply
+      setTimeout(() => window.location.reload(), 50);
+    } else {
+      window.location.reload();
+    }
   };
 
   return (
@@ -41,12 +75,12 @@ export function GoogleTranslate() {
       <Globe className="h-3 w-3" />
       <select
         onChange={onChange}
-        defaultValue=""
+        value={current}
         className="bg-transparent text-primary-foreground text-xs hover:underline focus:outline-none cursor-pointer appearance-none pr-4"
         aria-label="Select language"
       >
         {LANGS.map((l) => (
-          <option key={l.code || "en"} value={l.code} className="text-foreground">
+          <option key={l.code} value={l.code} className="text-foreground">
             {l.label}
           </option>
         ))}
