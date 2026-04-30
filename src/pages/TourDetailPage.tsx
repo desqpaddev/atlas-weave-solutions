@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
@@ -39,8 +39,12 @@ const fallbackToursBySlug: Record<string, TourFallback> = {
 
 export default function TourDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const departureId = searchParams.get("departure");
+  const departureDate = searchParams.get("date");
   const [bookingForm, setBookingForm] = useState({
-    fullName: "", email: "", phone: "", adults: 1, children: 0, checkIn: "", notes: "",
+    fullName: "", email: "", phone: "", adults: 1, children: 0,
+    checkIn: departureDate || "", notes: "",
   });
   const [showPayment, setShowPayment] = useState(false);
   const [checkoutPayload, setCheckoutPayload] = useState<CheckoutBookingPayload | null>(null);
@@ -100,6 +104,7 @@ export default function TourDetailPage() {
         children: bookingForm.children,
         tour_slug: activeTour.slug,
         notes: bookingForm.notes,
+        ...(departureId ? { departure_id: departureId } : {}),
       },
     });
     setShowPayment(true);
