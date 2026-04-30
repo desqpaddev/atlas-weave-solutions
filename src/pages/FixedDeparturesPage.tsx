@@ -90,9 +90,9 @@ export default function FixedDeparturesPage() {
                         <p className="text-xl font-bold text-primary">£{price.toLocaleString()}</p>
                         <span className="text-xs text-muted-foreground">per adult</span>
                       </div>
-                      <Button variant="brand" size="sm" asChild>
-                        <Link to={`/tours/${tour.slug}`} className="gap-1">
-                          Book Now <ArrowRight className="h-3.5 w-3.5" />
+                      <Button variant="brand" size="sm" asChild disabled={seatsLeft <= 0}>
+                        <Link to={`/tours/${tour.slug}?departure=${dep.id}&date=${dep.departure_date}`} className="gap-1">
+                          {seatsLeft <= 0 ? "Sold Out" : "Book Seats"} <ArrowRight className="h-3.5 w-3.5" />
                         </Link>
                       </Button>
                     </div>
