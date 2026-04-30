@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Check, X, Star, Users, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { MockPaymentDialog } from "@/components/MockPaymentDialog";
+import { StripeCheckoutDialog, type CheckoutBookingPayload } from "@/components/StripeCheckoutDialog";
 import destBali from "@/assets/dest-bali.jpg";
 import destSwiss from "@/assets/dest-swiss.jpg";
 import destDubai from "@/assets/dest-dubai.jpg";
@@ -42,8 +42,8 @@ export default function TourDetailPage() {
   const [bookingForm, setBookingForm] = useState({
     fullName: "", email: "", phone: "", adults: 1, children: 0, checkIn: "", notes: "",
   });
-  const [submitting, setSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [checkoutPayload, setCheckoutPayload] = useState<CheckoutBookingPayload | null>(null);
 
   const { data: tour, isLoading } = useQuery({
     queryKey: ["tour-detail", slug],
@@ -62,79 +62,47 @@ export default function TourDetailPage() {
   const childPrice = Number(activeTour?.child_price || 0);
   const totalPrice = (adultPrice * bookingForm.adults) + (childPrice * bookingForm.children);
 
-  const handleBooking = (e: React.FormEvent) => {
+  const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeTour) return;
     if (!bookingForm.fullName || !bookingForm.email) {
       toast.error("Please fill in your name and email.");
       return;
     }
-    setShowPayment(true);
-  };
-
-  const finalizeBooking = async () => {
-    if (!activeTour) return;
-    setSubmitting(true);
-    setShowPayment(false);
-    try {
-      let companyId = activeTour.company_id;
-      if (!companyId) {
-        const { data: company } = await supabase.from("companies").select("id").limit(1).single();
-        companyId = company?.id ?? null;
-      }
-      if (!companyId) {
-        toast.error("No company configured. Please contact support.");
-        setSubmitting(false);
-        return;
-      }
-      const refNumber = `BK-${Date.now().toString(36).toUpperCase()}`;
-
-      // Create lead
-      const { error: leadError } = await supabase.from("leads").insert({
-        company_id: companyId,
-        full_name: bookingForm.fullName, email: bookingForm.email, phone: bookingForm.phone,
-        pax: bookingForm.adults + bookingForm.children,
-        destination: activeTour.destination, travel_dates: bookingForm.checkIn,
-        budget: totalPrice, source: "website",
-        notes: `Tour: ${activeTour.title}\nAdults: ${bookingForm.adults}, Children: ${bookingForm.children}\nCheck-in: ${bookingForm.checkIn}\n${bookingForm.notes}`,
-        status: "new",
-      });
-      if (leadError) throw leadError;
-
-      // Create booking (paid)
-      const { error: bookingError } = await supabase.from("bookings").insert({
-        company_id: companyId,
-        title: activeTour.title,
-        booking_type: "tour" as const,
-        status: "confirmed" as const,
-        total_amount: totalPrice,
-        paid_amount: totalPrice,
-        payment_status: "paid" as const,
-        destination: activeTour.destination || null,
-        pax: bookingForm.adults + bookingForm.children,
-        check_in: bookingForm.checkIn || null,
-        reference_number: refNumber,
-        description: `Customer: ${bookingForm.fullName}\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}\nAdults: ${bookingForm.adults}, Children: ${bookingForm.children}\n${bookingForm.notes}`,
-        metadata: {
-          customer_name: bookingForm.fullName,
-          customer_email: bookingForm.email,
-          customer_phone: bookingForm.phone,
-          adults: bookingForm.adults,
-          children: bookingForm.children,
-          tour_slug: activeTour.slug,
-          payment_method: "card",
-          payment_status: "paid",
-        },
-      });
-      if (bookingError) console.error("Booking creation failed:", bookingError);
-
-      toast.success(`Booking confirmed! Ref: ${refNumber}`);
-      setBookingForm({ fullName: "", email: "", phone: "", adults: 1, children: 0, checkIn: "", notes: "" });
-    } catch (err: any) {
-      toast.error(err.message || "Failed to complete booking");
-    } finally {
-      setSubmitting(false);
+    if (totalPrice < 1) {
+      toast.error("Invalid total amount.");
+      return;
     }
+
+    let companyId = activeTour.company_id;
+    if (!companyId) {
+      const { data: company } = await supabase.from("companies").select("id").limit(1).maybeSingle();
+      companyId = company?.id ?? null;
+    }
+
+    const refNumber = `BK-${Date.now().toString(36).toUpperCase()}`;
+    const pax = bookingForm.adults + bookingForm.children;
+
+    setCheckoutPayload({
+      reference_number: refNumber,
+      title: activeTour.title,
+      destination: activeTour.destination ?? null,
+      pax,
+      check_in: bookingForm.checkIn || null,
+      description: `Customer: ${bookingForm.fullName}\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}\nAdults: ${bookingForm.adults}, Children: ${bookingForm.children}\n${bookingForm.notes}`,
+      company_id: companyId,
+      customer_email: bookingForm.email,
+      metadata: {
+        customer_name: bookingForm.fullName,
+        customer_email: bookingForm.email,
+        customer_phone: bookingForm.phone,
+        adults: bookingForm.adults,
+        children: bookingForm.children,
+        tour_slug: activeTour.slug,
+        notes: bookingForm.notes,
+      },
+    });
+    setShowPayment(true);
   };
 
   if (isLoading) return (
@@ -245,20 +213,23 @@ export default function TourDetailPage() {
                 </div>
 
                 <div><Label className="text-xs">Special Requests</Label><textarea value={bookingForm.notes} onChange={(e) => setBookingForm({ ...bookingForm, notes: e.target.value })} rows={2} className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" placeholder="Any special requirements..." /></div>
-                <Button variant="brand-yellow" size="lg" className="w-full" disabled={submitting}>{submitting ? "Submitting..." : "Book Now"}</Button>
-                <p className="text-xs text-center text-muted-foreground">No payment required. We'll contact you to confirm.</p>
+                <Button variant="brand-yellow" size="lg" className="w-full">Pay £{totalPrice.toLocaleString()} & Book Now</Button>
+                <p className="text-xs text-center text-muted-foreground">Secure payment via Stripe. Test mode in preview.</p>
               </form>
             </div>
           </div>
         </div>
       </div>
-      {activeTour && (
-        <MockPaymentDialog
+      {activeTour && checkoutPayload && (
+        <StripeCheckoutDialog
           open={showPayment}
           onClose={() => setShowPayment(false)}
-          onPaymentSuccess={finalizeBooking}
           amount={totalPrice}
-          title={activeTour.title}
+          currency="GBP"
+          productName={activeTour.title}
+          customerEmail={bookingForm.email}
+          bookingType="tour"
+          bookingPayload={checkoutPayload}
         />
       )}
       <Footer />
