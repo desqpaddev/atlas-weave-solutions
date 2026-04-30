@@ -15,7 +15,6 @@ const adminNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { label: "Leads", icon: Users, path: "/dashboard/leads" },
   { label: "Customers", icon: UserCheck, path: "/dashboard/customers" },
-  { label: "Agents", icon: Briefcase, path: "/dashboard/agents" },
   { label: "Tours", icon: Map, path: "/dashboard/tours" },
   { label: "Departures", icon: CalendarDays, path: "/dashboard/departures" },
   { label: "Packages", icon: Package, path: "/dashboard/packages" },
