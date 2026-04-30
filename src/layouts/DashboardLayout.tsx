@@ -29,7 +29,6 @@ const customerNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { label: "My Bookings", icon: CalendarDays, path: "/dashboard/bookings" },
   { label: "My Payments", icon: DollarSign, path: "/dashboard/payments" },
-  { label: "Settings", icon: Settings, path: "/dashboard/settings" },
 ];
 
 const agentNavItems = [
