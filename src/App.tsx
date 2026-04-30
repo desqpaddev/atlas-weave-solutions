@@ -31,6 +31,8 @@ import FixedDeparturesPage from "./pages/FixedDeparturesPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import CookiePolicyPage from "./pages/CookiePolicyPage";
+import CheckoutReturnPage from "./pages/CheckoutReturnPage";
+import { PaymentTestModeBanner } from "./components/PaymentTestModeBanner";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <PaymentTestModeBanner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
@@ -56,6 +59,7 @@ const App = () => (
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms-of-service" element={<TermsOfServicePage />} />
             <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+            <Route path="/checkout/return" element={<CheckoutReturnPage />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<DashboardOverview />} />
               <Route path="leads" element={<LeadsPage />} />
