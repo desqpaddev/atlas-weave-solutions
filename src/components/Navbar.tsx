@@ -32,7 +32,7 @@ export function Navbar() {
         <div className="container mx-auto flex items-center justify-between h-9 px-4 text-xs">
           <div className="flex items-center gap-1.5">
             <Phone className="h-3 w-3" />
-            <span className="font-medium">{company?.phone || "1800-123-4567"}</span>
+            <span className="font-medium">{company?.phone || "+44 7418375151"}</span>
           </div>
           <div className="hidden sm:flex items-center gap-4">
             <a href="#" className="flex items-center gap-1 hover:underline"><Phone className="h-3 w-3" /> Contact Us</a>
