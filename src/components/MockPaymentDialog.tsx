@@ -80,7 +80,7 @@ export function MockPaymentDialog({ open, onClose, onPaymentSuccess, amount, cur
             </div>
 
             <Button variant="brand" size="lg" className="w-full" disabled={!isValid} type="submit">
-              <Lock className="h-4 w-4 mr-2" /> Pay ${amount.toLocaleString()}
+              <Lock className="h-4 w-4 mr-2" /> Pay £{amount.toLocaleString()}
             </Button>
 
             <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1">
