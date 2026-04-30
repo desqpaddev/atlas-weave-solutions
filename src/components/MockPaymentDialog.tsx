@@ -14,7 +14,7 @@ interface MockPaymentDialogProps {
   title: string;
 }
 
-export function MockPaymentDialog({ open, onClose, onPaymentSuccess, amount, currency = "USD", title }: MockPaymentDialogProps) {
+export function MockPaymentDialog({ open, onClose, onPaymentSuccess, amount, currency = "GBP", title }: MockPaymentDialogProps) {
   const [step, setStep] = useState<"form" | "processing" | "success">("form");
   const [card, setCard] = useState({ number: "", expiry: "", cvv: "", name: "" });
 
