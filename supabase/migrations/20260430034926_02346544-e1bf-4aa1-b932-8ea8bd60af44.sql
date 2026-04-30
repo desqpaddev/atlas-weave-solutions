@@ -1,0 +1,1 @@
+UPDATE public.companies SET email='admin@joannaholidays.uk', phone='+44 7418375151', currency='GBP' WHERE id='c3aa80f7-372f-49b8-b4a2-9466a305fe53';
