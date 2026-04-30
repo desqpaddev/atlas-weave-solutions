@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { Shield, Users, Award, Globe, MapPin, Plane, Heart, Star } from "lucide-react";
+import { Shield, Users, Award, Globe, MapPin, Plane, Heart, Star, Sparkles, Compass } from "lucide-react";
 
 const stats = [
   { value: "8+", label: "Years of Excellence" },
@@ -11,11 +11,13 @@ const stats = [
 
 const values = [
   { icon: Shield, title: "IATA Accredited", desc: "We are a fully IATA Accredited Travel Management Company, ensuring the highest standards of service and reliability." },
-  { icon: Users, title: "Expert Team", desc: "Our dynamic team of experienced travel professionals is dedicated to crafting exceptional travel experiences." },
-  { icon: Award, title: "Excellence Since 2017", desc: "With over 8 years of excellence, we have established ourselves as leaders in the hospitality & tourism sector." },
-  { icon: Globe, title: "Worldwide Coverage", desc: "From exotic beaches to historic cities, we cover destinations across every continent." },
-  { icon: Heart, title: "Tailored Experiences", desc: "Every journey is personally crafted to match your preferences, budget, and travel style." },
-  { icon: Star, title: "Best Price Guarantee", desc: "We ensure competitive pricing without compromising on quality or experience." },
+  { icon: Users, title: "Expert Local Team", desc: "Our team of travel experts brings deep local knowledge, professional excellence, and a commitment to quality from start to finish." },
+  { icon: Award, title: "Trusted Direct DMC", desc: "A leading Destination Management Company for the UK and Europe, dedicated to creating exceptional travel experiences." },
+  { icon: Globe, title: "Worldwide Coverage", desc: "From iconic landmarks to hidden gems across the UK and Europe, we deliver experiences that go beyond expectations." },
+  { icon: Heart, title: "Personalized Service", desc: "Every traveler is unique. We listen, understand, and design your journey to match your dreams and preferences." },
+  { icon: Star, title: "Comprehensive Solutions", desc: "From flights and hotels to visas and tours, we handle every detail so you can focus on making memories." },
+  { icon: Sparkles, title: "Luxury & Private Tours", desc: "Specialists in luxury tours, private tours, minivan tours, and group tours blending comfort, culture, and class." },
+  { icon: Compass, title: "Personal Touch", desc: "Every journey is crafted with precision, passion, and a personal touch — turning dreams into lifelong memories." },
 ];
 
 export default function AboutPage() {
@@ -32,9 +34,9 @@ export default function AboutPage() {
             <Plane className="h-4 w-4" />
             <span className="text-sm font-medium">About Joanna Holidays</span>
           </div>
-          <h1 className="font-display text-3xl md:text-5xl font-bold mb-4">Your Trusted Travel Partner</h1>
+          <h1 className="font-display text-3xl md:text-5xl font-bold mb-4">Crafting Journeys, Creating Memories</h1>
           <p className="text-primary-foreground/80 max-w-2xl mx-auto text-lg">
-            Headquartered in South India, serving travelers worldwide with passion and expertise.
+            Your trusted Direct DMC for the UK and Europe — where every journey is crafted with precision, passion, and a personal touch.
           </p>
         </div>
       </div>
@@ -44,15 +46,18 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
             <div>
-              <span className="text-primary font-semibold text-sm tracking-widest uppercase mb-3 block">Our Story</span>
+              <span className="text-primary font-semibold text-sm tracking-widest uppercase mb-3 block">About Joanna Holidays</span>
               <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-4">
                 Where Exceptional <span className="text-primary">Memories Begin</span>
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                Joanna Holidays Pvt Ltd is an IATA Accredited Travel Management Company headquartered in South India. With over 8 years of excellence since 2017, we have established ourselves as leaders in the hospitality & Tourism sector.
+                Welcome to Joanna Holidays, your trusted Direct DMC for the UK and Europe. Based in the heart of the United Kingdom, Kent, we have proudly built our reputation as a leading destination management company dedicated to creating exceptional travel experiences for discerning clients and global travel partners.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                We specialize in curating luxury tours, private tours, minivan tours, group tours, and premium vacations, ensuring that every itinerary reflects the perfect blend of comfort, culture, and class. From iconic landmarks to hidden gems, we deliver experiences that go beyond expectations — turning travel dreams into lifelong memories.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Our dynamic team of experienced travel professionals is dedicated to crafting exceptional travel experiences tailored to your needs. We believe travel should be transformative — creating memories that last a lifetime.
+                Our team of travel experts brings deep local knowledge, professional excellence, and a commitment to quality that ensures seamless service from start to finish. Whether it's a family getaway, a corporate incentive trip, or a luxury European escape, Joanna Holidays guarantees a smooth, memorable, and enriching journey every time.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
