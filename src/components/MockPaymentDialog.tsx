@@ -54,7 +54,7 @@ export function MockPaymentDialog({ open, onClose, onPaymentSuccess, amount, cur
             <div className="bg-secondary rounded-lg p-4 flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Total Amount</span>
               <span className="text-2xl font-bold text-primary font-display">
-                {currency === "USD" ? "$" : currency} {amount.toLocaleString()}
+                {currency === "GBP" ? "£" : currency === "USD" ? "$" : currency} {amount.toLocaleString()}
               </span>
             </div>
 
