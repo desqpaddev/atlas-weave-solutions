@@ -3,8 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { PageHero } from "@/components/PageHero";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, Clock, ArrowRight, Plane, Hotel, Map, Car } from "lucide-react";
+import { MapPin, Clock, ArrowRight, Plane, Hotel, Map, Car, Palmtree } from "lucide-react";
+import holidaysHero from "@/assets/holidays-hero.jpg";
 
 const normalizeText = (value?: string | null) =>
   (value ?? "")
@@ -42,14 +44,12 @@ export default function PackagesListPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="bg-primary text-primary-foreground py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">Holiday Packages</h1>
-          <p className="text-primary-foreground/80 max-w-lg mx-auto">
-            Explore our curated collection of travel packages designed for unforgettable experiences.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        image={holidaysHero}
+        eyebrow={<><Palmtree className="h-4 w-4" /> All-Inclusive Getaways</>}
+        title={<>Holiday <span className="text-accent">Packages</span></>}
+        subtitle="Flights, hotels, transfers and tours bundled into effortless escapes — perfectly curated for unforgettable memories."
+      />
 
       <div className="container mx-auto px-4 py-12">
         {destinationFilter && (

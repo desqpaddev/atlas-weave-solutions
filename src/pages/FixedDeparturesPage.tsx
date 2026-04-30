@@ -2,11 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { PageHero } from "@/components/PageHero";
 import { Link } from "react-router-dom";
 import { MapPin, Clock, ArrowRight, Users, CalendarDays, Ticket } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import departuresHero from "@/assets/departures-hero.jpg";
 
 export default function FixedDeparturesPage() {
   const { data: departures = [], isLoading } = useQuery({
@@ -26,14 +28,12 @@ export default function FixedDeparturesPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="bg-primary text-primary-foreground py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">Fixed Departures</h1>
-          <p className="text-primary-foreground/80 max-w-lg mx-auto">
-            Guaranteed departure dates with fixed group sizes. Book your seat now!
-          </p>
-        </div>
-      </div>
+      <PageHero
+        image={departuresHero}
+        eyebrow={<><Ticket className="h-4 w-4" /> Guaranteed Group Departures</>}
+        title={<>Fixed <span className="text-accent">Departures</span></>}
+        subtitle="Locked-in dates, fixed group sizes, unbeatable value — secure your seat on our most loved guided journeys."
+      />
 
       <div className="container mx-auto px-4 py-12">
         {isLoading ? (
