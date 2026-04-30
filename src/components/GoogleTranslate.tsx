@@ -56,17 +56,30 @@ export function GoogleTranslate() {
 
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const lang = e.target.value;
+    setCurrent(lang);
     setGoogleTranslateCookie(lang);
 
-    // Try to use the live Google combo if present (no reload needed)
-    const combo = document.querySelector<HTMLSelectElement>("select.goog-te-combo");
-    if (combo) {
+    const applyTranslation = () => {
+      const combo = document.querySelector<HTMLSelectElement>("select.goog-te-combo");
+      if (!combo) return false;
+
       combo.value = lang === "en" ? "" : lang;
-      combo.dispatchEvent(new Event("change"));
-      // Some pages still need a reload to fully apply
-      setTimeout(() => window.location.reload(), 50);
-    } else {
+      combo.dispatchEvent(new Event("change", { bubbles: true }));
+      combo.dispatchEvent(new Event("input", { bubbles: true }));
+      return true;
+    };
+
+    if (lang === "en") {
       window.location.reload();
+      return;
+    }
+
+    if (!applyTranslation()) {
+      window.setTimeout(() => {
+        if (!applyTranslation()) {
+          window.location.reload();
+        }
+      }, 400);
     }
   };
 
