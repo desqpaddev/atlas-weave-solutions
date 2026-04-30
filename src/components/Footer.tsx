@@ -69,8 +69,20 @@ export function Footer() {
               Welcome to Joanna Holidays, your trusted Direct DMC for the UK and Europe — where every journey is crafted with precision, passion, and a personal touch. Based in Kent, we specialize in luxury, private, minivan, and group tours that turn travel dreams into lifelong memories.
             </p>
             <div className="flex gap-3">
-              {[Facebook, Instagram, Youtube, Globe].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 rounded-full bg-background/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110">
+              {[
+                { Icon: Facebook, href: "#", label: "Facebook" },
+                { Icon: Instagram, href: "https://www.instagram.com/joannaholidays.uk.europe/", label: "Instagram" },
+                { Icon: Youtube, href: "#", label: "YouTube" },
+                { Icon: Globe, href: "#", label: "Website" },
+              ].map(({ Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  aria-label={label}
+                  className="w-9 h-9 rounded-full bg-background/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110"
+                >
                   <Icon className="h-4 w-4" />
                 </a>
               ))}
