@@ -121,7 +121,7 @@ function CustomerDashboard({ user, profile }: { user: any; profile: any }) {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Spent</CardTitle>
             <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
-          <CardContent><p className="text-2xl font-bold text-foreground">${totalSpent.toLocaleString()}</p></CardContent>
+          <CardContent><p className="text-2xl font-bold text-foreground">£{totalSpent.toLocaleString()}</p></CardContent>
         </Card>
       </div>
 
@@ -160,7 +160,7 @@ function CustomerDashboard({ user, profile }: { user: any; profile: any }) {
             ) : myPayments.slice(0, 5).map((p: any) => (
               <div key={p.id} className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-foreground">${Number(p.amount).toLocaleString()}</p>
+                  <p className="text-sm font-medium text-foreground">£{Number(p.amount).toLocaleString()}</p>
                   <p className="text-xs text-muted-foreground capitalize">{p.method || "—"} · {p.paid_at ? format(new Date(p.paid_at), "dd MMM yyyy") : "Pending"}</p>
                 </div>
                 <Badge variant="secondary" className={p.status === "paid" ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}>{p.status}</Badge>
@@ -225,7 +225,7 @@ function AdminDashboard({ profile }: { profile: any }) {
     { label: "Total Leads", value: leadCount ?? 0, icon: TrendingUp, color: "text-primary" },
     { label: "Bookings", value: bookingCount ?? 0, icon: CalendarDays, color: "text-primary" },
     { label: "Customers", value: customerCount ?? 0, icon: Users, color: "text-primary" },
-    { label: "Revenue", value: `$${(revenue ?? 0).toLocaleString()}`, icon: DollarSign, color: "text-primary" },
+    { label: "Revenue", value: `£${(revenue ?? 0).toLocaleString()}`, icon: DollarSign, color: "text-primary" },
   ];
 
   return (
@@ -277,7 +277,7 @@ function AdminDashboard({ profile }: { profile: any }) {
                   </div>
                   <div className="text-right">
                     <Badge variant="secondary" className={statusColors[b.status] || ""}>{b.status}</Badge>
-                    <p className="text-xs font-medium text-foreground mt-1">${Number(b.total_amount).toLocaleString()}</p>
+                    <p className="text-xs font-medium text-foreground mt-1">£{Number(b.total_amount).toLocaleString()}</p>
                   </div>
                 </div>
               ))

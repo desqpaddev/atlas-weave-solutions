@@ -280,7 +280,7 @@ export default function PackagesPage() {
                   <TableCell><div><p className="font-medium text-foreground">{p.title}</p>{p.is_customizable && <p className="text-xs text-muted-foreground">Customizable</p>}</div></TableCell>
                   <TableCell className="hidden md:table-cell"><span className="flex items-center gap-1 text-muted-foreground text-sm"><MapPin className="h-3 w-3" /> {p.destination || "—"}</span></TableCell>
                   <TableCell className="hidden sm:table-cell"><span className="flex items-center gap-1 text-muted-foreground text-sm"><Clock className="h-3 w-3" /> {p.duration_days}D/{p.duration_nights}N</span></TableCell>
-                  <TableCell className="text-foreground font-medium">${Number(p.base_price).toLocaleString()}</TableCell>
+                  <TableCell className="text-foreground font-medium">£{Number(p.base_price).toLocaleString()}</TableCell>
                   <TableCell><Badge variant="secondary" className={p.is_active ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}>{p.is_active ? "Active" : "Inactive"}</Badge></TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -310,7 +310,7 @@ export default function PackagesPage() {
                 <div><p className="text-muted-foreground">Title</p><p className="font-medium text-foreground">{viewPkg.title}</p></div>
                 <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewPkg.destination || "—"}</p></div>
                 <div><p className="text-muted-foreground">Duration</p><p className="text-foreground">{viewPkg.duration_days}D / {viewPkg.duration_nights}N</p></div>
-                <div><p className="text-muted-foreground">Price</p><p className="text-foreground">${Number(viewPkg.base_price).toLocaleString()}</p></div>
+                <div><p className="text-muted-foreground">Price</p><p className="text-foreground">£{Number(viewPkg.base_price).toLocaleString()}</p></div>
               </div>
               <div><p className="text-muted-foreground">Includes</p><p className="text-foreground">{[viewPkg.includes_flight && "Flights", viewPkg.includes_hotel && "Hotels", viewPkg.includes_tour && "Tours", viewPkg.includes_transfer && "Transfers"].filter(Boolean).join(", ") || "—"}</p></div>
               {viewPkg.description && <div><p className="text-muted-foreground">Description</p><p className="text-foreground">{viewPkg.description}</p></div>}

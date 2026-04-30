@@ -43,7 +43,7 @@ export default function ToursListPage() {
     return tours.filter((tour) => {
       const destination = normalizeText(tour.destination);
       const category = normalizeText(tour.category);
-      const searchable = normalizeText(`${tour.title} ${tour.destination ?? ""} ${tour.category ?? ""} ${tour.description ?? ""} ${tour.difficulty ?? ""} ${(tour.highlights ?? []).join(" ")} ${(tour.inclusions ?? []).join(" ")}`);
+      const searchable = normalizeText(`£{tour.title} ${tour.destination ?? ""} ${tour.category ?? ""} ${tour.description ?? ""} ${tour.difficulty ?? ""} ${(tour.highlights ?? []).join(" ")} ${(tour.inclusions ?? []).join(" ")}`);
 
       if (!matchesFilter(destination, destinationFilter)) return false;
       if (!matchesFilter(category, categoryFilter)) return false;
@@ -119,7 +119,7 @@ export default function ToursListPage() {
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
                     <div>
-                      <p className="text-xl font-bold text-primary">${Number(tour.adult_price).toLocaleString()}</p>
+                      <p className="text-xl font-bold text-primary">£{Number(tour.adult_price).toLocaleString()}</p>
                       <span className="text-xs text-muted-foreground">per adult</span>
                     </div>
                     <span className="text-primary text-sm font-semibold flex items-center gap-1">

@@ -140,7 +140,7 @@ export default function PaymentsPage() {
               payments.map((p: any) => (
                 <TableRow key={p.id} className="border-border">
                   <TableCell><div><p className="font-mono text-xs text-primary">{p.bookings?.reference_number}</p><p className="text-xs text-muted-foreground">{p.bookings?.title}</p></div></TableCell>
-                  <TableCell className="font-medium text-foreground">${Number(p.amount).toLocaleString()}</TableCell>
+                  <TableCell className="font-medium text-foreground">£{Number(p.amount).toLocaleString()}</TableCell>
                   <TableCell className="text-muted-foreground capitalize">{p.method || "—"}</TableCell>
                   <TableCell><Badge variant="secondary" className={statusColors[(p.status as PaymentStatus) || "pending"]}>{p.status || "pending"}</Badge></TableCell>
                   <TableCell className="hidden sm:table-cell text-muted-foreground">{p.paid_at ? format(new Date(p.paid_at), "dd MMM yyyy") : "—"}</TableCell>
@@ -166,7 +166,7 @@ export default function PaymentsPage() {
           {viewPayment && (
             <div className="space-y-3 text-sm grid grid-cols-2 gap-3">
               <div><p className="text-muted-foreground">Booking</p><p className="font-mono text-primary">{(viewPayment as any).bookings?.reference_number}</p></div>
-              <div><p className="text-muted-foreground">Amount</p><p className="font-medium text-foreground">${Number(viewPayment.amount).toLocaleString()}</p></div>
+              <div><p className="text-muted-foreground">Amount</p><p className="font-medium text-foreground">£{Number(viewPayment.amount).toLocaleString()}</p></div>
               <div><p className="text-muted-foreground">Method</p><p className="text-foreground capitalize">{viewPayment.method || "—"}</p></div>
               <div><p className="text-muted-foreground">Status</p><Badge variant="secondary" className={statusColors[(viewPayment.status as PaymentStatus) || "pending"]}>{viewPayment.status || "pending"}</Badge></div>
               <div><p className="text-muted-foreground">Transaction ID</p><p className="text-foreground">{viewPayment.transaction_id || "—"}</p></div>

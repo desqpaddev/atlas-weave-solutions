@@ -140,8 +140,8 @@ export default function BookingsPage() {
                   <TableCell><Badge variant="secondary" className={statusColors[b.status as BookingStatus]}>{b.status}</Badge></TableCell>
                   <TableCell className="hidden sm:table-cell text-muted-foreground">{b.destination || "—"}</TableCell>
                   <TableCell className="hidden lg:table-cell text-muted-foreground">{b.pax}</TableCell>
-                  <TableCell className="hidden sm:table-cell text-foreground font-medium">${Number(b.total_amount).toLocaleString()}</TableCell>
-                  <TableCell className="hidden lg:table-cell text-muted-foreground">${Number(b.paid_amount).toLocaleString()}</TableCell>
+                  <TableCell className="hidden sm:table-cell text-foreground font-medium">£{Number(b.total_amount).toLocaleString()}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-muted-foreground">£{Number(b.paid_amount).toLocaleString()}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(b.id)}><Eye className="h-3.5 w-3.5" /></Button>
@@ -172,8 +172,8 @@ export default function BookingsPage() {
                 <div><p className="text-muted-foreground">Status</p><Badge variant="secondary" className={statusColors[viewBooking.status as BookingStatus]}>{viewBooking.status}</Badge></div>
                 <div><p className="text-muted-foreground">Title</p><p className="font-medium text-foreground">{viewBooking.title}</p></div>
                 <div><p className="text-muted-foreground">Type</p><p className="text-foreground capitalize">{viewBooking.booking_type}</p></div>
-                <div><p className="text-muted-foreground">Total Amount</p><p className="text-foreground font-semibold">${Number(viewBooking.total_amount).toLocaleString()}</p></div>
-                <div><p className="text-muted-foreground">Paid Amount</p><p className="text-foreground">${Number(viewBooking.paid_amount).toLocaleString()}</p></div>
+                <div><p className="text-muted-foreground">Total Amount</p><p className="text-foreground font-semibold">£{Number(viewBooking.total_amount).toLocaleString()}</p></div>
+                <div><p className="text-muted-foreground">Paid Amount</p><p className="text-foreground">£{Number(viewBooking.paid_amount).toLocaleString()}</p></div>
                 <div><p className="text-muted-foreground">Payment Status</p><p className="text-foreground capitalize">{viewBooking.payment_status || "pending"}</p></div>
                 <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewBooking.destination || "—"}</p></div>
                 <div><p className="text-muted-foreground">Travelers</p><p className="text-foreground">{viewBooking.pax}</p></div>

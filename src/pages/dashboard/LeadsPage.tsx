@@ -130,7 +130,7 @@ export default function LeadsPage() {
                 <TableCell className="hidden sm:table-cell text-muted-foreground">{l.phone || "—"}</TableCell>
                 <TableCell className="hidden sm:table-cell text-muted-foreground">{l.destination || "—"}</TableCell>
                 <TableCell><Badge variant="secondary" className={statusColors[l.status as LeadStatus]}>{l.status}</Badge></TableCell>
-                <TableCell className="hidden lg:table-cell text-muted-foreground">{l.budget ? `$${Number(l.budget).toLocaleString()}` : "—"}</TableCell>
+                <TableCell className="hidden lg:table-cell text-muted-foreground">{l.budget ? `£${Number(l.budget).toLocaleString()}` : "—"}</TableCell>
                 <TableCell className="hidden lg:table-cell text-muted-foreground">{l.pax || "—"}</TableCell>
                 <TableCell className="hidden xl:table-cell text-muted-foreground capitalize">{l.source || "—"}</TableCell>
                 <TableCell className="hidden xl:table-cell text-muted-foreground">{l.travel_dates || "—"}</TableCell>
@@ -162,7 +162,7 @@ export default function LeadsPage() {
                 <div><p className="text-muted-foreground">Email</p><p className="text-foreground">{viewLead.email || "—"}</p></div>
                 <div><p className="text-muted-foreground">Phone</p><p className="text-foreground">{viewLead.phone || "—"}</p></div>
                 <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewLead.destination || "—"}</p></div>
-                <div><p className="text-muted-foreground">Budget</p><p className="text-foreground font-semibold">{viewLead.budget ? `$${Number(viewLead.budget).toLocaleString()}` : "—"}</p></div>
+                <div><p className="text-muted-foreground">Budget</p><p className="text-foreground font-semibold">{viewLead.budget ? `£${Number(viewLead.budget).toLocaleString()}` : "—"}</p></div>
                 <div><p className="text-muted-foreground">Source</p><p className="text-foreground capitalize">{viewLead.source || "—"}</p></div>
                 <div><p className="text-muted-foreground">Travelers</p><p className="text-foreground">{viewLead.pax || "—"}</p></div>
                 <div><p className="text-muted-foreground">Travel Dates</p><p className="text-foreground">{viewLead.travel_dates || "—"}</p></div>

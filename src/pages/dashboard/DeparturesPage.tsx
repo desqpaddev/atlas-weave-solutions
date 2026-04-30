@@ -95,7 +95,7 @@ export default function DeparturesPage() {
                 <TableCell><span className="flex items-center gap-1 text-sm text-muted-foreground"><Calendar className="h-3 w-3" />{format(new Date(d.departure_date), "dd MMM yyyy")}</span></TableCell>
                 <TableCell><span className="flex items-center gap-1 text-sm"><Users className="h-3 w-3 text-muted-foreground" /><span className="text-foreground font-medium">{d.booked_seats}</span><span className="text-muted-foreground">/ {d.total_seats}</span>{d.waitlist_count > 0 && <Badge variant="secondary" className="ml-1 bg-yellow-500/20 text-yellow-400 text-xs">+{d.waitlist_count} WL</Badge>}</span></TableCell>
                 <TableCell><Badge variant="secondary" className={statusColor[d.status] || "bg-gray-500/20 text-gray-400"}>{d.status}</Badge></TableCell>
-                <TableCell className="hidden sm:table-cell text-foreground font-medium">{d.price_override ? `$${Number(d.price_override).toLocaleString()}` : "Default"}</TableCell>
+                <TableCell className="hidden sm:table-cell text-foreground font-medium">{d.price_override ? `£${Number(d.price_override).toLocaleString()}` : "Default"}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewId(d.id)}><Eye className="h-3.5 w-3.5" /></Button>
@@ -119,7 +119,7 @@ export default function DeparturesPage() {
               <div><p className="text-muted-foreground">Departure</p><p className="text-foreground">{format(new Date(viewDep.departure_date), "dd MMM yyyy")}</p></div>
               <div><p className="text-muted-foreground">Return</p><p className="text-foreground">{viewDep.return_date ? format(new Date(viewDep.return_date), "dd MMM yyyy") : "—"}</p></div>
               <div><p className="text-muted-foreground">Seats</p><p className="text-foreground">{viewDep.booked_seats} / {viewDep.total_seats}</p></div>
-              <div><p className="text-muted-foreground">Price Override</p><p className="text-foreground">{viewDep.price_override ? `$${Number(viewDep.price_override).toLocaleString()}` : "Default"}</p></div>
+              <div><p className="text-muted-foreground">Price Override</p><p className="text-foreground">{viewDep.price_override ? `£${Number(viewDep.price_override).toLocaleString()}` : "Default"}</p></div>
               {viewDep.notes && <div className="col-span-2"><p className="text-muted-foreground">Notes</p><p className="text-foreground">{viewDep.notes}</p></div>}
             </div>
           )}

@@ -138,7 +138,7 @@ export default function ToursPage() {
                 <TableCell><div><p className="font-medium text-foreground">{t.title}</p><p className="text-xs text-muted-foreground capitalize">{t.category}</p></div></TableCell>
                 <TableCell className="hidden md:table-cell"><span className="flex items-center gap-1 text-muted-foreground text-sm"><MapPin className="h-3 w-3" /> {t.destination || "—"}</span></TableCell>
                 <TableCell className="hidden sm:table-cell"><span className="flex items-center gap-1 text-muted-foreground text-sm"><Clock className="h-3 w-3" /> {t.duration_days}D/{t.duration_nights}N</span></TableCell>
-                <TableCell className="text-foreground font-medium">${Number(t.adult_price).toLocaleString()}</TableCell>
+                <TableCell className="text-foreground font-medium">£{Number(t.adult_price).toLocaleString()}</TableCell>
                 <TableCell><Badge variant="secondary" className={t.is_active ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}>{t.is_active ? "Active" : "Inactive"}</Badge></TableCell>
                 <TableCell>
                   <div className="flex gap-1">
@@ -164,8 +164,8 @@ export default function ToursPage() {
                 <div><p className="text-muted-foreground">Destination</p><p className="text-foreground">{viewTour.destination || "—"}</p></div>
                 <div><p className="text-muted-foreground">Duration</p><p className="text-foreground">{viewTour.duration_days}D / {viewTour.duration_nights}N</p></div>
                 <div><p className="text-muted-foreground">Category</p><p className="text-foreground capitalize">{viewTour.category}</p></div>
-                <div><p className="text-muted-foreground">Adult Price</p><p className="text-foreground">${Number(viewTour.adult_price).toLocaleString()}</p></div>
-                <div><p className="text-muted-foreground">Child Price</p><p className="text-foreground">${Number(viewTour.child_price || 0).toLocaleString()}</p></div>
+                <div><p className="text-muted-foreground">Adult Price</p><p className="text-foreground">£{Number(viewTour.adult_price).toLocaleString()}</p></div>
+                <div><p className="text-muted-foreground">Child Price</p><p className="text-foreground">£{Number(viewTour.child_price || 0).toLocaleString()}</p></div>
               </div>
               {viewTour.description && <div><p className="text-muted-foreground">Description</p><p className="text-foreground">{viewTour.description}</p></div>}
               {viewTour.highlights && (viewTour.highlights as string[]).length > 0 && <div><p className="text-muted-foreground">Highlights</p><p className="text-foreground">{(viewTour.highlights as string[]).join(", ")}</p></div>}
