@@ -101,7 +101,7 @@ export default function DashboardLayout() {
               ) : (
                 <>
                   <Plane className="h-5 w-5 text-primary" />
-                  <span className="font-display text-xl font-bold text-gradient-blue">{company?.name || "TravelHub"}</span>
+                  <span className="font-display text-xl font-bold text-gradient-blue">{company?.name || "Joanna Holidays"}</span>
                 </>
               )}
             </Link>
