@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Json } from "@/integrations/supabase/types";
+import { StripeCheckoutDialog, type CheckoutBookingPayload } from "@/components/StripeCheckoutDialog";
 
 type ItineraryDay = { day: number; title: string; description: string; activities: string[] };
 
@@ -21,7 +22,8 @@ export default function PackageDetailPage() {
   const [bookingForm, setBookingForm] = useState({
     fullName: "", email: "", phone: "", pax: 1, checkIn: "", notes: "",
   });
-  const [submitting, setSubmitting] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [checkoutPayload, setCheckoutPayload] = useState<CheckoutBookingPayload | null>(null);
 
   const { data: pkg, isLoading } = useQuery({
     queryKey: ["package-detail", slug],
@@ -41,30 +43,34 @@ export default function PackageDetailPage() {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pkg) return;
-    setSubmitting(true);
-    try {
-      // Create a lead from the booking inquiry
-      const { error } = await supabase.from("leads").insert({
-        company_id: pkg.company_id,
-        full_name: bookingForm.fullName,
-        email: bookingForm.email,
-        phone: bookingForm.phone,
-        pax: bookingForm.pax,
-        destination: pkg.destination,
-        travel_dates: bookingForm.checkIn,
-        budget: pkg.base_price * bookingForm.pax,
-        source: "website",
-        notes: `Package: ${pkg.title}\n${bookingForm.notes}`,
-        status: "new",
-      });
-      if (error) throw error;
-      toast.success("Booking inquiry submitted! We'll contact you shortly.");
-      setBookingForm({ fullName: "", email: "", phone: "", pax: 1, checkIn: "", notes: "" });
-    } catch (err: any) {
-      toast.error(err.message || "Failed to submit inquiry");
-    } finally {
-      setSubmitting(false);
+    if (!bookingForm.fullName || !bookingForm.email) {
+      toast.error("Please fill in your name and email.");
+      return;
     }
+    const total = Number(pkg.base_price) * bookingForm.pax;
+    if (total < 1) {
+      toast.error("Invalid total amount.");
+      return;
+    }
+    const refNumber = `BK-${Date.now().toString(36).toUpperCase()}`;
+    setCheckoutPayload({
+      reference_number: refNumber,
+      title: pkg.title,
+      destination: pkg.destination ?? null,
+      pax: bookingForm.pax,
+      check_in: bookingForm.checkIn || null,
+      description: `Customer: ${bookingForm.fullName}\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}\nTravelers: ${bookingForm.pax}\n${bookingForm.notes}`,
+      company_id: pkg.company_id,
+      customer_email: bookingForm.email,
+      metadata: {
+        customer_name: bookingForm.fullName,
+        customer_email: bookingForm.email,
+        customer_phone: bookingForm.phone,
+        package_slug: pkg.slug,
+        notes: bookingForm.notes,
+      },
+    });
+    setShowPayment(true);
   };
 
   const itinerary: ItineraryDay[] = Array.isArray(pkg?.itinerary)
