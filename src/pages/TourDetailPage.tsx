@@ -190,9 +190,9 @@ export default function TourDetailPage() {
             <div>
               <h2 className="font-display text-xl font-bold text-foreground mb-3">Pricing</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Adult</p><p className="text-2xl font-bold text-primary">${adultPrice.toLocaleString()}</p></div>
-                {childPrice > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Child</p><p className="text-2xl font-bold text-primary">${childPrice.toLocaleString()}</p></div>}
-                {activeTour.group_price && Number(activeTour.group_price) > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Group</p><p className="text-2xl font-bold text-primary">${Number(activeTour.group_price).toLocaleString()}</p></div>}
+                <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Adult</p><p className="text-2xl font-bold text-primary">£{adultPrice.toLocaleString()}</p></div>
+                {childPrice > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Child</p><p className="text-2xl font-bold text-primary">£{childPrice.toLocaleString()}</p></div>}
+                {activeTour.group_price && Number(activeTour.group_price) > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Group</p><p className="text-2xl font-bold text-primary">£{Number(activeTour.group_price).toLocaleString()}</p></div>}
               </div>
             </div>
           </div>
@@ -202,7 +202,7 @@ export default function TourDetailPage() {
             <div className="sticky top-28 bg-card border border-border rounded-xl p-6 shadow-card">
               <div className="mb-5">
                 <p className="text-xs text-muted-foreground">Starting from</p>
-                <p className="text-3xl font-bold text-primary font-display">${adultPrice.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-primary font-display">£{adultPrice.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">per adult</p>
               </div>
 
@@ -215,12 +215,12 @@ export default function TourDetailPage() {
                   <div>
                     <Label className="text-xs">Adults</Label>
                     <Input type="number" min={1} value={bookingForm.adults} onChange={(e) => setBookingForm({ ...bookingForm, adults: Number(e.target.value) })} className="mt-1" />
-                    <p className="text-xs text-muted-foreground mt-0.5">${adultPrice.toLocaleString()} each</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">£{adultPrice.toLocaleString()} each</p>
                   </div>
                   <div>
                     <Label className="text-xs">Children</Label>
                     <Input type="number" min={0} value={bookingForm.children} onChange={(e) => setBookingForm({ ...bookingForm, children: Number(e.target.value) })} className="mt-1" />
-                    <p className="text-xs text-muted-foreground mt-0.5">{childPrice > 0 ? `$${childPrice.toLocaleString()} each` : "Free"}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{childPrice > 0 ? `£${childPrice.toLocaleString()} each` : "Free"}</p>
                   </div>
                 </div>
 
@@ -230,17 +230,17 @@ export default function TourDetailPage() {
                 <div className="bg-secondary rounded-lg p-3 space-y-1">
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>{bookingForm.adults} Adult{bookingForm.adults > 1 ? "s" : ""}</span>
-                    <span>${(adultPrice * bookingForm.adults).toLocaleString()}</span>
+                    <span>£{(adultPrice * bookingForm.adults).toLocaleString()}</span>
                   </div>
                   {bookingForm.children > 0 && (
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>{bookingForm.children} Child{bookingForm.children > 1 ? "ren" : ""}</span>
-                      <span>${(childPrice * bookingForm.children).toLocaleString()}</span>
+                      <span>£{(childPrice * bookingForm.children).toLocaleString()}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm font-bold text-foreground border-t border-border pt-1">
                     <span>Total</span>
-                    <span className="text-primary">${totalPrice.toLocaleString()}</span>
+                    <span className="text-primary">£{totalPrice.toLocaleString()}</span>
                   </div>
                 </div>
 

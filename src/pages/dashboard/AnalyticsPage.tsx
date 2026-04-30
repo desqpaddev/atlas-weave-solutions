@@ -138,7 +138,7 @@ export default function AnalyticsPage() {
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><DollarSign className="h-5 w-5 text-primary" /></div>
-              <div><p className="text-xs text-muted-foreground">Total Revenue</p><p className="text-xl font-bold text-foreground">${totalRevenue.toLocaleString()}</p></div>
+              <div><p className="text-xs text-muted-foreground">Total Revenue</p><p className="text-xl font-bold text-foreground">£{totalRevenue.toLocaleString()}</p></div>
             </div>
           </CardContent>
         </Card>
@@ -146,7 +146,7 @@ export default function AnalyticsPage() {
           <CardContent className="pt-4 pb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-green-500" /></div>
-              <div><p className="text-xs text-muted-foreground">Collected</p><p className="text-xl font-bold text-foreground">${totalPaid.toLocaleString()}</p></div>
+              <div><p className="text-xs text-muted-foreground">Collected</p><p className="text-xl font-bold text-foreground">£{totalPaid.toLocaleString()}</p></div>
             </div>
           </CardContent>
         </Card>
@@ -193,7 +193,7 @@ export default function AnalyticsPage() {
             {statusChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={statusChartData} cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `${name}: ${value}`} dataKey="value">
+                  <Pie data={statusChartData} cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `£{name}: ${value}`} dataKey="value">
                     {statusChartData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
@@ -243,7 +243,7 @@ export default function AnalyticsPage() {
             {leadChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={leadChartData} cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `${name}: ${value}`} dataKey="value">
+                  <Pie data={leadChartData} cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `£{name}: ${value}`} dataKey="value">
                     {leadChartData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />

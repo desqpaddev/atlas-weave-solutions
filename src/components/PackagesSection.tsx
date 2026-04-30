@@ -111,7 +111,7 @@ export function PackagesSection() {
                     <div>
                       <span className="text-[10px] text-muted-foreground uppercase tracking-wider">From</span>
                       <p className="text-lg font-bold text-primary font-display">
-                        {tour.currency === "GBP" ? "£" : "$"}{Number(tour.adult_price).toLocaleString()}
+                        {"£"}{Number(tour.adult_price).toLocaleString()}
                       </p>
                     </div>
                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 px-4 py-2 rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">

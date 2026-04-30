@@ -222,7 +222,7 @@ export default function PackageDetailPage() {
             <div className="sticky top-28 bg-card border border-border rounded-xl p-6 shadow-card">
               <div className="mb-5">
                 <p className="text-xs text-muted-foreground">Starting from</p>
-                <p className="text-3xl font-bold text-primary font-display">${Number(pkg.base_price).toLocaleString()}</p>
+                <p className="text-3xl font-bold text-primary font-display">£{Number(pkg.base_price).toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">per person</p>
               </div>
 
@@ -257,8 +257,8 @@ export default function PackageDetailPage() {
                 {bookingForm.pax > 0 && (
                   <div className="bg-secondary rounded-lg p-3 text-sm">
                     <div className="flex justify-between text-muted-foreground">
-                      <span>${Number(pkg.base_price).toLocaleString()} × {bookingForm.pax}</span>
-                      <span className="font-semibold text-foreground">${(Number(pkg.base_price) * bookingForm.pax).toLocaleString()}</span>
+                      <span>£{Number(pkg.base_price).toLocaleString()} × {bookingForm.pax}</span>
+                      <span className="font-semibold text-foreground">£{(Number(pkg.base_price) * bookingForm.pax).toLocaleString()}</span>
                     </div>
                   </div>
                 )}

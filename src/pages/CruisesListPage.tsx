@@ -72,7 +72,7 @@ export default function CruisesListPage() {
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
                     <div>
-                      <p className="text-xl font-bold text-primary">${Number(cruise.adult_price).toLocaleString()}</p>
+                      <p className="text-xl font-bold text-primary">£{Number(cruise.adult_price).toLocaleString()}</p>
                       <span className="text-xs text-muted-foreground">per adult</span>
                     </div>
                     <span className="text-primary text-sm font-semibold flex items-center gap-1">
