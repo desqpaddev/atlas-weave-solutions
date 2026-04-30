@@ -49,7 +49,7 @@ export function Navbar() {
             {company?.logo_url ? (
               <img src={company.logo_url} alt={company.name || "Logo"} className="h-10 w-auto max-w-[160px] object-contain" />
             ) : (
-              <span className="font-display text-2xl font-bold text-primary">{company?.name || "TravelHub"}</span>
+              <span className="font-display text-2xl font-bold text-primary">{company?.name || "Joanna Holidays"}</span>
             )}
           </Link>
 
