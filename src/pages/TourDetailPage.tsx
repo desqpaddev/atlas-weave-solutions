@@ -233,7 +233,7 @@ export default function TourDetailPage() {
           currency="GBP"
           productName={activeTour.title}
           customerEmail={bookingForm.email}
-          bookingType="tour"
+          bookingType={departureId ? "fixed_departure" : "tour"}
           bookingPayload={checkoutPayload}
         />
       )}
