@@ -66,7 +66,7 @@ export function Footer() {
               <span className="font-display text-2xl font-bold text-accent block mb-4">{companyName}</span>
             )}
             <p className="text-sm text-background/60 leading-relaxed mb-5">
-              Joanna Holidays Pvt Ltd is an IATA Accredited Travel Management Company. With over 8 years of excellence, we craft exceptional travel experiences tailored to your needs.
+              Welcome to Joanna Holidays, your trusted Direct DMC for the UK and Europe — where every journey is crafted with precision, passion, and a personal touch. Based in Kent, we specialize in luxury, private, minivan, and group tours that turn travel dreams into lifelong memories.
             </p>
             <div className="flex gap-3">
               {[Facebook, Instagram, Youtube, Globe].map((Icon, i) => (

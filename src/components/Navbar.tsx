@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, MapPin, Globe, Plane, Hotel, Compass, Ship, ChevronDown, User, CalendarDays } from "lucide-react";
 import { Link } from "react-router-dom";
+import { GoogleTranslate } from "@/components/GoogleTranslate";
 
 const navLinks = [
   { label: "Holidays", href: "/packages", icon: Compass },
@@ -35,11 +36,9 @@ export function Navbar() {
             <span className="font-medium">{company?.phone || "+44 7418375151"}</span>
           </div>
           <div className="hidden sm:flex items-center gap-4">
-            <a href="#" className="flex items-center gap-1 hover:underline"><Phone className="h-3 w-3" /> Contact Us</a>
+            <a href="/contact" className="flex items-center gap-1 hover:underline"><Phone className="h-3 w-3" /> Contact Us</a>
             <span className="w-px h-3 bg-primary-foreground/30" />
-            <a href="#" className="flex items-center gap-1 hover:underline"><MapPin className="h-3 w-3" /> Stores</a>
-            <span className="w-px h-3 bg-primary-foreground/30" />
-            <button className="flex items-center gap-1 hover:underline"><Globe className="h-3 w-3" /> English <ChevronDown className="h-3 w-3" /></button>
+            <GoogleTranslate />
           </div>
         </div>
       </div>
