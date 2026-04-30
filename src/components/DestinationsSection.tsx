@@ -80,7 +80,7 @@ export function DestinationsSection() {
                     {dest}
                   </h3>
                   <p className="text-white/70 text-xs mt-1">
-                    From {tour.currency === "GBP" ? "£" : "$"}{Number(tour.adult_price).toLocaleString()}
+                    From {"£"}{Number(tour.adult_price).toLocaleString()}
                   </p>
                 </div>
 
