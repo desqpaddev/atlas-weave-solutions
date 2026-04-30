@@ -2,9 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { PageHero } from "@/components/PageHero";
 import { Link } from "react-router-dom";
 import { MapPin, Clock, ArrowRight, Users, Ship } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import cruisesHero from "@/assets/cruises-hero.jpg";
 
 export default function CruisesListPage() {
   const { data: cruises = [], isLoading } = useQuery({
@@ -24,15 +26,12 @@ export default function CruisesListPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-16">
-        <div className="container mx-auto px-4 text-center">
-          <Ship className="h-12 w-12 mx-auto mb-4 opacity-80" />
-          <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">Cruise Tours</h1>
-          <p className="text-primary-foreground/80 max-w-lg mx-auto">
-            Set sail on unforgettable cruise adventures across the world's most beautiful waters.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        image={cruisesHero}
+        eyebrow={<><Ship className="h-4 w-4" /> Set Sail in Style</>}
+        title={<>Cruise <span className="text-accent">Adventures</span></>}
+        subtitle="From the Mediterranean to the Caribbean — board world-class ships and wake up in a new paradise every morning."
+      />
 
       <div className="container mx-auto px-4 py-12">
         {isLoading ? (

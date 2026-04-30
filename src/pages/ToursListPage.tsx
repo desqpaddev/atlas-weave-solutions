@@ -3,9 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { PageHero } from "@/components/PageHero";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, Clock, ArrowRight, Users } from "lucide-react";
+import { MapPin, Clock, ArrowRight, Users, Compass } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import toursHero from "@/assets/tours-hero.jpg";
 
 const normalizeText = (value?: string | null) =>
   (value ?? "")
@@ -58,14 +60,12 @@ export default function ToursListPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="bg-primary text-primary-foreground py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">Tours & Experiences</h1>
-          <p className="text-primary-foreground/80 max-w-lg mx-auto">
-            Discover guided tours and unique experiences across the world.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        image={toursHero}
+        eyebrow={<><Compass className="h-4 w-4" /> Curated Worldwide Tours</>}
+        title={<>Tours & <span className="text-accent">Experiences</span></>}
+        subtitle="Discover handpicked guided tours and unforgettable experiences across iconic destinations and hidden gems."
+      />
 
       <div className="container mx-auto px-4 py-12">
         {hasActiveFilters && (
