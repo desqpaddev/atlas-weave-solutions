@@ -111,9 +111,9 @@ export function Footer() {
               {[
                 { label: "About Us", href: "/about" },
                 { label: "Contact Us", href: "/contact" },
-                { label: "Privacy Policy", href: "#" },
-                { label: "Terms of Service", href: "#" },
-                { label: "Cookie Policy", href: "#" },
+                { label: "Privacy Policy", href: "/privacy-policy" },
+                { label: "Terms of Service", href: "/terms-of-service" },
+                { label: "Cookie Policy", href: "/cookie-policy" },
               ].map((item) => (
                 <li key={item.label}>
                   <Link to={item.href} className="hover:text-accent transition-colors flex items-center gap-1.5 group">
