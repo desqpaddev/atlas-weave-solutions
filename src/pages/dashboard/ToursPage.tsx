@@ -170,6 +170,30 @@ export default function ToursPage() {
                   )}
                 </div>
               </div>
+              <div>
+                <Label>Gallery Images (up to 3 — shown in tour detail slider)</Label>
+                <div className="mt-2 grid grid-cols-3 gap-3">
+                  {[0, 1, 2].map((idx) => (
+                    <div key={idx} className="flex flex-col gap-1.5">
+                      <div className="relative w-full aspect-[4/3] rounded-md overflow-hidden border border-border bg-muted/30">
+                        {form.images[idx] ? (
+                          <>
+                            <img src={form.images[idx]} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                            <Button type="button" variant="destructive" size="icon" className="h-6 w-6 absolute top-1 right-1" onClick={() => setForm((f) => { const n = [...f.images]; n[idx] = ""; return { ...f, images: n }; })}><X className="h-3 w-3" /></Button>
+                          </>
+                        ) : (
+                          <label className="absolute inset-0 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-muted/50 transition-colors text-xs text-muted-foreground">
+                            {uploadingIdx === idx ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                            <span>{uploadingIdx === idx ? "Uploading..." : `Image ${idx + 1}`}</span>
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleGalleryUpload(e, idx)} disabled={uploadingIdx !== null} />
+                          </label>
+                        )}
+                      </div>
+                      <Input value={form.images[idx]} placeholder="or URL" onChange={(e) => setForm((f) => { const n = [...f.images]; n[idx] = e.target.value; return { ...f, images: n }; })} className="h-8 text-xs" />
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 <div><Label>Days</Label><Input type="number" min={1} value={form.duration_days} onChange={(e) => setForm({ ...form, duration_days: Number(e.target.value) })} className="mt-1" /></div>
                 <div><Label>Nights</Label><Input type="number" min={0} value={form.duration_nights} onChange={(e) => setForm({ ...form, duration_nights: Number(e.target.value) })} className="mt-1" /></div>
