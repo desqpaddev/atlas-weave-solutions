@@ -99,6 +99,7 @@ export default function ToursPage() {
         child_price: form.child_price, category, difficulty: form.difficulty,
         max_group_size: form.max_group_size || null, description: form.description || null, is_active: form.is_active,
         cover_image: form.cover_image || null,
+        images: (form.images || []).filter((u) => u && u.trim()),
         inclusions: form.inclusions ? form.inclusions.split(",").map(s => s.trim()) : [],
         exclusions: form.exclusions ? form.exclusions.split(",").map(s => s.trim()) : [],
         highlights: form.highlights ? form.highlights.split(",").map(s => s.trim()) : [],
@@ -119,7 +120,9 @@ export default function ToursPage() {
   const closeDialog = () => { setOpen(false); setEditId(null); setForm(emptyForm); };
   const openEdit = (t: any) => {
     setEditId(t.id);
-    setForm({ title: t.title, destination: t.destination || "", duration_days: t.duration_days, duration_nights: t.duration_nights, adult_price: Number(t.adult_price), child_price: Number(t.child_price || 0), category: t.category || "tour", difficulty: t.difficulty || "easy", max_group_size: t.max_group_size || 20, description: t.description || "", is_active: t.is_active ?? true, inclusions: (t.inclusions || []).join(", "), exclusions: (t.exclusions || []).join(", "), highlights: (t.highlights || []).join(", "), cover_image: t.cover_image || "", newCategory: "" });
+    const existingImgs = (t.images || []) as string[];
+    const padded: string[] = [existingImgs[0] || "", existingImgs[1] || "", existingImgs[2] || ""];
+    setForm({ title: t.title, destination: t.destination || "", duration_days: t.duration_days, duration_nights: t.duration_nights, adult_price: Number(t.adult_price), child_price: Number(t.child_price || 0), category: t.category || "tour", difficulty: t.difficulty || "easy", max_group_size: t.max_group_size || 20, description: t.description || "", is_active: t.is_active ?? true, inclusions: (t.inclusions || []).join(", "), exclusions: (t.exclusions || []).join(", "), highlights: (t.highlights || []).join(", "), cover_image: t.cover_image || "", images: padded, newCategory: "" });
     setOpen(true);
   };
   const viewTour = tours.find(t => t.id === viewId);
