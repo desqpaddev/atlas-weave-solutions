@@ -338,17 +338,71 @@ export function Navbar() {
               </button>
             </div>
             <ul className="space-y-1">
-              {drawerLinks.map((l) => (
-                <li key={l.label}>
-                  <Link
-                    to={l.href}
-                    onClick={() => setOpen(false)}
-                    className="block py-3 border-b border-border font-display text-2xl text-foreground hover:text-primary transition-colors"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
+              {drawerLinks.map((l) => {
+                const isDest = l.label === "Destinations";
+                if (isDest) {
+                  return (
+                    <li key={l.label}>
+                      <button
+                        onClick={() => setDrawerDestOpen((v) => !v)}
+                        aria-expanded={drawerDestOpen}
+                        className="w-full flex items-center justify-between py-3 border-b border-border font-display text-2xl text-foreground hover:text-primary transition-colors"
+                      >
+                        <span>{l.label}</span>
+                        <ChevronRight
+                          className={`h-5 w-5 transition-transform ${drawerDestOpen ? "rotate-90" : ""}`}
+                        />
+                      </button>
+                      {drawerDestOpen && (
+                        <div className="pl-1 pr-1 py-4 animate-fade-in">
+                          {destinationRegions.map((r) => (
+                            <div key={r.label} className="mb-5 last:mb-0">
+                              <Link
+                                to={r.href}
+                                onClick={() => setOpen(false)}
+                                className="block font-display text-lg text-primary mb-2"
+                              >
+                                {r.label}
+                              </Link>
+                              <ul className="grid grid-cols-2 gap-x-4">
+                                {r.countries.map((c) => (
+                                  <li key={c.label}>
+                                    <Link
+                                      to={c.href}
+                                      onClick={() => setOpen(false)}
+                                      className="block py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors"
+                                    >
+                                      {c.label}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                          <Link
+                            to="/tours"
+                            onClick={() => setOpen(false)}
+                            className="inline-flex items-center gap-2 mt-2 text-xs font-sans-ui font-semibold tracking-[0.18em] uppercase text-primary"
+                          >
+                            View all destinations <ChevronRight className="h-3.5 w-3.5" />
+                          </Link>
+                        </div>
+                      )}
+                    </li>
+                  );
+                }
+                return (
+                  <li key={l.label}>
+                    <Link
+                      to={l.href}
+                      onClick={() => setOpen(false)}
+                      className="block py-3 border-b border-border font-display text-2xl text-foreground hover:text-primary transition-colors"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
             <div className="mt-10 text-sm text-muted-foreground space-y-2">
               <p className="font-sans-ui text-[11px] tracking-[0.2em] uppercase text-foreground/60">Speak to us</p>
