@@ -22,58 +22,54 @@ export function Footer() {
   const logoUrl = company?.logo_url;
 
   return (
-    <footer className="bg-foreground text-background relative overflow-hidden">
-      {/* Decorative top wave */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
-
-      {/* Newsletter */}
-      <div className="container mx-auto px-4 py-14">
-        <div className="relative bg-gradient-blue rounded-3xl p-8 md:p-12 overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-          
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left">
-              <h3 className="font-display text-xl md:text-2xl font-bold text-white mb-2">
-                Get Exclusive Travel Deals ✈
-              </h3>
-              <p className="text-white/70 text-sm max-w-md">
-                Subscribe to receive handpicked destinations and early access to our best packages.
-              </p>
-            </div>
-            <div className="flex gap-2 w-full max-w-sm">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl h-12"
-              />
-              <Button variant="brand-yellow" className="rounded-xl h-12 px-6 gap-2">
-                <Send className="h-4 w-4" /> Subscribe
-              </Button>
-            </div>
+    <footer className="bg-foreground text-background">
+      {/* Newsletter band */}
+      <div className="border-b border-background/10">
+        <div className="container mx-auto px-6 md:px-10 py-16 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+          <div>
+            <span className="block text-[11px] font-sans-ui font-semibold tracking-[0.28em] uppercase text-accent mb-4">
+              Stay in touch
+            </span>
+            <h3 className="font-display text-3xl md:text-4xl text-background leading-tight">
+              Receive our <em className="italic">latest journeys</em>, directly.
+            </h3>
           </div>
+          <form className="flex items-center gap-0 border-b border-background/30 focus-within:border-accent transition-colors">
+            <Input
+              type="email"
+              placeholder="Your email address"
+              className="flex-1 bg-transparent border-0 rounded-none text-background placeholder:text-background/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-0 h-14"
+            />
+            <Button
+              type="submit"
+              className="bg-transparent hover:bg-transparent text-accent text-xs font-sans-ui font-semibold tracking-[0.22em] uppercase px-0 gap-2"
+            >
+              Subscribe <Send className="h-4 w-4" />
+            </Button>
+          </form>
         </div>
       </div>
 
       {/* Main footer */}
-      <div className="container mx-auto px-4 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div className="container mx-auto px-6 md:px-10 py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
-          <div>
+          <div className="lg:col-span-1">
             {logoUrl ? (
-              <img src={logoUrl} alt={companyName} className="h-12 w-auto max-w-[180px] object-contain mb-4 brightness-0 invert" />
+              <img src={logoUrl} alt={companyName} className="h-12 w-auto max-w-[180px] object-contain mb-5 brightness-0 invert" />
             ) : (
-              <span className="font-display text-2xl font-bold text-accent block mb-4">{companyName}</span>
+              <span className="font-display text-2xl text-background block mb-5 tracking-[0.05em]">
+                {companyName}
+              </span>
             )}
-            <p className="text-sm text-background/60 leading-relaxed mb-5">
-              Welcome to Joanna Holidays, your trusted Direct DMC for the UK and Europe — where every journey is crafted with precision, passion, and a personal touch. Based in Kent, we specialize in luxury, private, minivan, and group tours that turn travel dreams into lifelong memories.
+            <p className="text-sm text-background/60 leading-relaxed mb-6">
+              Your trusted Direct DMC for the UK and Europe — crafting private, expertly-guided journeys from our home in Kent.
             </p>
             <div className="flex gap-3">
               {[
                 { Icon: Facebook, href: "#", label: "Facebook" },
                 { Icon: Instagram, href: "https://www.instagram.com/joannaholidays.uk.europe/", label: "Instagram" },
                 { Icon: Youtube, href: "#", label: "YouTube" },
-                { Icon: Globe, href: "#", label: "Website" },
               ].map(({ Icon, href, label }) => (
                 <a
                   key={label}
@@ -81,7 +77,7 @@ export function Footer() {
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                   aria-label={label}
-                  className="w-9 h-9 rounded-full bg-background/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110"
+                  className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center hover:bg-accent hover:text-accent-foreground hover:border-accent transition-colors"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -89,23 +85,20 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Travel Itineraries */}
+          {/* Journeys */}
           <div>
-            <h4 className="font-display font-semibold text-background mb-5 text-sm relative inline-block">
-              Travel Itineraries
-              <span className="absolute -bottom-1.5 left-0 w-8 h-0.5 bg-accent rounded-full" />
+            <h4 className="font-sans-ui text-[11px] font-semibold tracking-[0.22em] uppercase text-background mb-5">
+              Journeys
             </h4>
-            <ul className="space-y-3 text-sm text-background/60">
+            <ul className="space-y-3 text-sm text-background/65">
               {[
-                { label: "Tour Listings", href: "/tours" },
-                { label: "Holiday Packages", href: "/packages" },
-                { label: "Cruise Tours", href: "/cruises" },
-                { label: "Fixed Departures", href: "/departures" },
                 { label: "Destinations", href: "/tours" },
+                { label: "Holiday Packages", href: "/packages" },
+                { label: "Cruises", href: "/cruises" },
+                { label: "Fixed Departures", href: "/departures" },
               ].map((item) => (
                 <li key={item.label}>
-                  <Link to={item.href} className="hover:text-accent transition-colors flex items-center gap-1.5 group">
-                    <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent" />
+                  <Link to={item.href} className="hover:text-accent transition-colors">
                     {item.label}
                   </Link>
                 </li>
@@ -113,23 +106,21 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Explore */}
+          {/* About */}
           <div>
-            <h4 className="font-display font-semibold text-background mb-5 text-sm relative inline-block">
-              Explore Now
-              <span className="absolute -bottom-1.5 left-0 w-8 h-0.5 bg-accent rounded-full" />
+            <h4 className="font-sans-ui text-[11px] font-semibold tracking-[0.22em] uppercase text-background mb-5">
+              About
             </h4>
-            <ul className="space-y-3 text-sm text-background/60">
+            <ul className="space-y-3 text-sm text-background/65">
               {[
                 { label: "About Us", href: "/about" },
-                { label: "Contact Us", href: "/contact" },
+                { label: "Contact", href: "/contact" },
                 { label: "Privacy Policy", href: "/privacy-policy" },
                 { label: "Terms of Service", href: "/terms-of-service" },
                 { label: "Cookie Policy", href: "/cookie-policy" },
               ].map((item) => (
                 <li key={item.label}>
-                  <Link to={item.href} className="hover:text-accent transition-colors flex items-center gap-1.5 group">
-                    <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-accent" />
+                  <Link to={item.href} className="hover:text-accent transition-colors">
                     {item.label}
                   </Link>
                 </li>
@@ -139,45 +130,29 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-display font-semibold text-background mb-5 text-sm relative inline-block">
-              Contact Info
-              <span className="absolute -bottom-1.5 left-0 w-8 h-0.5 bg-accent rounded-full" />
+            <h4 className="font-sans-ui text-[11px] font-semibold tracking-[0.22em] uppercase text-background mb-5">
+              Speak to us
             </h4>
-            <ul className="space-y-4 text-sm text-background/60">
+            <ul className="space-y-4 text-sm text-background/65">
               <li className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <Phone className="h-4 w-4 text-accent" />
-                </div>
-                <div>
-                  <p className="font-medium text-background text-xs mb-0.5">Need Help?</p>
-                  <p>{companyPhone}</p>
-                </div>
+                <Phone className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+                <a href={`tel:${companyPhone}`} className="hover:text-accent transition-colors">{companyPhone}</a>
               </li>
               <li className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <Mail className="h-4 w-4 text-accent" />
-                </div>
-                <div>
-                  <p className="font-medium text-background text-xs mb-0.5">Email Us</p>
-                  <p>{companyEmail}</p>
-                </div>
+                <Mail className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+                <a href={`mailto:${companyEmail}`} className="hover:text-accent transition-colors break-all">{companyEmail}</a>
               </li>
               <li className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <MapPin className="h-4 w-4 text-accent" />
-                </div>
-                <div>
-                  <p className="font-medium text-background text-xs mb-0.5">Location</p>
-                  <p className="leading-relaxed">{companyAddress}</p>
-                </div>
+                <MapPin className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+                <span className="leading-relaxed">{companyAddress}</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-background/10 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-background/40">
+        <div className="border-t border-background/10 mt-14 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-background/45">
           <p>© {new Date().getFullYear()} {companyName}. All rights reserved.</p>
-          <p>IATA Accredited Travel Management Company</p>
+          <p className="font-sans-ui tracking-[0.18em] uppercase text-[10px]">IATA Accredited Travel Management Company</p>
         </div>
       </div>
     </footer>
