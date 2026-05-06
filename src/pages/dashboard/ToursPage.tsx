@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 const defaultCategories = ["tour", "activity", "experience", "adventure", "cultural", "cruise", "wildlife", "honeymoon", "pilgrimage", "trekking"];
 
-const emptyForm = { title: "", destination: "", duration_days: 1, duration_nights: 0, adult_price: 0, child_price: 0, category: "tour", difficulty: "easy", max_group_size: 20, description: "", inclusions: "", exclusions: "", highlights: "", is_active: true, cover_image: "", newCategory: "" };
+const emptyForm = { title: "", destination: "", duration_days: 1, duration_nights: 0, adult_price: 0, child_price: 0, category: "tour", difficulty: "easy", max_group_size: 20, description: "", inclusions: "", exclusions: "", highlights: "", is_active: true, cover_image: "", images: ["", "", ""] as string[], newCategory: "" };
 
 export default function ToursPage() {
   const { profile } = useAuth();
@@ -24,26 +24,45 @@ export default function ToursPage() {
   const [viewId, setViewId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(false);
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+
+  const uploadFile = async (file: File): Promise<string> => {
+    if (!profile?.company_id) throw new Error("No company assigned");
+    if (file.size > 5 * 1024 * 1024) throw new Error("Image must be under 5MB");
+    const ext = file.name.split(".").pop();
+    const path = `${profile.company_id}/tours/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+    const { error } = await supabase.storage.from("company-assets").upload(path, file, { upsert: true });
+    if (error) throw error;
+    const { data } = supabase.storage.from("company-assets").getPublicUrl(path);
+    return data.publicUrl;
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!profile?.company_id) { toast.error("No company assigned"); return; }
-    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${profile.company_id}/tours/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("company-assets").upload(path, file, { upsert: true });
-      if (error) throw error;
-      const { data } = supabase.storage.from("company-assets").getPublicUrl(path);
-      setForm((f) => ({ ...f, cover_image: data.publicUrl }));
+      const url = await uploadFile(file);
+      setForm((f) => ({ ...f, cover_image: url }));
       toast.success("Image uploaded");
-    } catch (err: any) {
-      toast.error(err.message || "Upload failed");
-    } finally {
-      setUploading(false);
-    }
+    } catch (err: any) { toast.error(err.message || "Upload failed"); }
+    finally { setUploading(false); }
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingIdx(idx);
+    try {
+      const url = await uploadFile(file);
+      setForm((f) => {
+        const next = [...f.images];
+        next[idx] = url;
+        return { ...f, images: next };
+      });
+      toast.success(`Gallery image ${idx + 1} uploaded`);
+    } catch (err: any) { toast.error(err.message || "Upload failed"); }
+    finally { setUploadingIdx(null); }
   };
 
   // Fetch distinct categories from existing tours
@@ -80,6 +99,7 @@ export default function ToursPage() {
         child_price: form.child_price, category, difficulty: form.difficulty,
         max_group_size: form.max_group_size || null, description: form.description || null, is_active: form.is_active,
         cover_image: form.cover_image || null,
+        images: (form.images || []).filter((u) => u && u.trim()),
         inclusions: form.inclusions ? form.inclusions.split(",").map(s => s.trim()) : [],
         exclusions: form.exclusions ? form.exclusions.split(",").map(s => s.trim()) : [],
         highlights: form.highlights ? form.highlights.split(",").map(s => s.trim()) : [],
@@ -100,7 +120,9 @@ export default function ToursPage() {
   const closeDialog = () => { setOpen(false); setEditId(null); setForm(emptyForm); };
   const openEdit = (t: any) => {
     setEditId(t.id);
-    setForm({ title: t.title, destination: t.destination || "", duration_days: t.duration_days, duration_nights: t.duration_nights, adult_price: Number(t.adult_price), child_price: Number(t.child_price || 0), category: t.category || "tour", difficulty: t.difficulty || "easy", max_group_size: t.max_group_size || 20, description: t.description || "", is_active: t.is_active ?? true, inclusions: (t.inclusions || []).join(", "), exclusions: (t.exclusions || []).join(", "), highlights: (t.highlights || []).join(", "), cover_image: t.cover_image || "", newCategory: "" });
+    const existingImgs = (t.images || []) as string[];
+    const padded: string[] = [existingImgs[0] || "", existingImgs[1] || "", existingImgs[2] || ""];
+    setForm({ title: t.title, destination: t.destination || "", duration_days: t.duration_days, duration_nights: t.duration_nights, adult_price: Number(t.adult_price), child_price: Number(t.child_price || 0), category: t.category || "tour", difficulty: t.difficulty || "easy", max_group_size: t.max_group_size || 20, description: t.description || "", is_active: t.is_active ?? true, inclusions: (t.inclusions || []).join(", "), exclusions: (t.exclusions || []).join(", "), highlights: (t.highlights || []).join(", "), cover_image: t.cover_image || "", images: padded, newCategory: "" });
     setOpen(true);
   };
   const viewTour = tours.find(t => t.id === viewId);
@@ -146,6 +168,30 @@ export default function ToursPage() {
                       <Button type="button" variant="destructive" size="icon" className="h-6 w-6 absolute top-1 right-1" onClick={() => setForm({ ...form, cover_image: "" })}><X className="h-3 w-3" /></Button>
                     </div>
                   )}
+                </div>
+              </div>
+              <div>
+                <Label>Gallery Images (up to 3 — shown in tour detail slider)</Label>
+                <div className="mt-2 grid grid-cols-3 gap-3">
+                  {[0, 1, 2].map((idx) => (
+                    <div key={idx} className="flex flex-col gap-1.5">
+                      <div className="relative w-full aspect-[4/3] rounded-md overflow-hidden border border-border bg-muted/30">
+                        {form.images[idx] ? (
+                          <>
+                            <img src={form.images[idx]} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                            <Button type="button" variant="destructive" size="icon" className="h-6 w-6 absolute top-1 right-1" onClick={() => setForm((f) => { const n = [...f.images]; n[idx] = ""; return { ...f, images: n }; })}><X className="h-3 w-3" /></Button>
+                          </>
+                        ) : (
+                          <label className="absolute inset-0 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-muted/50 transition-colors text-xs text-muted-foreground">
+                            {uploadingIdx === idx ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                            <span>{uploadingIdx === idx ? "Uploading..." : `Image ${idx + 1}`}</span>
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleGalleryUpload(e, idx)} disabled={uploadingIdx !== null} />
+                          </label>
+                        )}
+                      </div>
+                      <Input value={form.images[idx]} placeholder="or URL" onChange={(e) => setForm((f) => { const n = [...f.images]; n[idx] = e.target.value; return { ...f, images: n }; })} className="h-8 text-xs" />
+                    </div>
+                  ))}
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
