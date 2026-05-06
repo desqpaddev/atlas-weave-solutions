@@ -1,15 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Mail, MapPin, Phone, Facebook, Instagram, Youtube, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+
+const enquirySchema = z.object({
+  full_name: z.string().trim().min(1, "Name is required").max(100),
+  email: z.string().trim().email("Invalid email").max(255),
+  phone: z.string().trim().max(30).optional().or(z.literal("")),
+  destination: z.string().trim().max(100).optional().or(z.literal("")),
+  travel_dates: z.string().trim().max(100).optional().or(z.literal("")),
+  pax: z.coerce.number().int().min(1).max(50).optional(),
+  notes: z.string().trim().max(2000).optional().or(z.literal("")),
+});
 
 export function Footer() {
   const { data: company } = useQuery({
     queryKey: ["footer-company"],
     queryFn: async () => {
-      const { data } = await supabase.from("companies").select("name, logo_url, phone, email, address, website, settings").limit(1).maybeSingle();
+      const { data } = await supabase.from("companies").select("id, name, logo_url, phone, email, address, website, settings").limit(1).maybeSingle();
       return data;
     },
     staleTime: 1000 * 60 * 5,
@@ -21,31 +36,94 @@ export function Footer() {
   const companyAddress = company?.address || "The Business Terrace, Maidstone House, King Street, Maidstone, Kent. ME 15 6JQ";
   const logoUrl = company?.logo_url;
 
+  const [form, setForm] = useState({ full_name: "", email: "", phone: "", destination: "", travel_dates: "", pax: "2", notes: "" });
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleEnquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!company?.id) {
+      toast.error("Unable to submit, please try again later.");
+      return;
+    }
+    const parsed = enquirySchema.safeParse(form);
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      toast.error(first.message);
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from("leads").insert({
+      company_id: company.id,
+      full_name: parsed.data.full_name,
+      email: parsed.data.email,
+      phone: parsed.data.phone || null,
+      destination: parsed.data.destination || null,
+      travel_dates: parsed.data.travel_dates || null,
+      pax: parsed.data.pax || 1,
+      notes: parsed.data.notes || null,
+      source: "website",
+      status: "new",
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error("Could not submit enquiry. Please try again.");
+      return;
+    }
+    toast.success("Thank you! Our team will be in touch shortly.");
+    setForm({ full_name: "", email: "", phone: "", destination: "", travel_dates: "", pax: "2", notes: "" });
+  };
+
   return (
     <footer className="bg-foreground text-background">
-      {/* Newsletter band */}
+      {/* Enquiry band */}
       <div className="border-b border-background/10">
-        <div className="container mx-auto px-6 md:px-10 py-16 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+        <div className="container mx-auto px-6 md:px-10 py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div>
             <span className="block text-[11px] font-sans-ui font-semibold tracking-[0.28em] uppercase text-accent mb-4">
-              Stay in touch
+              Start your journey
             </span>
-            <h3 className="font-display text-3xl md:text-4xl text-background leading-tight">
-              Receive our <em className="italic">latest journeys</em>, directly.
+            <h3 className="font-display text-3xl md:text-4xl text-background leading-tight mb-5">
+              Make an <em className="italic">enquiry</em> — let our experts craft your trip.
             </h3>
+            <p className="text-sm text-background/60 leading-relaxed max-w-md">
+              Share a few details and one of our travel specialists will get in touch within 24 hours to design your perfect journey.
+            </p>
           </div>
-          <form className="flex items-center gap-0 border-b border-background/30 focus-within:border-accent transition-colors">
-            <Input
-              type="email"
-              placeholder="Your email address"
-              className="flex-1 bg-transparent border-0 rounded-none text-background placeholder:text-background/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-0 h-14"
-            />
-            <Button
-              type="submit"
-              className="bg-transparent hover:bg-transparent text-accent text-xs font-sans-ui font-semibold tracking-[0.22em] uppercase px-0 gap-2"
-            >
-              Subscribe <Send className="h-4 w-4" />
-            </Button>
+
+          <form onSubmit={handleEnquiry} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-1">
+              <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Full Name *</Label>
+              <Input required value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent" />
+            </div>
+            <div className="sm:col-span-1">
+              <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Email *</Label>
+              <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent" />
+            </div>
+            <div>
+              <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Phone</Label>
+              <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent" />
+            </div>
+            <div>
+              <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Destination</Label>
+              <Input value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} placeholder="e.g. Switzerland" className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent" />
+            </div>
+            <div>
+              <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Travel Dates</Label>
+              <Input value={form.travel_dates} onChange={(e) => setForm({ ...form, travel_dates: e.target.value })} placeholder="e.g. June 2026" className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent" />
+            </div>
+            <div>
+              <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Travellers</Label>
+              <Input type="number" min={1} value={form.pax} onChange={(e) => setForm({ ...form, pax: e.target.value })} className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent" />
+            </div>
+            <div className="sm:col-span-2">
+              <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Tell us about your trip</Label>
+              <Textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent resize-none" />
+            </div>
+            <div className="sm:col-span-2">
+              <Button type="submit" disabled={submitting} className="bg-accent hover:bg-accent/90 text-accent-foreground text-xs font-sans-ui font-semibold tracking-[0.22em] uppercase px-8 h-12 gap-2">
+                {submitting ? "Sending..." : <>Submit Enquiry <Send className="h-4 w-4" /></>}
+              </Button>
+            </div>
           </form>
         </div>
       </div>
