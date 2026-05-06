@@ -14,7 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Poppins", "system-ui", "sans-serif"],
+        display: ["Playfair Display", "Times New Roman", "Georgia", "serif"],
+        serif: ["Playfair Display", "Times New Roman", "Georgia", "serif"],
+        sans: ["Poppins", "system-ui", "sans-serif"],
         body: ["Open Sans", "system-ui", "sans-serif"],
       },
       colors: {
