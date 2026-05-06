@@ -67,18 +67,15 @@ export function HeroSection() {
           className="absolute inset-0 transition-opacity duration-[1200ms] ease-in-out"
           style={{ opacity: i === current ? 1 : 0 }}
         >
-          {s.type === "video" ? (
-            <video src={s.video} autoPlay muted loop playsInline className="w-full h-full object-cover" />
-          ) : (
-            <img
-              src={s.image}
-              alt=""
-              className="w-full h-full object-cover"
-              width={1920}
-              height={1080}
-              loading={i === 0 ? undefined : "lazy"}
-            />
-          )}
+          <video
+            src={s.video}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload={i === 0 ? "auto" : "metadata"}
+            className="w-full h-full object-cover"
+          />
           {/* Editorial gradient — darker at bottom-left for text legibility */}
           <div className="absolute inset-0 bg-gradient-to-tr from-foreground/75 via-foreground/35 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-b from-foreground/15 via-transparent to-foreground/40" />
