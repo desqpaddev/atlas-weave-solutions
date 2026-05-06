@@ -23,6 +23,28 @@ export default function ToursPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!profile?.company_id) { toast.error("No company assigned"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${profile.company_id}/tours/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("company-assets").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("company-assets").getPublicUrl(path);
+      setForm((f) => ({ ...f, cover_image: data.publicUrl }));
+      toast.success("Image uploaded");
+    } catch (err: any) {
+      toast.error(err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // Fetch distinct categories from existing tours
   const { data: dynamicCategories = [] } = useQuery({
