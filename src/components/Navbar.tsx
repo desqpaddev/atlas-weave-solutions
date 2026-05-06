@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X, Phone, Search, User } from "lucide-react";
+import { Menu, X, Phone, Search, User, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleTranslate } from "@/components/GoogleTranslate";
 
@@ -10,6 +10,37 @@ const primaryLinks = [
   { label: "Our Journeys", href: "/packages" },
   { label: "Cruises", href: "/cruises" },
   { label: "Fixed Departures", href: "/departures" },
+];
+
+type DestinationRegion = {
+  label: string;
+  href: string;
+  blurb: string;
+  image: string;
+  countries: { label: string; href: string }[];
+};
+
+const destinationRegions: DestinationRegion[] = [
+  {
+    label: "Europe",
+    href: "/tours?region=europe",
+    blurb:
+      "From Alpine peaks to Mediterranean shores — timeless cities, romantic countryside and grand journeys across the continent.",
+    image:
+      "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=70",
+    countries: [
+      { label: "Switzerland", href: "/tours?country=switzerland" },
+      { label: "France", href: "/tours?country=france" },
+      { label: "Belgium", href: "/tours?country=belgium" },
+      { label: "Netherlands", href: "/tours?country=netherlands" },
+      { label: "Germany", href: "/tours?country=germany" },
+      { label: "Italy", href: "/tours?country=italy" },
+      { label: "Austria", href: "/tours?country=austria" },
+      { label: "Hungary", href: "/tours?country=hungary" },
+      { label: "Poland", href: "/tours?country=poland" },
+      { label: "Czech Republic", href: "/tours?country=czech-republic" },
+    ],
+  },
 ];
 
 const drawerLinks = [
