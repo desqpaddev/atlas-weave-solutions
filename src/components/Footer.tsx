@@ -143,7 +143,7 @@ export function Footer() {
             <p className="text-sm text-background/60 leading-relaxed mb-6">
               Your trusted Direct DMC for the UK and Europe — crafting private, expertly-guided journeys from our home in Kent.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 mb-6">
               {[
                 { Icon: Facebook, href: "#", label: "Facebook" },
                 { Icon: Instagram, href: "https://www.instagram.com/joannaholidays.uk.europe/", label: "Instagram" },
