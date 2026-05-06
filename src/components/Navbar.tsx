@@ -23,22 +23,22 @@ type DestinationRegion = {
 const destinationRegions: DestinationRegion[] = [
   {
     label: "Europe",
-    href: "/tours?region=europe",
+    href: "/tours?destination=europe",
     blurb:
       "From Alpine peaks to Mediterranean shores — timeless cities, romantic countryside and grand journeys across the continent.",
     image:
       "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=70",
     countries: [
-      { label: "Switzerland", href: "/tours?country=switzerland" },
-      { label: "France", href: "/tours?country=france" },
-      { label: "Belgium", href: "/tours?country=belgium" },
-      { label: "Netherlands", href: "/tours?country=netherlands" },
-      { label: "Germany", href: "/tours?country=germany" },
-      { label: "Italy", href: "/tours?country=italy" },
-      { label: "Austria", href: "/tours?country=austria" },
-      { label: "Hungary", href: "/tours?country=hungary" },
-      { label: "Poland", href: "/tours?country=poland" },
-      { label: "Czech Republic", href: "/tours?country=czech-republic" },
+      { label: "Switzerland", href: "/tours?destination=Switzerland" },
+      { label: "France", href: "/tours?destination=France" },
+      { label: "Belgium", href: "/tours?destination=Belgium" },
+      { label: "Netherlands", href: "/tours?destination=Netherlands" },
+      { label: "Germany", href: "/tours?destination=Germany" },
+      { label: "Italy", href: "/tours?destination=Italy" },
+      { label: "Austria", href: "/tours?destination=Austria" },
+      { label: "Hungary", href: "/tours?destination=Hungary" },
+      { label: "Poland", href: "/tours?destination=Poland" },
+      { label: "Czech Republic", href: "/tours?destination=Czech Republic" },
     ],
   },
 ];
