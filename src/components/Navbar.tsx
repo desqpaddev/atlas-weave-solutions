@@ -56,8 +56,20 @@ const drawerLinks = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [destOpen, setDestOpen] = useState(false);
+  const [activeRegion, setActiveRegion] = useState<string>(destinationRegions[0].label);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const closeTimer = useRef<number | null>(null);
+
+  const openDest = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setDestOpen(true);
+  };
+  const scheduleCloseDest = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setDestOpen(false), 150);
+  };
 
   const { data: company } = useQuery({
     queryKey: ["public-company-branding"],
