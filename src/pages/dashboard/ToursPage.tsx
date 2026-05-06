@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 const defaultCategories = ["tour", "activity", "experience", "adventure", "cultural", "cruise", "wildlife", "honeymoon", "pilgrimage", "trekking"];
 
-const emptyForm = { title: "", destination: "", duration_days: 1, duration_nights: 0, adult_price: 0, child_price: 0, category: "tour", difficulty: "easy", max_group_size: 20, description: "", inclusions: "", exclusions: "", highlights: "", is_active: true, cover_image: "", newCategory: "" };
+const emptyForm = { title: "", destination: "", duration_days: 1, duration_nights: 0, adult_price: 0, child_price: 0, category: "tour", difficulty: "easy", max_group_size: 20, description: "", inclusions: "", exclusions: "", highlights: "", is_active: true, cover_image: "", images: ["", "", ""] as string[], newCategory: "" };
 
 export default function ToursPage() {
   const { profile } = useAuth();
@@ -24,26 +24,45 @@ export default function ToursPage() {
   const [viewId, setViewId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(false);
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+
+  const uploadFile = async (file: File): Promise<string> => {
+    if (!profile?.company_id) throw new Error("No company assigned");
+    if (file.size > 5 * 1024 * 1024) throw new Error("Image must be under 5MB");
+    const ext = file.name.split(".").pop();
+    const path = `${profile.company_id}/tours/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+    const { error } = await supabase.storage.from("company-assets").upload(path, file, { upsert: true });
+    if (error) throw error;
+    const { data } = supabase.storage.from("company-assets").getPublicUrl(path);
+    return data.publicUrl;
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!profile?.company_id) { toast.error("No company assigned"); return; }
-    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${profile.company_id}/tours/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("company-assets").upload(path, file, { upsert: true });
-      if (error) throw error;
-      const { data } = supabase.storage.from("company-assets").getPublicUrl(path);
-      setForm((f) => ({ ...f, cover_image: data.publicUrl }));
+      const url = await uploadFile(file);
+      setForm((f) => ({ ...f, cover_image: url }));
       toast.success("Image uploaded");
-    } catch (err: any) {
-      toast.error(err.message || "Upload failed");
-    } finally {
-      setUploading(false);
-    }
+    } catch (err: any) { toast.error(err.message || "Upload failed"); }
+    finally { setUploading(false); }
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingIdx(idx);
+    try {
+      const url = await uploadFile(file);
+      setForm((f) => {
+        const next = [...f.images];
+        next[idx] = url;
+        return { ...f, images: next };
+      });
+      toast.success(`Gallery image ${idx + 1} uploaded`);
+    } catch (err: any) { toast.error(err.message || "Upload failed"); }
+    finally { setUploadingIdx(null); }
   };
 
   // Fetch distinct categories from existing tours
