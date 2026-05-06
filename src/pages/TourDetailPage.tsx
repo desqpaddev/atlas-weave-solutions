@@ -200,7 +200,6 @@ export default function TourDetailPage() {
                 {activeTour.destination && <span className="flex items-center gap-1"><MapPin className="h-4 w-4 text-primary" /> {activeTour.destination}</span>}
                 <span className="flex items-center gap-1"><Clock className="h-4 w-4 text-primary" /> {activeTour.duration_days}D / {activeTour.duration_nights}N</span>
                 {activeTour.category && <Badge variant="outline">{activeTour.category}</Badge>}
-                {activeTour.difficulty && <Badge variant="outline">{activeTour.difficulty}</Badge>}
                 {activeTour.max_group_size && <span className="flex items-center gap-1"><Users className="h-4 w-4 text-primary" /> Max {activeTour.max_group_size}</span>}
               </div>
             </div>
