@@ -24,6 +24,7 @@ const matchesFilter = (source: string, filter: string) =>
 
 export default function ToursListPage() {
   const [searchParams] = useSearchParams();
+  const [view, setView] = useState<"grid" | "list">("grid");
 
   const destinationFilter = normalizeText(searchParams.get("destination"));
   const categoryFilter = normalizeText(searchParams.get("category"));
