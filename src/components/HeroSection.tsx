@@ -1,15 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroSlide2 from "@/assets/hero-slide-2.jpg";
-import heroSlide3 from "@/assets/hero-slide-3.jpg";
 
-const TRAVEL_VIDEO_URL = "https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4";
-
+// Curated travel & tour videos (Pexels, royalty-free)
 const slides = [
   {
     type: "video" as const,
-    video: TRAVEL_VIDEO_URL,
+    video: "https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4",
     eyebrow: "Tailor-Made Journeys",
     title: "Extraordinary Travel,",
     titleItalic: "thoughtfully crafted.",
@@ -18,8 +15,8 @@ const slides = [
     cta: { label: "Explore Our Journeys", href: "/packages" },
   },
   {
-    type: "image" as const,
-    image: heroSlide2,
+    type: "video" as const,
+    video: "https://videos.pexels.com/video-files/2169880/2169880-uhd_2560_1440_30fps.mp4",
     eyebrow: "Private Escapes",
     title: "Sun-drenched coasts,",
     titleItalic: "timeless luxury.",
@@ -28,14 +25,24 @@ const slides = [
     cta: { label: "Discover Beach & Coast", href: "/tours?destination=Maldives" },
   },
   {
-    type: "image" as const,
-    image: heroSlide3,
+    type: "video" as const,
+    video: "https://videos.pexels.com/video-files/4763824/4763824-uhd_2560_1440_24fps.mp4",
     eyebrow: "Cultural Discovery",
     title: "The grand cities of",
     titleItalic: "Europe await.",
     subtitle:
       "Privately-guided experiences in Paris, Rome, Vienna and Prague — all crafted around your interests.",
     cta: { label: "Explore Europe", href: "/tours?destination=Europe" },
+  },
+  {
+    type: "video" as const,
+    video: "https://videos.pexels.com/video-files/2169307/2169307-uhd_2560_1440_30fps.mp4",
+    eyebrow: "Adventure Awaits",
+    title: "Mountains, jungles &",
+    titleItalic: "open horizons.",
+    subtitle:
+      "Trek the Himalayas, drift through Halong Bay or cruise the Nile — adventures designed around you.",
+    cta: { label: "Explore Adventures", href: "/tours" },
   },
 ];
 
