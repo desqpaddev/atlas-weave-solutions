@@ -1,66 +1,49 @@
-import { Shield, Headphones, CreditCard, Sparkles, Award, Clock } from "lucide-react";
+import { Compass, Award, Sparkles, Headphones } from "lucide-react";
 
-const features = [
+const pillars = [
   {
-    icon: Shield,
-    title: "Secure Booking",
-    description: "Enterprise-grade security for your payments and personal data.",
-  },
-  {
-    icon: Headphones,
-    title: "24/7 Support",
-    description: "Dedicated travel experts available around the clock.",
-  },
-  {
-    icon: CreditCard,
-    title: "Flexible Payments",
-    description: "Split payments, deposits, and multi-currency support.",
+    icon: Compass,
+    title: "Privately Guided",
+    description: "Every journey is led by an expert local guide, chosen for their depth of knowledge and character.",
   },
   {
     icon: Sparkles,
-    title: "AI Itineraries",
-    description: "Personalized travel plans crafted by AI for your preferences.",
+    title: "Tailor-Made",
+    description: "No two itineraries are the same. Every detail is shaped around how you like to travel.",
   },
   {
     icon: Award,
-    title: "Best Price Guarantee",
-    description: "We match any lower price you find for the same package.",
+    title: "Three Decades of Trust",
+    description: "An IATA-accredited DMC with deep relationships across the UK, Europe and beyond.",
   },
   {
-    icon: Clock,
-    title: "Instant Confirmation",
-    description: "Get immediate booking confirmation and e-vouchers.",
+    icon: Headphones,
+    title: "24 / 7 Concierge",
+    description: "From the moment you enquire to the day you return — a single dedicated point of contact.",
   },
 ];
 
 export function FeaturesSection() {
   return (
-    <section className="py-16 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-            Why Choose TravelHub
+    <section className="py-24 md:py-32 bg-cream">
+      <div className="container mx-auto px-6 md:px-10">
+        <div className="max-w-3xl mb-16 md:mb-20">
+          <span className="block text-[11px] font-sans-ui font-semibold tracking-[0.28em] uppercase text-primary mb-5">
+            The Joanna Holidays Way
+          </span>
+          <h2 className="font-display text-[clamp(2rem,4vw,3.5rem)] leading-[1.05] text-foreground">
+            A different way to <em className="italic text-primary">travel</em>.
           </h2>
-          <p className="text-muted-foreground mt-2 text-sm max-w-lg mx-auto">
-            Trusted by thousands of travelers for seamless booking experiences.
-          </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="text-center group"
-            >
-              <div className="w-14 h-14 mx-auto rounded-xl bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
-                <feature.icon className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="font-display text-sm font-semibold text-foreground mb-1">
-                {feature.title}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8">
+          {pillars.map((p) => (
+            <div key={p.title} className="border-t border-foreground/15 pt-8">
+              <p.icon className="h-7 w-7 text-primary mb-6" strokeWidth={1.25} />
+              <h3 className="font-display text-xl md:text-2xl text-foreground mb-3 leading-snug">
+                {p.title}
               </h3>
-              <p className="text-muted-foreground text-xs leading-relaxed">
-                {feature.description}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{p.description}</p>
             </div>
           ))}
         </div>
