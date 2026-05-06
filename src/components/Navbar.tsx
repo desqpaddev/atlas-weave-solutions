@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X, Phone, Search, User } from "lucide-react";
+import { Menu, X, Phone, Search, User, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleTranslate } from "@/components/GoogleTranslate";
 
@@ -10,6 +10,37 @@ const primaryLinks = [
   { label: "Our Journeys", href: "/packages" },
   { label: "Cruises", href: "/cruises" },
   { label: "Fixed Departures", href: "/departures" },
+];
+
+type DestinationRegion = {
+  label: string;
+  href: string;
+  blurb: string;
+  image: string;
+  countries: { label: string; href: string }[];
+};
+
+const destinationRegions: DestinationRegion[] = [
+  {
+    label: "Europe",
+    href: "/tours?region=europe",
+    blurb:
+      "From Alpine peaks to Mediterranean shores — timeless cities, romantic countryside and grand journeys across the continent.",
+    image:
+      "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=70",
+    countries: [
+      { label: "Switzerland", href: "/tours?country=switzerland" },
+      { label: "France", href: "/tours?country=france" },
+      { label: "Belgium", href: "/tours?country=belgium" },
+      { label: "Netherlands", href: "/tours?country=netherlands" },
+      { label: "Germany", href: "/tours?country=germany" },
+      { label: "Italy", href: "/tours?country=italy" },
+      { label: "Austria", href: "/tours?country=austria" },
+      { label: "Hungary", href: "/tours?country=hungary" },
+      { label: "Poland", href: "/tours?country=poland" },
+      { label: "Czech Republic", href: "/tours?country=czech-republic" },
+    ],
+  },
 ];
 
 const drawerLinks = [
@@ -25,8 +56,20 @@ const drawerLinks = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [destOpen, setDestOpen] = useState(false);
+  const [activeRegion, setActiveRegion] = useState<string>(destinationRegions[0].label);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const closeTimer = useRef<number | null>(null);
+
+  const openDest = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setDestOpen(true);
+  };
+  const scheduleCloseDest = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setDestOpen(false), 150);
+  };
 
   const { data: company } = useQuery({
     queryKey: ["public-company-branding"],
@@ -46,7 +89,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border/60">
+    <header className="sticky top-0 z-50 bg-background border-b border-border/60 relative">
       {/* Slim utility bar */}
       <div className="bg-primary text-primary-foreground">
         <div className="container mx-auto flex items-center justify-between h-9 px-4 text-[11px] tracking-wide uppercase font-sans-ui">
@@ -79,16 +122,32 @@ export function Navbar() {
 
             {/* Inline primary links on large screens */}
             <ul className="hidden xl:flex items-center gap-7 ml-4">
-              {primaryLinks.slice(0, 3).map((l) => (
-                <li key={l.label}>
-                  <Link
-                    to={l.href}
-                    className="text-xs font-sans-ui font-semibold tracking-[0.18em] uppercase text-foreground/80 hover:text-primary transition-colors"
+              {primaryLinks.slice(0, 3).map((l) => {
+                const isDest = l.label === "Destinations";
+                return (
+                  <li
+                    key={l.label}
+                    onMouseEnter={isDest ? openDest : undefined}
+                    onMouseLeave={isDest ? scheduleCloseDest : undefined}
                   >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
+                    <Link
+                      to={l.href}
+                      onClick={(e) => {
+                        if (isDest) {
+                          e.preventDefault();
+                          setDestOpen((v) => !v);
+                        }
+                      }}
+                      aria-expanded={isDest ? destOpen : undefined}
+                      className={`text-xs font-sans-ui font-semibold tracking-[0.18em] uppercase transition-colors ${
+                        isDest && destOpen ? "text-primary" : "text-foreground/80 hover:text-primary"
+                      }`}
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -153,6 +212,111 @@ export function Navbar() {
                 <X className="h-4 w-4" />
               </button>
             </form>
+          </div>
+        )}
+
+        {/* Destinations mega menu (A&K-style) */}
+        {destOpen && (
+          <div
+            onMouseEnter={openDest}
+            onMouseLeave={scheduleCloseDest}
+            className="hidden xl:block absolute left-0 right-0 top-full border-t border-border bg-background shadow-elevated animate-fade-in z-40"
+          >
+            <div className="container mx-auto px-8 py-10 grid grid-cols-12 gap-10">
+              {/* Regions rail */}
+              <div className="col-span-3 border-r border-border pr-8">
+                <p className="text-[10px] font-sans-ui font-semibold tracking-[0.22em] uppercase text-muted-foreground mb-5">
+                  Regions
+                </p>
+                <ul className="space-y-1">
+                  {destinationRegions.map((r) => {
+                    const active = r.label === activeRegion;
+                    return (
+                      <li key={r.label}>
+                        <button
+                          onMouseEnter={() => setActiveRegion(r.label)}
+                          onClick={() => {
+                            setDestOpen(false);
+                            navigate(r.href);
+                          }}
+                          className={`group w-full flex items-center justify-between py-2.5 font-display text-2xl transition-colors ${
+                            active ? "text-primary" : "text-foreground hover:text-primary"
+                          }`}
+                        >
+                          <span>{r.label}</span>
+                          <ChevronRight
+                            className={`h-4 w-4 transition-all ${
+                              active ? "opacity-100 translate-x-0 text-primary" : "opacity-0 -translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* Countries grid */}
+              <div className="col-span-6 pr-6">
+                {destinationRegions
+                  .filter((r) => r.label === activeRegion)
+                  .map((r) => (
+                    <div key={r.label}>
+                      <p className="text-[10px] font-sans-ui font-semibold tracking-[0.22em] uppercase text-muted-foreground mb-5">
+                        Countries · {r.label}
+                      </p>
+                      <ul className="grid grid-cols-2 gap-x-8 gap-y-3">
+                        {r.countries.map((c) => (
+                          <li key={c.label}>
+                            <Link
+                              to={c.href}
+                              onClick={() => setDestOpen(false)}
+                              className="group flex items-center justify-between border-b border-border/60 py-2.5 text-sm font-sans-ui tracking-wide text-foreground/85 hover:text-primary hover:border-primary/40 transition-colors"
+                            >
+                              <span>{c.label}</span>
+                              <ChevronRight className="h-3.5 w-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Editorial tile */}
+              <div className="col-span-3">
+                {destinationRegions
+                  .filter((r) => r.label === activeRegion)
+                  .map((r) => (
+                    <Link
+                      key={r.label}
+                      to={r.href}
+                      onClick={() => setDestOpen(false)}
+                      className="group block"
+                    >
+                      <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+                        <img
+                          src={r.image}
+                          alt={r.label}
+                          loading="lazy"
+                          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-5 text-background">
+                          <p className="text-[10px] font-sans-ui font-semibold tracking-[0.22em] uppercase opacity-90 mb-1">
+                            Discover
+                          </p>
+                          <h3 className="font-display text-2xl leading-tight">{r.label}</h3>
+                        </div>
+                      </div>
+                      <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{r.blurb}</p>
+                      <span className="mt-3 inline-flex items-center gap-2 text-xs font-sans-ui font-semibold tracking-[0.18em] uppercase text-primary">
+                        Explore {r.label} <ChevronRight className="h-3.5 w-3.5" />
+                      </span>
+                    </Link>
+                  ))}
+              </div>
+            </div>
           </div>
         )}
       </nav>
