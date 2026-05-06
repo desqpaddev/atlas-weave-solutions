@@ -7,7 +7,7 @@ import { GoogleTranslate } from "@/components/GoogleTranslate";
 
 const primaryLinks = [
   { label: "Destinations", href: "/tours" },
-  { label: "Our Journeys", href: "/packages" },
+  { label: "Journey", href: "/packages" },
   { label: "Cruises", href: "/cruises" },
   { label: "Fixed Departures", href: "/departures" },
 ];
@@ -45,7 +45,7 @@ const destinationRegions: DestinationRegion[] = [
 
 const drawerLinks = [
   { label: "Destinations", href: "/tours" },
-  { label: "Our Journeys", href: "/packages" },
+  { label: "Journey", href: "/packages" },
   { label: "Cruises", href: "/cruises" },
   { label: "Fixed Departures", href: "/departures" },
   { label: "About Us", href: "/about" },
