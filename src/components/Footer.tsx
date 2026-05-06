@@ -161,6 +161,39 @@ export function Footer() {
                 </a>
               ))}
             </div>
+
+            {/* Trustpilot badge */}
+            <a
+              href="https://www.trustpilot.com/review/joannaholidays.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 border border-background/20 rounded-md px-4 py-2.5 hover:bg-background/5 transition-colors"
+              aria-label="See our reviews on Trustpilot"
+            >
+              <div className="flex flex-col">
+                <span className="text-[9px] font-sans-ui tracking-[0.22em] uppercase text-background/60">
+                  Reviews
+                </span>
+                <span className="font-display text-sm font-semibold text-background leading-tight">
+                  Trustpilot
+                </span>
+              </div>
+              <div className="flex flex-col items-start">
+                <div className="flex gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`inline-flex items-center justify-center w-3.5 h-3.5 ${i < 4 ? "bg-[#00b67a]" : "bg-[#00b67a]/40"}`}
+                    >
+                      <Star className="h-2.5 w-2.5 text-white fill-white" />
+                    </span>
+                  ))}
+                </div>
+                <span className="text-[10px] text-background/70 mt-1">
+                  <strong className="text-background">4.1</strong> · 6 reviews
+                </span>
+              </div>
+            </a>
           </div>
 
           {/* Journeys */}
