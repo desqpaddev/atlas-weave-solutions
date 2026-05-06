@@ -14,7 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Poppins", "system-ui", "sans-serif"],
+        display: ["Playfair Display", "Times New Roman", "Georgia", "serif"],
+        serif: ["Playfair Display", "Times New Roman", "Georgia", "serif"],
+        sans: ["Poppins", "system-ui", "sans-serif"],
         body: ["Open Sans", "system-ui", "sans-serif"],
       },
       colors: {
@@ -60,6 +62,10 @@ export default {
           orange: "hsl(var(--brand-orange))",
           gray: "hsl(var(--brand-gray))",
           "gray-dark": "hsl(var(--brand-gray-dark))",
+        },
+        cream: {
+          DEFAULT: "hsl(var(--cream))",
+          foreground: "hsl(var(--cream-foreground))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
