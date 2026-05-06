@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, MapPin, Clock, Pencil, Trash2, Eye, X } from "lucide-react";
+import { Plus, MapPin, Clock, Pencil, Trash2, Eye, X, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const defaultCategories = ["tour", "activity", "experience", "adventure", "cultural", "cruise", "wildlife", "honeymoon", "pilgrimage", "trekking"];
