@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, MapPin, Phone, Facebook, Instagram, Youtube, ArrowRight, Globe, Send } from "lucide-react";
+import { Mail, MapPin, Phone, Facebook, Instagram, Youtube, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
