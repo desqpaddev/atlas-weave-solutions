@@ -349,10 +349,20 @@ export function Navbar() {
                         aria-expanded={drawerDestOpen}
                         className="w-full flex items-center justify-between py-3 border-b border-border font-display text-2xl text-foreground hover:text-primary transition-colors"
                       >
-                        <span>{l.label}</span>
-                        <ChevronRight
-                          className={`h-5 w-5 transition-transform ${drawerDestOpen ? "rotate-90" : ""}`}
-                        />
+                        <span className="flex items-center gap-3">
+                          {l.label}
+                          <span className="text-[10px] font-sans-ui font-semibold tracking-[0.2em] uppercase text-muted-foreground">
+                            {drawerDestOpen ? "Hide" : "Tap to expand"}
+                          </span>
+                        </span>
+                        <span className="relative flex items-center justify-center h-7 w-7 rounded-full border border-border text-foreground">
+                          <span className="block h-px w-3 bg-current" />
+                          <span
+                            className={`absolute block h-3 w-px bg-current transition-transform ${
+                              drawerDestOpen ? "scale-y-0" : "scale-y-100"
+                            }`}
+                          />
+                        </span>
                       </button>
                       {drawerDestOpen && (
                         <div className="pl-1 pr-1 py-4 animate-fade-in">
