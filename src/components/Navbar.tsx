@@ -57,6 +57,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [destOpen, setDestOpen] = useState(false);
+  const [drawerDestOpen, setDrawerDestOpen] = useState(false);
   const [activeRegion, setActiveRegion] = useState<string>(destinationRegions[0].label);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
