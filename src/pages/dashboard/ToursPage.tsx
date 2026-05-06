@@ -128,7 +128,26 @@ export default function ToursPage() {
                   )}
                 </div>
               </div>
-              <div><Label>Cover Image URL</Label><Input value={form.cover_image} onChange={(e) => setForm({ ...form, cover_image: e.target.value })} placeholder="https://..." className="mt-1" /></div>
+              <div>
+                <Label>Cover Image</Label>
+                <div className="mt-1 flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <label className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-input bg-background text-sm cursor-pointer hover:bg-muted transition-colors">
+                      {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      {uploading ? "Uploading..." : "Upload Image"}
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                    </label>
+                    <span className="text-xs text-muted-foreground">or paste URL below</span>
+                  </div>
+                  <Input value={form.cover_image} onChange={(e) => setForm({ ...form, cover_image: e.target.value })} placeholder="https://..." />
+                  {form.cover_image && (
+                    <div className="relative w-full h-32 rounded-md overflow-hidden border border-border">
+                      <img src={form.cover_image} alt="Preview" className="w-full h-full object-cover" />
+                      <Button type="button" variant="destructive" size="icon" className="h-6 w-6 absolute top-1 right-1" onClick={() => setForm({ ...form, cover_image: "" })}><X className="h-3 w-3" /></Button>
+                    </div>
+                  )}
+                </div>
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 <div><Label>Days</Label><Input type="number" min={1} value={form.duration_days} onChange={(e) => setForm({ ...form, duration_days: Number(e.target.value) })} className="mt-1" /></div>
                 <div><Label>Nights</Label><Input type="number" min={0} value={form.duration_nights} onChange={(e) => setForm({ ...form, duration_nights: Number(e.target.value) })} className="mt-1" /></div>
