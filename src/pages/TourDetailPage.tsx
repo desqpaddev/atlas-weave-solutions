@@ -204,7 +204,7 @@ export default function TourDetailPage() {
                 {activeTour.max_group_size && <span className="flex items-center gap-1"><Users className="h-4 w-4 text-primary" /> Max {activeTour.max_group_size}</span>}
               </div>
             </div>
-            <HighlightSlider highlights={activeTour.highlights || []} images={activeTour.images} fallbackImage={activeTour.cover_image} destination={activeTour.destination} title={activeTour.title} />
+            <HighlightSlider highlights={activeTour.highlights || []} images={(activeTour as any).images} fallbackImage={activeTour.cover_image} destination={activeTour.destination} title={activeTour.title} />
             {activeTour.description && <div><h2 className="font-display text-xl font-bold text-foreground mb-3">Overview</h2><p className="text-muted-foreground leading-relaxed">{activeTour.description}</p></div>}
             {activeTour.highlights && activeTour.highlights.length > 0 && (
               <div><h2 className="font-display text-xl font-bold text-foreground mb-3">Highlights</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{activeTour.highlights.map((h, i) => (<div key={i} className="flex items-start gap-2 text-sm"><Star className="h-4 w-4 text-accent shrink-0 mt-0.5" /><span className="text-muted-foreground">{h}</span></div>))}</div></div>
