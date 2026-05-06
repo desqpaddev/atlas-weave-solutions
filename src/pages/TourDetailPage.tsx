@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Check, X, Star, Users, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { MapPin, Clock, Check, X, Star, Users, ChevronRight, ChevronLeft } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { StripeCheckoutDialog, type CheckoutBookingPayload } from "@/components/StripeCheckoutDialog";
 import destBali from "@/assets/dest-bali.jpg";
@@ -36,6 +36,67 @@ const fallbackToursBySlug: Record<string, TourFallback> = {
   "santorini-sunset-romance": { slug: "santorini-sunset-romance", title: "Santorini Sunset Romance", destination: "Santorini", duration_days: 5, duration_nights: 4, adult_price: 1499, child_price: 999, group_price: 7499, category: "Romance", difficulty: "easy", max_group_size: 10, cover_image: destSantorini, description: "Romantic cliffside stays, caldera views, and Greek island charm.", highlights: ["Caldera sunset", "Winery tasting", "Blue-dome photo spots", "Catamaran cruise"], inclusions: ["4-night stay", "Breakfast", "Port transfers", "Sunset cruise"], exclusions: ["Flights", "Visa fees"], itinerary: [{ day: 1, title: "Arrival in Santorini", description: "Check in to a cliffside hotel.", activities: ["Transfer", "Village walk"] }, { day: 2, title: "Caldera Discovery", description: "Explore iconic viewpoints.", activities: ["Oia visit", "Sunset photos"] }, { day: 3, title: "Sea & Wine", description: "Cruise and tasting day.", activities: ["Catamaran cruise", "Winery experience"] }], company_id: null },
   "kyoto-cultural-journey": { slug: "kyoto-cultural-journey", title: "Kyoto Cultural Journey", destination: "Kyoto", duration_days: 6, duration_nights: 5, adult_price: 1799, child_price: 1299, group_price: 8999, category: "Culture", difficulty: "easy", max_group_size: 14, cover_image: destKyoto, description: "A deep cultural immersion into Kyoto's temples, traditions, and culinary gems.", highlights: ["Historic temples", "Tea ceremony", "Arashiyama district", "Traditional cuisine"], inclusions: ["5-night stay", "Daily breakfast", "Local guide", "Cultural activities"], exclusions: ["International flights", "Personal shopping"], itinerary: [{ day: 1, title: "Arrival & Check-in", description: "Welcome to Kyoto.", activities: ["Transfer", "Evening stroll"] }, { day: 2, title: "Temple Circuit", description: "Visit iconic heritage sites.", activities: ["Temple visits", "Zen garden experience"] }, { day: 3, title: "Cultural Workshop", description: "Hands-on local experiences.", activities: ["Tea ceremony", "Local market walk"] }], company_id: null },
 };
+
+function HighlightSlider({ highlights, fallbackImage, destination, title }: { highlights: string[]; fallbackImage?: string | null; destination?: string | null; title: string }) {
+  const slides = useMemo(() => {
+    const picks = (highlights && highlights.length > 0 ? highlights : [destination || title, "scenic landscape", "travel adventure"]).slice(0, 3);
+    while (picks.length < 3) picks.push(destination || title);
+    return picks.map((label) => ({
+      label,
+      image: `https://source.unsplash.com/1200x700/?${encodeURIComponent(label)},${encodeURIComponent(destination || "travel")}`,
+    }));
+  }, [highlights, destination, title]);
+
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 5000);
+    return () => clearInterval(t);
+  }, [slides.length]);
+
+  return (
+    <div className="relative w-full rounded-xl overflow-hidden bg-muted" style={{ aspectRatio: "16/9", maxHeight: 460 }}>
+      {slides.map((s, i) => (
+        <img
+          key={i}
+          src={s.image}
+          alt={s.label}
+          onError={(e) => { if (fallbackImage) (e.currentTarget as HTMLImageElement).src = fallbackImage; }}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+          style={{ opacity: i === idx ? 1 : 0 }}
+        />
+      ))}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/80 to-transparent p-4">
+        <p className="text-white text-sm md:text-base font-medium drop-shadow">{slides[idx].label}</p>
+      </div>
+      <button
+        type="button"
+        aria-label="Previous"
+        onClick={() => setIdx((i) => (i - 1 + slides.length) % slides.length)}
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/80 hover:bg-background flex items-center justify-center shadow"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+      <button
+        type="button"
+        aria-label="Next"
+        onClick={() => setIdx((i) => (i + 1) % slides.length)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/80 hover:bg-background flex items-center justify-center shadow"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+      <div className="absolute top-3 right-3 flex gap-1.5">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`Go to slide ${i + 1}`}
+            onClick={() => setIdx(i)}
+            className={`h-1.5 rounded-full transition-all ${i === idx ? "bg-white w-6" : "bg-white/60 w-3"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function TourDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -142,7 +203,7 @@ export default function TourDetailPage() {
                 {activeTour.max_group_size && <span className="flex items-center gap-1"><Users className="h-4 w-4 text-primary" /> Max {activeTour.max_group_size}</span>}
               </div>
             </div>
-            {activeTour.cover_image && <img src={activeTour.cover_image} alt={activeTour.title} className="w-full rounded-xl object-cover max-h-[400px]" />}
+            <HighlightSlider highlights={activeTour.highlights || []} fallbackImage={activeTour.cover_image} destination={activeTour.destination} title={activeTour.title} />
             {activeTour.description && <div><h2 className="font-display text-xl font-bold text-foreground mb-3">Overview</h2><p className="text-muted-foreground leading-relaxed">{activeTour.description}</p></div>}
             {activeTour.highlights && activeTour.highlights.length > 0 && (
               <div><h2 className="font-display text-xl font-bold text-foreground mb-3">Highlights</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{activeTour.highlights.map((h, i) => (<div key={i} className="flex items-start gap-2 text-sm"><Star className="h-4 w-4 text-accent shrink-0 mt-0.5" /><span className="text-muted-foreground">{h}</span></div>))}</div></div>
