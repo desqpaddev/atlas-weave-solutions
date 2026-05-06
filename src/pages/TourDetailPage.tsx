@@ -37,15 +37,16 @@ const fallbackToursBySlug: Record<string, TourFallback> = {
   "kyoto-cultural-journey": { slug: "kyoto-cultural-journey", title: "Kyoto Cultural Journey", destination: "Kyoto", duration_days: 6, duration_nights: 5, adult_price: 1799, child_price: 1299, group_price: 8999, category: "Culture", difficulty: "easy", max_group_size: 14, cover_image: destKyoto, description: "A deep cultural immersion into Kyoto's temples, traditions, and culinary gems.", highlights: ["Historic temples", "Tea ceremony", "Arashiyama district", "Traditional cuisine"], inclusions: ["5-night stay", "Daily breakfast", "Local guide", "Cultural activities"], exclusions: ["International flights", "Personal shopping"], itinerary: [{ day: 1, title: "Arrival & Check-in", description: "Welcome to Kyoto.", activities: ["Transfer", "Evening stroll"] }, { day: 2, title: "Temple Circuit", description: "Visit iconic heritage sites.", activities: ["Temple visits", "Zen garden experience"] }, { day: 3, title: "Cultural Workshop", description: "Hands-on local experiences.", activities: ["Tea ceremony", "Local market walk"] }], company_id: null },
 };
 
-function HighlightSlider({ highlights, fallbackImage, destination, title }: { highlights: string[]; fallbackImage?: string | null; destination?: string | null; title: string }) {
+function HighlightSlider({ highlights, images, fallbackImage, destination, title }: { highlights: string[]; images?: string[] | null; fallbackImage?: string | null; destination?: string | null; title: string }) {
   const slides = useMemo(() => {
-    const picks = (highlights && highlights.length > 0 ? highlights : [destination || title, "scenic landscape", "travel adventure"]).slice(0, 3);
-    while (picks.length < 3) picks.push(destination || title);
-    return picks.map((label) => ({
+    const labels = (highlights && highlights.length > 0 ? highlights : [destination || title, "scenic landscape", "travel adventure"]).slice(0, 3);
+    while (labels.length < 3) labels.push(destination || title);
+    const stored = (images || []).filter(Boolean).slice(0, 3);
+    return labels.map((label, i) => ({
       label,
-      image: `https://source.unsplash.com/1200x700/?${encodeURIComponent(label)},${encodeURIComponent(destination || "travel")}`,
+      image: stored[i] || `https://source.unsplash.com/1200x700/?${encodeURIComponent(label)},${encodeURIComponent(destination || "travel")}`,
     }));
-  }, [highlights, destination, title]);
+  }, [highlights, images, destination, title]);
 
   const [idx, setIdx] = useState(0);
   useEffect(() => {
