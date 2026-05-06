@@ -122,16 +122,32 @@ export function Navbar() {
 
             {/* Inline primary links on large screens */}
             <ul className="hidden xl:flex items-center gap-7 ml-4">
-              {primaryLinks.slice(0, 3).map((l) => (
-                <li key={l.label}>
-                  <Link
-                    to={l.href}
-                    className="text-xs font-sans-ui font-semibold tracking-[0.18em] uppercase text-foreground/80 hover:text-primary transition-colors"
+              {primaryLinks.slice(0, 3).map((l) => {
+                const isDest = l.label === "Destinations";
+                return (
+                  <li
+                    key={l.label}
+                    onMouseEnter={isDest ? openDest : undefined}
+                    onMouseLeave={isDest ? scheduleCloseDest : undefined}
                   >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
+                    <Link
+                      to={l.href}
+                      onClick={(e) => {
+                        if (isDest) {
+                          e.preventDefault();
+                          setDestOpen((v) => !v);
+                        }
+                      }}
+                      aria-expanded={isDest ? destOpen : undefined}
+                      className={`text-xs font-sans-ui font-semibold tracking-[0.18em] uppercase transition-colors ${
+                        isDest && destOpen ? "text-primary" : "text-foreground/80 hover:text-primary"
+                      }`}
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
