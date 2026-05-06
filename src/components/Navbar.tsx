@@ -89,7 +89,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border/60">
+    <header className="sticky top-0 z-50 bg-background border-b border-border/60 relative">
       {/* Slim utility bar */}
       <div className="bg-primary text-primary-foreground">
         <div className="container mx-auto flex items-center justify-between h-9 px-4 text-[11px] tracking-wide uppercase font-sans-ui">
