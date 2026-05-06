@@ -1,12 +1,13 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PageHero } from "@/components/PageHero";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, Clock, ArrowRight, Users, Compass } from "lucide-react";
+import { MapPin, Clock, ArrowRight, Users, Compass, LayoutGrid, List } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import toursHero from "@/assets/tours-hero.jpg";
 
 const normalizeText = (value?: string | null) =>
