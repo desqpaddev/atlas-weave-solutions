@@ -37,6 +37,67 @@ const fallbackToursBySlug: Record<string, TourFallback> = {
   "kyoto-cultural-journey": { slug: "kyoto-cultural-journey", title: "Kyoto Cultural Journey", destination: "Kyoto", duration_days: 6, duration_nights: 5, adult_price: 1799, child_price: 1299, group_price: 8999, category: "Culture", difficulty: "easy", max_group_size: 14, cover_image: destKyoto, description: "A deep cultural immersion into Kyoto's temples, traditions, and culinary gems.", highlights: ["Historic temples", "Tea ceremony", "Arashiyama district", "Traditional cuisine"], inclusions: ["5-night stay", "Daily breakfast", "Local guide", "Cultural activities"], exclusions: ["International flights", "Personal shopping"], itinerary: [{ day: 1, title: "Arrival & Check-in", description: "Welcome to Kyoto.", activities: ["Transfer", "Evening stroll"] }, { day: 2, title: "Temple Circuit", description: "Visit iconic heritage sites.", activities: ["Temple visits", "Zen garden experience"] }, { day: 3, title: "Cultural Workshop", description: "Hands-on local experiences.", activities: ["Tea ceremony", "Local market walk"] }], company_id: null },
 };
 
+function HighlightSlider({ highlights, fallbackImage, destination, title }: { highlights: string[]; fallbackImage?: string | null; destination?: string | null; title: string }) {
+  const slides = useMemo(() => {
+    const picks = (highlights && highlights.length > 0 ? highlights : [destination || title, "scenic landscape", "travel adventure"]).slice(0, 3);
+    while (picks.length < 3) picks.push(destination || title);
+    return picks.map((label) => ({
+      label,
+      image: `https://source.unsplash.com/1200x700/?${encodeURIComponent(label)},${encodeURIComponent(destination || "travel")}`,
+    }));
+  }, [highlights, destination, title]);
+
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 5000);
+    return () => clearInterval(t);
+  }, [slides.length]);
+
+  return (
+    <div className="relative w-full rounded-xl overflow-hidden bg-muted" style={{ aspectRatio: "16/9", maxHeight: 460 }}>
+      {slides.map((s, i) => (
+        <img
+          key={i}
+          src={s.image}
+          alt={s.label}
+          onError={(e) => { if (fallbackImage) (e.currentTarget as HTMLImageElement).src = fallbackImage; }}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+          style={{ opacity: i === idx ? 1 : 0 }}
+        />
+      ))}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/80 to-transparent p-4">
+        <p className="text-white text-sm md:text-base font-medium drop-shadow">{slides[idx].label}</p>
+      </div>
+      <button
+        type="button"
+        aria-label="Previous"
+        onClick={() => setIdx((i) => (i - 1 + slides.length) % slides.length)}
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/80 hover:bg-background flex items-center justify-center shadow"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+      <button
+        type="button"
+        aria-label="Next"
+        onClick={() => setIdx((i) => (i + 1) % slides.length)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/80 hover:bg-background flex items-center justify-center shadow"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+      <div className="absolute top-3 right-3 flex gap-1.5">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`Go to slide ${i + 1}`}
+            onClick={() => setIdx(i)}
+            className={`h-1.5 rounded-full transition-all ${i === idx ? "bg-white w-6" : "bg-white/60 w-3"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function TourDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
