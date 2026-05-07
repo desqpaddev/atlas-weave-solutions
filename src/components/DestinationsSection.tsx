@@ -99,8 +99,9 @@ export function DestinationsSection() {
                       {dest}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {destTours.length} {destTours.length === 1 ? "journey" : "journeys"} · from £
-                      {Number(tour.adult_price).toLocaleString()}
+                      {dest === "Asia"
+                        ? `${asiaTours.length} ${asiaTours.length === 1 ? "journey" : "journeys"}${asiaMin ? ` · from £${asiaMin.toLocaleString()}` : ""}`
+                        : `${destTours.length} ${destTours.length === 1 ? "journey" : "journeys"} · from £${Number(tour.adult_price).toLocaleString()}`}
                     </p>
                   </div>
                   <ArrowUpRight className="h-5 w-5 text-foreground/60 group-hover:text-primary group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
