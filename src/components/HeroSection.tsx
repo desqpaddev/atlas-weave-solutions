@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 const slides = [
   {
     type: "video" as const,
-    video: "https://videos.pexels.com/video-files/10369746/10369746-uhd_2560_1440_30fps.mp4",
+    video: "https://videos.pexels.com/video-files/10369746/10369746-hd_1920_1080_30fps.mp4",
     eyebrow: "Tailor-Made Journeys",
     title: "Extraordinary Travel,",
     titleItalic: "thoughtfully crafted.",
