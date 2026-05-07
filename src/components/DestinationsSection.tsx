@@ -19,15 +19,43 @@ export function DestinationsSection() {
 
   if (tours.length === 0) return null;
 
+  const ASIA_COUNTRIES = [
+    "India", "China", "Japan", "Azerbaijan", "Bhutan", "Singapore", "Malaysia",
+    "Vietnam", "United Arab Emirates (UAE)", "Indonesia", "Cambodia",
+    "Philippines", "Kazakhstan", "Sri Lanka", "Thailand", "Turkey",
+  ];
+
   const destMap = new Map<string, typeof tours>();
   tours.forEach((t) => {
     const dest = t.destination || "Other";
     if (!destMap.has(dest)) destMap.set(dest, []);
     destMap.get(dest)!.push(t);
   });
-  const topDestinations = Array.from(destMap.entries())
-    .sort((a, b) => b[1].length - a[1].length)
-    .slice(0, 6);
+
+  const asiaTours = tours.filter((t) =>
+    ASIA_COUNTRIES.some((c) => (t.destination || "").toLowerCase().includes(c.toLowerCase()))
+  );
+  const asiaCover =
+    asiaTours[0]?.cover_image ||
+    "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1600&q=80";
+  const asiaMin = asiaTours.length
+    ? Math.min(...asiaTours.map((t) => Number(t.adult_price) || 0).filter((n) => n > 0))
+    : 0;
+
+  const asiaEntry: [string, typeof tours] = [
+    "Asia",
+    asiaTours.length
+      ? asiaTours
+      : ([{ cover_image: asiaCover, adult_price: 0 }] as unknown as typeof tours),
+  ];
+
+  const topDestinations: [string, typeof tours][] = [
+    asiaEntry,
+    ...Array.from(destMap.entries())
+      .filter(([d]) => d !== "Asia")
+      .sort((a, b) => b[1].length - a[1].length)
+      .slice(0, 5),
+  ];
 
   return (
     <section id="destinations" className="py-24 md:py-32 bg-cream">
@@ -71,8 +99,9 @@ export function DestinationsSection() {
                       {dest}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {destTours.length} {destTours.length === 1 ? "journey" : "journeys"} · from £
-                      {Number(tour.adult_price).toLocaleString()}
+                      {dest === "Asia"
+                        ? `${asiaTours.length} ${asiaTours.length === 1 ? "journey" : "journeys"}${asiaMin ? ` · from £${asiaMin.toLocaleString()}` : ""}`
+                        : `${destTours.length} ${destTours.length === 1 ? "journey" : "journeys"} · from £${Number(tour.adult_price).toLocaleString()}`}
                     </p>
                   </div>
                   <ArrowUpRight className="h-5 w-5 text-foreground/60 group-hover:text-primary group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
