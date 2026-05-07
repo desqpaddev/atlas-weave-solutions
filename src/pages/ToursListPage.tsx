@@ -22,6 +22,12 @@ const normalizeText = (value?: string | null) =>
 const matchesFilter = (source: string, filter: string) =>
   !filter || source.includes(filter) || filter.includes(source);
 
+const ASIA_COUNTRIES = [
+  "india", "china", "japan", "azerbaijan", "bhutan", "singapore", "malaysia",
+  "vietnam", "united arab emirates", "uae", "indonesia", "cambodia",
+  "philippines", "kazakhstan", "sri lanka", "thailand", "turkey",
+];
+
 export default function ToursListPage() {
   const [searchParams] = useSearchParams();
   const [view, setView] = useState<"grid" | "list">("grid");
