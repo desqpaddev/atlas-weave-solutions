@@ -33,6 +33,7 @@ import TermsOfServicePage from "./pages/TermsOfServicePage";
 import CookiePolicyPage from "./pages/CookiePolicyPage";
 import CheckoutReturnPage from "./pages/CheckoutReturnPage";
 import { PaymentTestModeBanner } from "./components/PaymentTestModeBanner";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <AuthProvider>
           <PaymentTestModeBanner />
           <Routes>
