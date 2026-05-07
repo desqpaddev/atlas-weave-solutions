@@ -55,7 +55,9 @@ export default function ToursListPage() {
       const category = normalizeText(tour.category);
       const searchable = normalizeText(`£{tour.title} ${tour.destination ?? ""} ${tour.category ?? ""} ${tour.description ?? ""} ${tour.difficulty ?? ""} ${(tour.highlights ?? []).join(" ")} ${(tour.inclusions ?? []).join(" ")}`);
 
-      if (!matchesFilter(destination, destinationFilter)) return false;
+      if (destinationFilter === "asia") {
+        if (!ASIA_COUNTRIES.some((c) => destination.includes(c))) return false;
+      } else if (!matchesFilter(destination, destinationFilter)) return false;
       if (!matchesFilter(category, categoryFilter)) return false;
       if (searchFilter && !searchable.includes(searchFilter)) return false;
 
