@@ -41,6 +41,32 @@ const destinationRegions: DestinationRegion[] = [
       { label: "Czech Republic", href: "/tours?destination=Czech Republic" },
     ],
   },
+  {
+    label: "Asia",
+    href: "/tours?destination=Asia",
+    blurb:
+      "Ancient temples, vibrant cities and tropical paradises — from the Himalayas to the Pacific shores.",
+    image:
+      "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=70",
+    countries: [
+      { label: "India", href: "/tours?destination=India" },
+      { label: "China", href: "/tours?destination=China" },
+      { label: "Japan", href: "/tours?destination=Japan" },
+      { label: "Azerbaijan", href: "/tours?destination=Azerbaijan" },
+      { label: "Bhutan", href: "/tours?destination=Bhutan" },
+      { label: "Singapore", href: "/tours?destination=Singapore" },
+      { label: "Malaysia", href: "/tours?destination=Malaysia" },
+      { label: "Vietnam", href: "/tours?destination=Vietnam" },
+      { label: "United Arab Emirates (UAE)", href: "/tours?destination=United Arab Emirates" },
+      { label: "Indonesia", href: "/tours?destination=Indonesia" },
+      { label: "Cambodia", href: "/tours?destination=Cambodia" },
+      { label: "Philippines", href: "/tours?destination=Philippines" },
+      { label: "Kazakhstan", href: "/tours?destination=Kazakhstan" },
+      { label: "Sri Lanka", href: "/tours?destination=Sri Lanka" },
+      { label: "Thailand", href: "/tours?destination=Thailand" },
+      { label: "Turkey", href: "/tours?destination=Turkey" },
+    ],
+  },
 ];
 
 const drawerLinks = [
