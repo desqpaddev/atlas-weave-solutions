@@ -5,6 +5,34 @@ import { Footer } from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { ChevronRight, Ship } from "lucide-react";
 
+const IMG = (p: string) => `https://www.msccruises.com/int/-/media/global-contents/ships/${p}`;
+const FLEET = [
+  { name: "World Atlantic", image: IMG("fleet/world-atlantic/miniature_world_atlantic_1260x405px.png?bc=transparent&as=1&mh=405&mw=1260&hash=7EEDC267BA37C740414B9D288B203F96") },
+  { name: "World Asia", image: IMG("fleet-page/as_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=E07329441A72339EE27B83CF416B98B6") },
+  { name: "World America", image: IMG("fleet-page/am_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=8C3DB307CB6EAF2FAC1673DE13C08064") },
+  { name: "Euribia", image: IMG("fleet-page/er_silhouette.png?bc=transparent&as=1&mh=405&mw=1260&hash=B727D67C8D44D7D6F85FC80DD8B735F2") },
+  { name: "Seascape", image: IMG("fleet-page/sc_miniature.png?bc=transparent&as=1&mh=203&mw=630&hash=7F552F5E9EF6B3E53469AB0FE51BF6AB") },
+  { name: "World Europa", image: IMG("fleet-page/eu_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=A4B48F1237AD0650BED16637011704F5") },
+  { name: "Seashore", image: IMG("fleet-page/sh_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=EA8DCBE50A7A1EEF520496F231C1439C") },
+  { name: "Virtuosa", image: IMG("fleet-page/vi-miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=F7B6D1B21A781D14CC7054F323981901") },
+  { name: "Grandiosa", image: IMG("fleet-page/gr_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=3D86929CB136365470A018947210D533") },
+  { name: "Bellissima", image: IMG("fleet-page/bellissima_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=D9AFBCFC84DDD85765AB5706DD4FC59E") },
+  { name: "Seaview", image: IMG("fleet-page/sv_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=D830FBC7ECBEB0A3F5B45D0CA6A897F9") },
+  { name: "Meraviglia", image: IMG("fleet-page/mr__miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=1B8D3755EC8119AF28F941B84045EA57") },
+  { name: "Preziosa", image: IMG("fleet-page/pr_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=2AD90F07F39415787F5F437EEED7244A") },
+  { name: "Divina", image: IMG("fleet-page/di_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=A46EBCCA3C14F76075D7FEA90B6C7FD9") },
+  { name: "Splendida", image: IMG("fleet-page/splendida_miniature_ok.png?bc=transparent&as=1&mh=405&mw=1260&hash=6878CA5116F521FDBC8E926E9EB5FFE0") },
+  { name: "Fantasia", image: IMG("fleet-page/fa_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=BD159B0F1F8E6BBA60D883F598AF341C") },
+  { name: "Magnifica", image: IMG("fleet-page/ma_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=36F93DD2A2230ACF9798A7FC44D184FE") },
+  { name: "Poesia", image: IMG("fleet-page/po_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=C63093BCD478B8B829419C66C5620D21") },
+  { name: "Orchestra", image: IMG("fleet-page/or_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=720248F08FB1B0F9461511625A715B43") },
+  { name: "Musica", image: IMG("fleet-page/mu_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=4344E39BFDE830CDA95539F310C3E7FF") },
+  { name: "Opera", image: IMG("fleet-page/ox_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=454448BB17E6610957881CB074DA8F81") },
+  { name: "Lirica", image: IMG("fleet-page/li_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=9378D399A3E4E762AD4BC9750F78B161") },
+  { name: "Sinfonia", image: IMG("fleet-page/sx_miniature.png?bc=transparent&as=1&mh=405&mw=1260&hash=041A792AA8533C37495F0F40A0588C9F") },
+  { name: "Armonia", image: IMG("fleet-page/armonia_minuature.png?bc=transparent&as=1&mh=405&mw=1260&hash=113E50E3E6C9957403D267A0613A1BCC") },
+];
+
 export default function CruisesListPage() {
   const { data: cruises = [], isLoading } = useQuery({
     queryKey: ["public-cruises"],
