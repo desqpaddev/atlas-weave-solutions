@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { ChevronRight, Ship } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const IMG = (p: string) => `https://www.msccruises.com/int/-/media/global-contents/ships/${p}`;
 const FLEET = [
@@ -34,6 +36,7 @@ const FLEET = [
 ];
 
 export default function CruisesListPage() {
+  const [activeShip, setActiveShip] = useState<{ name: string; image: string } | null>(null);
   const { data: cruises = [], isLoading } = useQuery({
     queryKey: ["public-cruises"],
     queryFn: async () => {
@@ -82,9 +85,11 @@ export default function CruisesListPage() {
       <section className="container mx-auto px-4 pb-16">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {FLEET.map((ship) => (
-            <div
+            <button
+              type="button"
               key={ship.name}
-              className="group relative bg-gradient-to-b from-slate-50 to-slate-200 border border-border overflow-hidden shadow-soft hover:shadow-elevated transition-all duration-300 cursor-pointer"
+              onClick={() => setActiveShip(ship)}
+              className="group relative bg-gradient-to-b from-slate-50 to-slate-200 border border-border overflow-hidden shadow-soft hover:shadow-elevated transition-all duration-300 cursor-pointer text-left"
             >
               <div className="aspect-[16/9] flex items-center justify-center p-3 bg-white">
                 <img
@@ -99,10 +104,31 @@ export default function CruisesListPage() {
                   {ship.name}
                 </h3>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>
+
+      <Dialog open={!!activeShip} onOpenChange={(o) => !o && setActiveShip(null)}>
+        <DialogContent className="max-w-5xl bg-white p-0 overflow-hidden">
+          {activeShip && (
+            <div>
+              <div className="flex items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100 p-8">
+                <img
+                  src={activeShip.image}
+                  alt={activeShip.name}
+                  className="max-h-[70vh] w-auto object-contain"
+                />
+              </div>
+              <div className="px-6 py-4 border-t border-border bg-white">
+                <h3 className="font-display text-xl md:text-2xl font-semibold text-primary tracking-wide uppercase text-center">
+                  {activeShip.name}
+                </h3>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Ships grid (dynamic from DB) */}
       <section className="container mx-auto px-4 pb-20">
