@@ -50,7 +50,33 @@ export default function CruisesListPage() {
         </p>
       </section>
 
-      {/* Ships grid */}
+      {/* Fleet tiles */}
+      <section className="container mx-auto px-4 pb-16">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {FLEET.map((ship) => (
+            <div
+              key={ship.name}
+              className="group relative bg-gradient-to-b from-slate-50 to-slate-200 border border-border overflow-hidden shadow-soft hover:shadow-elevated transition-all duration-300 cursor-pointer"
+            >
+              <div className="aspect-[16/9] flex items-center justify-center p-3 bg-white">
+                <img
+                  src={ship.image}
+                  alt={ship.name}
+                  loading="lazy"
+                  className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <div className="px-4 py-3 bg-gradient-to-b from-slate-100 to-slate-200 border-t border-slate-200">
+                <h3 className="font-display text-sm md:text-base font-semibold text-primary tracking-wide uppercase text-center">
+                  {ship.name}
+                </h3>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Ships grid (dynamic from DB) */}
       <section className="container mx-auto px-4 pb-20">
         {isLoading ? (
           <div className="text-center py-16">
