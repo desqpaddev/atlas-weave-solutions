@@ -36,6 +36,7 @@ const FLEET = [
 ];
 
 export default function CruisesListPage() {
+  const [activeShip, setActiveShip] = useState<{ name: string; image: string } | null>(null);
   const { data: cruises = [], isLoading } = useQuery({
     queryKey: ["public-cruises"],
     queryFn: async () => {
