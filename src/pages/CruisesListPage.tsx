@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Link } from "react-router-dom";
-import { ChevronRight, Ship } from "lucide-react";
+import { ChevronRight, Ship, X } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const IMG = (p: string) => `https://www.msccruises.com/int/-/media/global-contents/ships/${p}`;
 const FLEET = [
