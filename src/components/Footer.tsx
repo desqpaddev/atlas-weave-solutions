@@ -98,7 +98,21 @@ export function Footer() {
             </div>
             <div className="sm:col-span-1">
               <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Email *</Label>
-              <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent" />
+              <Input
+                required
+                type="email"
+                value={form.email}
+                onChange={(e) => {
+                  setForm({ ...form, email: e.target.value });
+                  if (emailError) setEmailError("");
+                }}
+                onBlur={(e) => {
+                  const v = e.target.value.trim();
+                  setEmailError(v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "Please enter a valid email address." : "");
+                }}
+                className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent"
+              />
+              {emailError && <p className="mt-1 text-xs text-accent">{emailError}</p>}
             </div>
             <div>
               <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Phone</Label>
