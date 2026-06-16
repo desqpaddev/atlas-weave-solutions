@@ -273,7 +273,7 @@ export default function TourDetailPage() {
                   </div>
                 </div>
 
-                <div><Label className="text-xs">Travel Date</Label><Input type="date" value={bookingForm.checkIn} onChange={(e) => setBookingForm({ ...bookingForm, checkIn: e.target.value })} className="mt-1" /></div>
+                <div><Label className="text-xs">Travel Date</Label><Input type="date" min={new Date().toISOString().split("T")[0]} value={bookingForm.checkIn} onChange={(e) => setBookingForm({ ...bookingForm, checkIn: e.target.value })} className="mt-1" /></div>
 
                 {/* Price Summary */}
                 <div className="bg-secondary rounded-lg p-3 space-y-1">
