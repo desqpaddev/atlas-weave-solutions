@@ -267,7 +267,7 @@ export default function PackageDetailPage() {
                   </div>
                   <div>
                     <Label className="text-xs">Travel Date</Label>
-                    <Input type="date" value={bookingForm.checkIn} onChange={(e) => setBookingForm({ ...bookingForm, checkIn: e.target.value })} className="mt-1" />
+                    <Input type="date" min={new Date().toISOString().split("T")[0]} value={bookingForm.checkIn} onChange={(e) => setBookingForm({ ...bookingForm, checkIn: e.target.value })} className="mt-1" />
                   </div>
                 </div>
                 <div>
