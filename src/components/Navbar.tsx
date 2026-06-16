@@ -162,7 +162,12 @@ export function Navbar() {
                       onClick={(e) => {
                         if (isDest) {
                           e.preventDefault();
-                          setDestOpen((v) => !v);
+                          if (destOpen) {
+                            navigate(l.href);
+                            setDestOpen(false);
+                          } else {
+                            setDestOpen(true);
+                          }
                         }
                       }}
                       aria-expanded={isDest ? destOpen : undefined}
