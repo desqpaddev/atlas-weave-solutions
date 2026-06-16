@@ -34,6 +34,18 @@ export default function ContactPage() {
       toast.error("Name and email are required");
       return;
     }
+    if (!/^[A-Za-z][A-Za-z\s'-]*$/.test(form.name.trim())) {
+      toast.error("Please enter a valid name (letters only)");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    if (form.phone.trim() && !/^[\d\s+()-]{7,}$/.test(form.phone.trim())) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
     setLoading(true);
     try {
       const { data: companies } = await supabase.from("companies").select("id").limit(1);
