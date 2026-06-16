@@ -95,7 +95,7 @@ export function Navbar() {
   };
   const scheduleCloseDest = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setDestOpen(false), 150);
+    closeTimer.current = window.setTimeout(() => setDestOpen(false), 320);
   };
 
   const { data: company } = useQuery({
