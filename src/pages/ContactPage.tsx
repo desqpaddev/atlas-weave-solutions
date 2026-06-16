@@ -126,7 +126,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Phone</label>
-                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+44 7XXX XXXXXX" className="h-12" />
+                <Input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/[^\d\s+()-]/g, "") })} placeholder="+44 7XXX XXXXXX" className="h-12" />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Tell us about your trip</label>
