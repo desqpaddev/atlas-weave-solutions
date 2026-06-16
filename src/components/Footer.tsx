@@ -38,6 +38,7 @@ export function Footer() {
 
   const [form, setForm] = useState({ full_name: "", email: "", phone: "", destination: "", travel_dates: "", pax: "2", notes: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [emailError, setEmailError] = useState("");
 
   const handleEnquiry = async (e: React.FormEvent) => {
     e.preventDefault();
