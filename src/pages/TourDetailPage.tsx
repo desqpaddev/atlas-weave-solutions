@@ -131,8 +131,23 @@ export default function TourDetailPage() {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeTour) return;
-    if (!bookingForm.fullName || !bookingForm.email) {
-      toast.error("Please fill in your name and email.");
+    const name = bookingForm.fullName.trim();
+    const email = bookingForm.email.trim();
+    const phone = bookingForm.phone.trim();
+    if (!/^[A-Za-z][A-Za-z .'-]{1,}$/.test(name)) {
+      toast.error("Please enter a valid full name (letters only).");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (phone && !/^[+]?[\d\s-]{7,15}$/.test(phone)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+    if (bookingForm.checkIn && bookingForm.checkIn < new Date().toISOString().split("T")[0]) {
+      toast.error("Travel date cannot be in the past.");
       return;
     }
     if (totalPrice < 1) {
@@ -226,7 +241,7 @@ export default function TourDetailPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Adult</p><p className="text-2xl font-bold text-primary">£{adultPrice.toLocaleString()}</p></div>
                 {childPrice > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Child</p><p className="text-2xl font-bold text-primary">£{childPrice.toLocaleString()}</p></div>}
-                {activeTour.group_price && Number(activeTour.group_price) > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Group</p><p className="text-2xl font-bold text-primary">£{Number(activeTour.group_price).toLocaleString()}</p></div>}
+                {Number(activeTour.group_price) > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Group</p><p className="text-2xl font-bold text-primary">£{Number(activeTour.group_price).toLocaleString()}</p></div>}
               </div>
             </div>
           </div>
@@ -241,9 +256,9 @@ export default function TourDetailPage() {
               </div>
 
               <form onSubmit={handleBooking} className="space-y-3">
-                <div><Label className="text-xs">Full Name *</Label><Input required value={bookingForm.fullName} onChange={(e) => setBookingForm({ ...bookingForm, fullName: e.target.value })} placeholder="Your name" className="mt-1" /></div>
+                <div><Label className="text-xs">Full Name *</Label><Input required value={bookingForm.fullName} onChange={(e) => setBookingForm({ ...bookingForm, fullName: e.target.value.replace(/[0-9]/g, "") })} placeholder="Your name" className="mt-1" /></div>
                 <div><Label className="text-xs">Email *</Label><Input required type="email" value={bookingForm.email} onChange={(e) => setBookingForm({ ...bookingForm, email: e.target.value })} placeholder="email@example.com" className="mt-1" /></div>
-                <div><Label className="text-xs">Phone</Label><Input value={bookingForm.phone} onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value })} placeholder="+1 234 567 8900" className="mt-1" /></div>
+                <div><Label className="text-xs">Phone</Label><Input type="tel" inputMode="tel" value={bookingForm.phone} onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value.replace(/[^\d+\s-]/g, "") })} placeholder="+1 234 567 8900" className="mt-1" /></div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -258,7 +273,7 @@ export default function TourDetailPage() {
                   </div>
                 </div>
 
-                <div><Label className="text-xs">Travel Date</Label><Input type="date" value={bookingForm.checkIn} onChange={(e) => setBookingForm({ ...bookingForm, checkIn: e.target.value })} className="mt-1" /></div>
+                <div><Label className="text-xs">Travel Date</Label><Input type="date" min={new Date().toISOString().split("T")[0]} value={bookingForm.checkIn} onChange={(e) => setBookingForm({ ...bookingForm, checkIn: e.target.value })} className="mt-1" /></div>
 
                 {/* Price Summary */}
                 <div className="bg-secondary rounded-lg p-3 space-y-1">

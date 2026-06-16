@@ -38,6 +38,7 @@ export function Footer() {
 
   const [form, setForm] = useState({ full_name: "", email: "", phone: "", destination: "", travel_dates: "", pax: "2", notes: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [emailError, setEmailError] = useState("");
 
   const handleEnquiry = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +98,21 @@ export function Footer() {
             </div>
             <div className="sm:col-span-1">
               <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Email *</Label>
-              <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent" />
+              <Input
+                required
+                type="email"
+                value={form.email}
+                onChange={(e) => {
+                  setForm({ ...form, email: e.target.value });
+                  if (emailError) setEmailError("");
+                }}
+                onBlur={(e) => {
+                  const v = e.target.value.trim();
+                  setEmailError(v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "Please enter a valid email address." : "");
+                }}
+                className="mt-1.5 bg-background/5 border-background/20 text-background placeholder:text-background/40 focus-visible:ring-accent"
+              />
+              {emailError && <p className="mt-1 text-xs text-accent">{emailError}</p>}
             </div>
             <div>
               <Label className="text-background/70 text-xs font-sans-ui tracking-wider uppercase">Phone</Label>
@@ -143,7 +158,7 @@ export function Footer() {
             <p className="text-sm text-background/60 leading-relaxed mb-6">
               Your trusted Direct DMC for the UK and Europe — crafting private, expertly-guided journeys from our home in Kent.
             </p>
-            <div className="flex gap-3 mb-6">
+            <div className="flex flex-wrap items-center gap-3 mb-6">
               {[
                 { Icon: Facebook, href: "#", label: "Facebook" },
                 { Icon: Instagram, href: "https://www.instagram.com/joannaholidays.uk.europe/", label: "Instagram" },
@@ -155,7 +170,7 @@ export function Footer() {
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                   aria-label={label}
-                  className="w-9 h-9 rounded-full border border-background/20 flex items-center justify-center hover:bg-accent hover:text-accent-foreground hover:border-accent transition-colors"
+                  className="w-9 h-9 shrink-0 rounded-full border border-background/20 inline-flex items-center justify-center hover:bg-accent hover:text-accent-foreground hover:border-accent transition-colors"
                 >
                   <Icon className="h-4 w-4" />
                 </a>

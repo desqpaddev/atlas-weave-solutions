@@ -95,7 +95,7 @@ export function Navbar() {
   };
   const scheduleCloseDest = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setDestOpen(false), 150);
+    closeTimer.current = window.setTimeout(() => setDestOpen(false), 320);
   };
 
   const { data: company } = useQuery({
@@ -162,7 +162,12 @@ export function Navbar() {
                       onClick={(e) => {
                         if (isDest) {
                           e.preventDefault();
-                          setDestOpen((v) => !v);
+                          if (destOpen) {
+                            navigate(l.href);
+                            setDestOpen(false);
+                          } else {
+                            setDestOpen(true);
+                          }
                         }
                       }}
                       aria-expanded={isDest ? destOpen : undefined}

@@ -43,8 +43,23 @@ export default function PackageDetailPage() {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pkg) return;
-    if (!bookingForm.fullName || !bookingForm.email) {
-      toast.error("Please fill in your name and email.");
+    const name = bookingForm.fullName.trim();
+    const email = bookingForm.email.trim();
+    const phone = bookingForm.phone.trim();
+    if (!/^[A-Za-z][A-Za-z .'-]{1,}$/.test(name)) {
+      toast.error("Please enter a valid full name (letters only).");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (phone && !/^[+]?[\d\s-]{7,15}$/.test(phone)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+    if (bookingForm.checkIn && bookingForm.checkIn < new Date().toISOString().split("T")[0]) {
+      toast.error("Travel date cannot be in the past.");
       return;
     }
     const total = Number(pkg.base_price) * bookingForm.pax;
@@ -235,7 +250,7 @@ export default function PackageDetailPage() {
               <form onSubmit={handleBooking} className="space-y-3">
                 <div>
                   <Label className="text-xs">Full Name *</Label>
-                  <Input required value={bookingForm.fullName} onChange={(e) => setBookingForm({ ...bookingForm, fullName: e.target.value })} placeholder="Your name" className="mt-1" />
+                  <Input required value={bookingForm.fullName} onChange={(e) => setBookingForm({ ...bookingForm, fullName: e.target.value.replace(/[0-9]/g, "") })} placeholder="Your name" className="mt-1" />
                 </div>
                 <div>
                   <Label className="text-xs">Email *</Label>
@@ -243,7 +258,7 @@ export default function PackageDetailPage() {
                 </div>
                 <div>
                   <Label className="text-xs">Phone</Label>
-                  <Input value={bookingForm.phone} onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value })} placeholder="+1 234 567 8900" className="mt-1" />
+                  <Input type="tel" inputMode="tel" value={bookingForm.phone} onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value.replace(/[^\d+\s-]/g, "") })} placeholder="+1 234 567 8900" className="mt-1" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -252,7 +267,7 @@ export default function PackageDetailPage() {
                   </div>
                   <div>
                     <Label className="text-xs">Travel Date</Label>
-                    <Input type="date" value={bookingForm.checkIn} onChange={(e) => setBookingForm({ ...bookingForm, checkIn: e.target.value })} className="mt-1" />
+                    <Input type="date" min={new Date().toISOString().split("T")[0]} value={bookingForm.checkIn} onChange={(e) => setBookingForm({ ...bookingForm, checkIn: e.target.value })} className="mt-1" />
                   </div>
                 </div>
                 <div>
