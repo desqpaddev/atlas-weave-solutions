@@ -131,8 +131,23 @@ export default function TourDetailPage() {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeTour) return;
-    if (!bookingForm.fullName || !bookingForm.email) {
-      toast.error("Please fill in your name and email.");
+    const name = bookingForm.fullName.trim();
+    const email = bookingForm.email.trim();
+    const phone = bookingForm.phone.trim();
+    if (!/^[A-Za-z][A-Za-z .'-]{1,}$/.test(name)) {
+      toast.error("Please enter a valid full name (letters only).");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (phone && !/^[+]?[\d\s-]{7,15}$/.test(phone)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+    if (bookingForm.checkIn && bookingForm.checkIn < new Date().toISOString().split("T")[0]) {
+      toast.error("Travel date cannot be in the past.");
       return;
     }
     if (totalPrice < 1) {
