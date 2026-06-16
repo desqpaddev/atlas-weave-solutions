@@ -226,7 +226,7 @@ export default function TourDetailPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Adult</p><p className="text-2xl font-bold text-primary">£{adultPrice.toLocaleString()}</p></div>
                 {childPrice > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Child</p><p className="text-2xl font-bold text-primary">£{childPrice.toLocaleString()}</p></div>}
-                {activeTour.group_price && Number(activeTour.group_price) > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Group</p><p className="text-2xl font-bold text-primary">£{Number(activeTour.group_price).toLocaleString()}</p></div>}
+                {Number(activeTour.group_price) > 0 && <div className="bg-card border border-border rounded-xl p-4 text-center"><p className="text-xs text-muted-foreground mb-1">Group</p><p className="text-2xl font-bold text-primary">£{Number(activeTour.group_price).toLocaleString()}</p></div>}
               </div>
             </div>
           </div>
