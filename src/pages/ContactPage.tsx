@@ -117,7 +117,7 @@ export default function ContactPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Full Name *</label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="John Doe" required className="h-12" />
+                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value.replace(/[^A-Za-z\s'-]/g, "") })} placeholder="John Doe" required className="h-12" />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Email *</label>
