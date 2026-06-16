@@ -34,6 +34,18 @@ export default function ContactPage() {
       toast.error("Name and email are required");
       return;
     }
+    if (!/^[A-Za-z][A-Za-z\s'-]*$/.test(form.name.trim())) {
+      toast.error("Please enter a valid name (letters only)");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    if (form.phone.trim() && !/^[\d\s+()-]{7,}$/.test(form.phone.trim())) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
     setLoading(true);
     try {
       const { data: companies } = await supabase.from("companies").select("id").limit(1);
@@ -105,7 +117,7 @@ export default function ContactPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Full Name *</label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="John Doe" required className="h-12" />
+                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value.replace(/[^A-Za-z\s'-]/g, "") })} placeholder="John Doe" required className="h-12" />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Email *</label>
@@ -114,7 +126,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Phone</label>
-                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+44 7XXX XXXXXX" className="h-12" />
+                <Input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/[^\d\s+()-]/g, "") })} placeholder="+44 7XXX XXXXXX" className="h-12" />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Tell us about your trip</label>
