@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
         quantity: 1,
       }],
       mode: "payment",
-      ui_mode: "embedded_page",
+      ui_mode: "embedded",
       return_url: returnUrl,
       ...(customerEmail && { customer_email: customerEmail }),
       metadata: {
