@@ -250,7 +250,7 @@ export default function PackageDetailPage() {
               <form onSubmit={handleBooking} className="space-y-3">
                 <div>
                   <Label className="text-xs">Full Name *</Label>
-                  <Input required value={bookingForm.fullName} onChange={(e) => setBookingForm({ ...bookingForm, fullName: e.target.value })} placeholder="Your name" className="mt-1" />
+                  <Input required value={bookingForm.fullName} onChange={(e) => setBookingForm({ ...bookingForm, fullName: e.target.value.replace(/[0-9]/g, "") })} placeholder="Your name" className="mt-1" />
                 </div>
                 <div>
                   <Label className="text-xs">Email *</Label>
@@ -258,7 +258,7 @@ export default function PackageDetailPage() {
                 </div>
                 <div>
                   <Label className="text-xs">Phone</Label>
-                  <Input value={bookingForm.phone} onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value })} placeholder="+1 234 567 8900" className="mt-1" />
+                  <Input type="tel" inputMode="tel" value={bookingForm.phone} onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value.replace(/[^\d+\s-]/g, "") })} placeholder="+1 234 567 8900" className="mt-1" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
