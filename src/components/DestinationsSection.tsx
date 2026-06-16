@@ -75,6 +75,15 @@ export function DestinationsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
           {topDestinations.map(([dest, destTours], i) => {
             const tour = destTours[0];
+            const coverImage = (() => {
+              if (dest === "India" && tour.cover_image === asiaCover) {
+                return (
+                  destTours.find((t) => t.cover_image && t.cover_image !== asiaCover)?.cover_image ||
+                  "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=800&q=80"
+                );
+              }
+              return tour.cover_image || "/placeholder.svg";
+            })();
             return (
               <Link
                 key={dest}
@@ -83,7 +92,7 @@ export function DestinationsSection() {
               >
                 <div className="relative overflow-hidden aspect-[4/5] mb-5">
                   <img
-                    src={tour.cover_image || "/placeholder.svg"}
+                    src={coverImage}
                     alt={dest}
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
